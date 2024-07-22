@@ -35,7 +35,7 @@ classifiers     = [
 [tool.setuptools]
 # Manual package discovery
 packages        = ["qpdnd"]
-package-dir     = { qpdnd = "pdnd" }
+package-dir     = { qpdnd = "qpdnd" }
 
 # Custom package discovery
 # [tool.setuptools.packages]
@@ -45,8 +45,8 @@ package-dir     = { qpdnd = "pdnd" }
 #
 # NB: see also: MANIFEST.in
 
-[tool.setuptools.dynamic]
-dependencies    = { file = ["requirements.txt"] }
+#[tool.setuptools.dynamic]
+#dependencies    = { file = ["requirements.txt"] }
 
 [tool.setuptools.dynamic.optional-dependencies]
 dev  = { file = ["requirements_dev.txt"] }
