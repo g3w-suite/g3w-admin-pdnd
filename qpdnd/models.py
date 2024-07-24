@@ -22,6 +22,13 @@ class QPDNDProject(models.Model):
     project = models.OneToOneField(Project, on_delete=models.CASCADE, related_name="%(app_label)s_projects")
     note = models.TextField('Note', null=True, blank=True)
 
+    def layers(self):
+        """
+        Return a list of all layers exposed
+        """
+
+        return self.qpdnd_layer.all()
+
     class Meta:
         verbose_name = 'PDND Project'
 

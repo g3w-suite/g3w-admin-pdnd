@@ -40,6 +40,8 @@ from .models import (
     QPDNDLayer
 )
 
+from .utils import allowed_layers_for_reporting
+
 
 class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
     """
@@ -82,50 +84,48 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                             )
 
 
-# class SimpleRepoLayerForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
-#     """
-#     Form for SimpleRepoLayer model.
-#     """
-#
-#     class Meta:
-#         model = SimpleRepoLayer
-#         fields = '__all__'
-#
-#     def __init__(self, *args, **kwargs):
-#
-#         self.simplereporting_project_instance = kwargs['simplereporting_project']
-#         del (kwargs['simplereporting_project'])
-#
-#         super().__init__(*args, **kwargs)
-#
-#         # build queryset for reporting vector layer
-#         self.fields['layer'].queryset = allowed_layers_for_reporting(self.simplereporting_project_instance)
-#
-#         self.initial['simplerepo_project'] = self.simplereporting_project_instance
-#
-#         self.helper = FormHelper(self)
-#         self.helper.form_tag = False
-#         self.helper.layout = Layout(
-#                                 Div(
-#                                     Div(
-#                                         Div(
-#                                             Div(
-#                                                 HTML("<h3 class='box-title'><i class='fa fa-file'></i> {}</h3>".format(
-#                                                     _('Reporting vector layer'))),
-#                                                 css_class='box-header with-border'
-#                                             ),
-#                                             Div(
-#                                                 Field('simplerepo_project', type='hidden'),
-#                                                 'layer',
-#                                                 'title',
-#                                                 Field('description', css_class='wys5'),
-#                                                 Field('note', css_class='wys5'),
-#                                                 css_class='box-body',
-#                                             ),
-#                                             css_class='box box-success'
-#                                         ),
-#                                         css_class='col-md-12'
-#                                     ),
-#                                     css_class='row'
-#                                 ),
-#                             )
+class QPDNDLayerForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
+    """
+    Form for QPDNDLayer model.
+    """
+
+    class Meta:
+        model = QPDNDLayer
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+
+        self.qpdnd_project_instance = kwargs['qpdnd_project']
+        del (kwargs['qpdnd_project'])
+
+        super().__init__(*args, **kwargs)
+
+        # build queryset for reporting vector layer
+        self.fields['layer'].queryset = allowed_layers_for_reporting(self.qpdnd_project_instance)
+
+        self.initial['qpdnd_project'] = self.qpdnd_project_instance
+
+        self.helper = FormHelper(self)
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+                                Div(
+                                    Div(
+                                        Div(
+                                            Div(
+                                                HTML("<h3 class='box-title'><i class='fa fa-file'></i> {}</h3>".format(
+                                                    _('Vector layer to expose'))),
+                                                css_class='box-header with-border'
+                                            ),
+                                            Div(
+                                                Field('qpdnd_project', type='hidden'),
+                                                'layer',
+                                                Field('note', css_class='wys5'),
+                                                css_class='box-body',
+                                            ),
+                                            css_class='box box-success'
+                                        ),
+                                        css_class='col-md-12'
+                                    ),
+                                    css_class='row'
+                                ),
+                            )

@@ -19,7 +19,11 @@ from qpdnd.views import (
     QPDNDProjectsListView,
     QPDNDProjectAddView,
     QPDNDProjectUpdateView,
-    QPDNDProjectDeleteView
+    QPDNDProjectDeleteView,
+    QPDNDLayersListView,
+    QPDNDLayerAddView,
+    QPDNDLayerUpdateView,
+    QPDNDLayerDeleteView
 )
 
 G3W_SITETREE_I18N_ALIAS.append('qprocessing')
@@ -54,28 +58,28 @@ urlpatterns = [
 
     # For reporting layer
     # -------------------
-    # path(
-    #     'projects/<int:qps_prj_pk>/layers/',
-    #     login_required(SimpleProLayersListView.as_view()),
-    #     name='simplereporting-project-layer-list'
-    # ),
-    #
-    # path(
-    #     'projects/<int:qps_prj_pk>/layers/add/',
-    #     login_required(SimpleProLayerAddView.as_view()),
-    #     name='simplereporting-project-layer-add'
-    # ),
-    #
-    # path(
-    #     'projects/<int:qps_prj_pk>/layers/update/<int:pk>/',
-    #     login_required(SimpleProLayerUpdateView.as_view()),
-    #     name='simplereporting-project-layer-update'
-    # ),
-    #
-    # path(
-    #     'projects/<int:qps_prj_pk>/layers/delete/<int:pk>/',
-    #     login_required(SimpleProLayerDeleteView.as_view()),
-    #     name='simplereporting-project-layer-delete'
-    # ),
+    path(
+        'projects/<int:qps_prj_pk>/layers/',
+        login_required(QPDNDLayersListView.as_view()),
+        name='qpdnd-project-layer-list'
+    ),
+
+    path(
+        'projects/<int:qps_prj_pk>/layers/add/',
+        login_required(QPDNDLayerAddView.as_view()),
+        name='qpdnd-project-layer-add'
+    ),
+
+    path(
+        'projects/<int:qps_prj_pk>/layers/update/<int:pk>/',
+        login_required(QPDNDLayerUpdateView.as_view()),
+        name='qpdnd-project-layer-update'
+    ),
+
+    path(
+        'projects/<int:qps_prj_pk>/layers/delete/<int:pk>/',
+        login_required(QPDNDLayerDeleteView.as_view()),
+        name='qpdnd-project-layer-delete'
+    ),
 ]
 

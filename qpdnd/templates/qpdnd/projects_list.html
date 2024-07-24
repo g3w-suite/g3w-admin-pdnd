@@ -39,9 +39,9 @@
                             <span class="col-xs-4 icon">
                                 <a href="#" data-toggle="tooltip" data-placement="top" title="{% trans 'Delete' %}"  data-widget-type="deleteItem" data-delete-url="{% url 'qpdnd-project-delete' object.pk %}" data-item-selector="#qpdnd_project_{{ object.pk }}"><i class="ion ion-trash-b"></i></a>
                             </span>
-{#                            <span class="col-xs-4 icon">#}
-{#                                <a href="{% url 'qpdnd-project-layer-list' object.id %}" data-toggle="tooltip" data-placement="top" title="{% trans 'Vector layers exposed' %}" ><i class="ion ion-android-list"></i></a>#}
-{#                            </span>#}
+                            <span class="col-xs-4 icon">
+                                <a href="{% url 'qpdnd-project-layer-list' object.id %}" data-toggle="tooltip" data-placement="top" title="{% trans 'Vector layers exposed' %}" ><i class="ion ion-android-list"></i></a>
+                            </span>
                         </td>
                         <td>
                             {% if "view_project" in userObj_perms %}
