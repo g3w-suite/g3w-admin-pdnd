@@ -25,7 +25,7 @@
                     <tr>
                         <th style="width:120px">{% trans 'Actions' %}</th>
                         <th>{% trans 'Project' %}</th>
-                        <th>{% trans 'Layers to expose as OGC Api' %}</th>
+                        <th>{% trans 'API endpoint' %}</th>
                         <th>{% trans 'Note' %}</th>
                     </tr>
                 </thead>
@@ -39,9 +39,6 @@
                             <span class="col-xs-4 icon">
                                 <a href="#" data-toggle="tooltip" data-placement="top" title="{% trans 'Delete' %}"  data-widget-type="deleteItem" data-delete-url="{% url 'qpdnd-project-delete' object.pk %}" data-item-selector="#qpdnd_project_{{ object.pk }}"><i class="ion ion-trash-b"></i></a>
                             </span>
-                            <span class="col-xs-4 icon">
-                                <a href="{% url 'qpdnd-project-layer-list' object.id %}" data-toggle="tooltip" data-placement="top" title="{% trans 'Vector layers exposed' %}" ><i class="ion ion-android-list"></i></a>
-                            </span>
                         </td>
                         <td>
                             {% if "view_project" in userObj_perms %}
@@ -53,8 +50,8 @@
                             {{ object.project }}
                         </td>
                         <td>
-                            {% if object.qpdnd_layer.all|length > 0 %}
-                                {{ object.qpdnd_layer.all|length }}
+                            {% if object.endpoint %}
+                                <a href="{% url "qpdnd-api-ogc" object.endpoint %}">{% url "qpdnd-api-ogc" object.endpoint %}</a>
                             {%  else %}
                                 <span style="color: red;">
                                 <span class="fa fa-exclamation-triangle"></span>
