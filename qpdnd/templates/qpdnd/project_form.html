@@ -5,6 +5,14 @@
 {% load i18n %}
 
 
+{% block custom_js_links_page %}
+<script>
+    ga.QPDND.init();
+    ga.QPDND.set_form_mod('insert');
+    ga.QPDND.set_project_info_url('{{ info_project_url }}');
+</script>
+{% endblock %}
+
 {% block page_header %}
     <h1>
         {% if form.instance.pk %}
@@ -19,10 +27,11 @@
 
 {% block main_content %}
 
-<form method="post" id="project-form">
+<form method="post" id="qpdnd-project-form">
     {% if form.errors %}
         <div class="row">
             <div class="col-md-12">
+                {{ info_projetc_url }}
             <div class="alert alert-danger alert-dismissable">
                 <h4><i class="icon fa fa-ban"></i> {% trans 'Alert' %}!</h4>
                     {% trans 'Some errors on form. Check it and send again.' %}

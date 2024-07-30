@@ -11,3 +11,4 @@ class QpdndConfig(AppConfig):
         # apps can load additional filters and services by
         # registering them directly to QGS_SERVER
         from . import server_filters
+        from . import receivers

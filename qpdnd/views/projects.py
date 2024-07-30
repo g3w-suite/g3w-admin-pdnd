@@ -38,7 +38,17 @@ class QPDNDProjectsListView(ListView):
         return super().dispatch(*args, **kwargs)
 
 
-class QPDNDProjectAddView(G3WRequestViewMixin, CreateView):
+class QPDNDProjectMixin(object):
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['info_project_url'] = '/qpdnd/api/infoproject/'
+
+        ctx['form_state'] = 'insert' if isinstance(self, CreateView) else 'update'
+        return ctx
+
+
+class QPDNDProjectAddView(QPDNDProjectMixin, G3WRequestViewMixin, CreateView):
     """
     Create view for QPDNDProject instance.
     """
@@ -49,9 +59,8 @@ class QPDNDProjectAddView(G3WRequestViewMixin, CreateView):
     @method_decorator(permission_required('qpdnd.add_qpdndproject', return_403=True))
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
-    
 
-class QPDNDProjectUpdateView(G3WRequestViewMixin, UpdateView):
+class QPDNDProjectUpdateView(QPDNDProjectMixin, G3WRequestViewMixin, UpdateView):
     """
     Update view for QPDNDProject model instance
     """
