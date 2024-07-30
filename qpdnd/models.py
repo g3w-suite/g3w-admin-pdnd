@@ -25,7 +25,28 @@ class QPDNDProject(models.Model):
                                 help_text=_('Select API endpoint for PDND layer. must be unique'),
                                 unique=True, default='')
 
+    version = models.CharField(max_length=255, null=True, blank=False,
+                               help_text=_('Indicate a version for the API to expose. I.e.: 1.0.0'),
+                               default='1.0.0')
+
+    terms_of_service = models.URLField(max_length=255, null=True, blank=False,
+                               help_text=_('Set an url where to find the terms fo service. '
+                                           'I.e.: https://smartbear.com/terms-of-use/'))
+
+    contact_author = models.CharField(max_length=400, null=True, blank=False, help_text=_('Author of the service'))
+    contact_email = models.EmailField(max_length=400, null=True, blank=False, help_text=_('Email reference'))
+    contact_url = models.URLField(max_length=1000, null=True, blank=True, help_text=_('Contact URL reference'))
+
+    title = models.CharField(max_length=400, null=True, blank=False, help_text=_('Title of the service'))
+    description = models.TextField(null=True, blank=True, help_text=_('Description of the project'))
+
+    x_summary = models.CharField(max_length=400, null=True, blank=False,
+                                 help_text=_('Used to specify a brief, one-liner description of your API: '
+                                             'this is very useful for catalog purposes (eg. this can be shown as your '
+                                             'API subtitle in catalogs and developer portals)'))
+
     note = models.TextField('Note', null=True, blank=True)
+
 
     def layers(self):
         """
@@ -42,3 +63,12 @@ class QPDNDProject(models.Model):
         verbose_name = 'PDND Project'
 
 
+class License(models.Model):
+    """
+    Model contain information about licenses
+    """
+
+    key = models.CharField(max_length=255, null=False, blank=False)
+    name = models.CharField(max_length=400, null=False, blank=False)
+    spdx_id = models.CharField(max_length=255, null=False, blank=False)
+    url = models.URLField(max_length=1000, null=False, blank=False)

@@ -10,32 +10,22 @@ __author__ = 'lorenzetti@gis3w.it'
 __copyright__ = 'Copyright Gis3w'
 
 
-from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
-from django.forms import (
-    CharField,
-    HiddenInput
-)
 from django.utils.translation import gettext_lazy as _
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import (
     Layout,
     Div,
     HTML,
-    Row,
     Field,
-    Hidden
 )
-from usersmanage.utils import (
-    crispyBoxACL,
-    userHasGroups
-)
-from usersmanage.configs import G3W_EDITOR1
 from core.mixins.forms import (
     G3WRequestFormMixin,
     G3WFormMixin
 )
 from .models import QPDNDProject
+import re
 
 
 class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
@@ -52,6 +42,8 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
         fields = [
             Field('project', css_class='select2'),
             'endpoint',
+            'version',
+            'terms_of_service',
             Field('note', css_class='wys5')
         ]
 
@@ -77,3 +69,13 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                                     css_class='row'
                                 ),
                             )
+
+
+    def clean_version(self, *args, **kwargs):
+        version = self.cleaned_data['version']
+        pattern = r'^\d+\.\d+\.\d+(-[a-zA-Z]+[0-9]*)?$'
+
+        if re.match(pattern, version):
+            return version
+        else:
+            raise ValidationError(_("Is not a valid version format!"))

@@ -51,7 +51,12 @@
                         </td>
                         <td>
                             {% if object.endpoint %}
-                                <a href="{% url "qpdnd-api-ogc" object.endpoint %}">{% url "qpdnd-api-ogc" object.endpoint %}</a>
+                                <ul>
+                                <li><a href="{% url "qpdnd-api-ogc" object.endpoint %}" target="_blank">{% trans "Landing page" %}</a></li>
+                                <li><a href="{% url "qpdnd-api-ogc" object.endpoint %}/api.openapi3" target="_blank">{% trans "OpenAPI schema" %}</a> | 
+                                    <a href="{% url "qpdnd-api-ogc" object.endpoint %}/api.openapi3?download=1" target="_blank">{% trans "Download" %}</a>
+                                </li>
+                                </ul>
                             {%  else %}
                                 <span style="color: red;">
                                 <span class="fa fa-exclamation-triangle"></span>
