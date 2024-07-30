@@ -12,7 +12,10 @@ __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
 from django.urls import path, re_path
-from .api.views import QPDNDAPIOgcView
+from .api.views import (
+    QPDNDAPIOgcView,
+    QPDNDInfoProjectAPIView
+)
 
 BASE_URLS = 'qpdnd'
 
@@ -22,4 +25,10 @@ urlpatterns = [
         QPDNDAPIOgcView.as_view(),
         name='qpdnd-api-ogc'
     ),
+
+    path('api/infoproject/<int:project_id>',
+         QPDNDInfoProjectAPIView.as_view(),
+         name='qpdnd-api-prj-info'
+    )
+
 ]

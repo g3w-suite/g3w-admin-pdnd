@@ -16,6 +16,20 @@ from django.core.exceptions import ValidationError
 from qdjango.models import Project, Layer
 
 
+class License(models.Model):
+    """
+    Model contain information about licenses
+    """
+
+    key = models.CharField(max_length=255, null=False, blank=False)
+    name = models.CharField(max_length=400, null=False, blank=False)
+    spdx_id = models.CharField(max_length=255, null=False, blank=False)
+    url = models.URLField(max_length=1000, null=False, blank=False)
+    node_id = models.CharField(max_length=1000, null=True, blank=False)
+
+    def __str__(self):
+        return self.name
+
 class QPDNDProject(models.Model):
     """ Projects to expose """
 
@@ -45,6 +59,8 @@ class QPDNDProject(models.Model):
                                              'this is very useful for catalog purposes (eg. this can be shown as your '
                                              'API subtitle in catalogs and developer portals)'))
 
+    license = models.ForeignKey(License, on_delete=models.SET_NULL, null=True, blank=True)
+
     note = models.TextField('Note', null=True, blank=True)
 
 
@@ -61,14 +77,3 @@ class QPDNDProject(models.Model):
 
     class Meta:
         verbose_name = 'PDND Project'
-
-
-class License(models.Model):
-    """
-    Model contain information about licenses
-    """
-
-    key = models.CharField(max_length=255, null=False, blank=False)
-    name = models.CharField(max_length=400, null=False, blank=False)
-    spdx_id = models.CharField(max_length=255, null=False, blank=False)
-    url = models.URLField(max_length=1000, null=False, blank=False)

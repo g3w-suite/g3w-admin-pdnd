@@ -1,3 +1,17 @@
 from django.contrib import admin
+from qpdnd.models import (
+    QPDNDProject,
+    License
+)
 
-# Register your models here.
+@admin.register(QPDNDProject)
+class QPDNDProjectAdmin(admin.ModelAdmin):
+   list_display = [
+       'project',
+       'endpoint'
+   ]
+
+
+@admin.register(License)
+class LicenseAdmin(admin.ModelAdmin):
+   pass

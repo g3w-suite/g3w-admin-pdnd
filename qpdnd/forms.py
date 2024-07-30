@@ -41,8 +41,18 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
 
         fields = [
             Field('project', css_class='select2'),
+        ]
+
+        fields_info_data = [
             'endpoint',
             'version',
+            'contact_author',
+            'contact_email',
+            'contact_url',
+            'title',
+            'description',
+            'x_summary',
+            Field('license', css_class='select2'),
             'terms_of_service',
             Field('note', css_class='wys5')
         ]
@@ -68,6 +78,24 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                                     ),
                                     css_class='row'
                                 ),
+                                    Div(
+                                        Div(
+                                            Div(
+                                                Div(
+                                                    HTML("<h3 class='box-title'><i class='fa fa-file'></i> {}</h3>".format(
+                                                        _('Info data'))),
+                                                    css_class='box-header with-border'
+                                                ),
+                                                Div(
+                                                    *fields_info_data,
+                                                    css_class='box-body',
+                                                ),
+                                                css_class='box box-success'
+                                            ),
+                                            css_class='col-md-12'
+                                        ),
+                                        css_class='row'
+                                    ),
                             )
 
 

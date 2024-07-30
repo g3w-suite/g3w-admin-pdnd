@@ -15,10 +15,15 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.urls import reverse
+from rest_framework.response import Response
 from OWS.views import OWSView, OWSREQUESTHANDLER_CLASSES
 from qdjango.ows import OWSRequestHandler
+from qdjango.models import Project
+from core.api.base.views import G3WAPIView
 from qpdnd.models import QPDNDProject
 from qpdnd.utils import QPDNDAdapter
+
+from qgis.server import QgsServerProjectUtils
 
 from django.test import Client
 import json
@@ -100,21 +105,30 @@ class QPDNDAPIOgcView(OWSView):
             return self._make_problem_json_response(str(e), 500)
 
 
+class QPDNDInfoProjectAPIView(G3WAPIView):
 
+    # TODO: add permission class for project grant
+    #permission_classes =
 
+    def get(self, request, *args, **kwargs):
 
-# class QPDNDAPIOgcView(G3WAPIView):
-#     """
-#     Works as wrapper for G3W-SUITE OWS /wf3 service
-#     """
-#
-#     def get(self, request, *args, **kwargs):
-#
-#         client = Client()
-#         user = User.objects.filter(is_superuser=True).first()
-#         client._login(user, 'django.contrib.auth.backends.ModelBackend')
-#         response = client.get('/ows/68/qdjango/336/wfs3/collections/buildings/items.json')
-#
-#
-#
-#         return Response(json.loads(response.content))
+        prj = Project.objects.get(pk=kwargs['project_id'])
+        qprj = prj.qgis_project
+
+        toret = {}
+        # Get OCG Server capabilitites properties:
+        for service_property in [
+            'Title',
+            'Abstract',
+            'OnlineResource',
+            'ContactMail',
+            'ContactPerson',
+
+        ]:
+            toret.update({
+              service_property: getattr(
+                QgsServerProjectUtils, f'owsService{service_property}')(qprj)
+            })
+
+        self.results.results.update(toret)
+        return Response(self.results.results)
