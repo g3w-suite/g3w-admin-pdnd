@@ -254,8 +254,10 @@ class QPDNDAdapter():
             'url': self.qdnd_project.license.url
         })
 
-        # TODO: fix x-api-id: 00000000-0000-0000-0000-000000000000
+        self._update_structure('#/info', {
+            'x-api-id': self.qdnd_project.x_api_id,
 
+        })
 
     def update_response(self):
         """

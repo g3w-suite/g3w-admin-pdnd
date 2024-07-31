@@ -14,7 +14,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from qdjango.models import Project, Layer
-
+import uuid
 
 class License(models.Model):
     """
@@ -61,8 +61,9 @@ class QPDNDProject(models.Model):
 
     license = models.ForeignKey(License, on_delete=models.SET_NULL, null=True, blank=True)
 
-    note = models.TextField('Note', null=True, blank=True)
+    x_api_id = models.CharField(max_length=36, null=True, blank=True)
 
+    note = models.TextField('Note', null=True, blank=True)
 
     def layers(self):
         """
@@ -71,7 +72,19 @@ class QPDNDProject(models.Model):
 
         return self.qpdnd_layer.all()
 
+    def save(self, *args, **kwargs):
 
+        # If is in adding state create a new uuid for x_api_d
+        if self._state.adding:
+            self.x_api_id = uuid.uuid4()
+        else:
+            current_instance = QPDNDProject.objects.get(pk=self.pk)
+            if not current_instance.x_api_id:
+                self.x_api_id = uuid.uuid4()
+            else:
+                self.x_api_id = current_instance.x_api_id
+
+        super().save(*args, **kwargs)
 
     # TODO: add check i WFS service is active
 

@@ -32,6 +32,7 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
     """
     Form for QPDNDProject model.
     """
+
     class Meta:
         model = QPDNDProject
         fields = '__all__'
@@ -54,7 +55,7 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
             'x_summary',
             Field('license', css_class='select2'),
             'terms_of_service',
-            Field('note', css_class='wys5')
+            Field('note', css_class='wys5'),
         ]
 
         self.helper = FormHelper(self)
