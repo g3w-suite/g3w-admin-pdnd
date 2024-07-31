@@ -214,10 +214,9 @@ class QPDNDAdapter():
         Fix italian guidelines extended requirements for `info` section
         """
 
-        # Todo: find  to get x-summary
         # Fix #/info/x-summary
         self._update_structure('#/info', {
-            'x-summary': 'test'
+            'x-summary': self.qdnd_project.x_summary
         })
 
         # Fix #/info/version
@@ -229,6 +228,34 @@ class QPDNDAdapter():
         self._update_structure('#/info', {
             'termsOfService': self.qdnd_project.terms_of_service
         })
+
+        self._update_structure('#/info', {
+            'title': self.qdnd_project.title
+        })
+
+        self._update_structure('#/info', {
+            'description': self.qdnd_project.description
+        })
+
+        self._update_structure('#/info/contact', {
+            'name': self.qdnd_project.contact_author
+        })
+
+        self._update_structure('#/info/contact', {
+            'email': self.qdnd_project.contact_email
+        })
+
+        self._update_structure('#/info/contact', {
+            'url': self.qdnd_project.contact_url
+        })
+
+        self._update_structure('#/info/license', {
+            'name': self.qdnd_project.license.name,
+            'url': self.qdnd_project.license.url
+        })
+
+        # TODO: fix x-api-id: 00000000-0000-0000-0000-000000000000
+
 
     def update_response(self):
         """
