@@ -99,7 +99,6 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                                     ),
                             )
 
-
     def clean_version(self, *args, **kwargs):
         version = self.cleaned_data['version']
         pattern = r'^\d+\.\d+\.\d+(-[a-zA-Z]+[0-9]*)?$'
@@ -108,3 +107,18 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
             return version
         else:
             raise ValidationError(_("Is not a valid version format!"))
+
+    def clean_project(self):
+        """
+        Check if WFS for almost one layer is active
+        """
+
+        prj = self.cleaned_data['project']
+        wfs_active = False
+        for l in prj.layer_set.all():
+            if l.wfscapabilities:
+                wfs_active = True
+
+        if not wfs_active:
+            raise ValidationError(_("The project must have almost one vector layer exposed as WFS service!"))
+        return prj
