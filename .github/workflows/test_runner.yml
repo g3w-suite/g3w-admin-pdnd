@@ -18,7 +18,7 @@ jobs:
       with:
         path: 'qpdnd'
 
-    - name: Move IRPI_UP inside G3W-ADMIN
+    - name: Move QPDND inside G3W-ADMIN
       run: mv qpdnd/qpdnd g3w-admin/ && echo "$(ls -lh g3w-admin/qpdnd)"
 
     - name: Starting Docker compose
