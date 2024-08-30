@@ -16,10 +16,10 @@ jobs:
 
     - uses: actions/checkout@v4
       with:
-        path: 'irpi_up'
+        path: 'qpdnd'
 
     - name: Move IRPI_UP inside G3W-ADMIN
-      run: mv irpi_up/irpi_up g3w-admin/ && echo "$(ls -lh g3w-admin/irpi_up)"
+      run: mv qpdnd/qpdnd g3w-admin/ && echo "$(ls -lh g3w-admin/qpdnd)"
 
     - name: Starting Docker compose
       run: docker compose -f docker-compose.ltr.yml up -d
