@@ -159,7 +159,19 @@ class QPDNDAdapter():
                 if 'text/html' in def_res['content']:
                     del (def_res['content']['text/html'])
 
+                # Fix parameters for integer|float
+                if 'parameters' in dpath['get']:
+                    for param in dpath['get']['parameters']:
+                        if 'schema' in param:
+                            if 'type' in param['schema'] and param['schema']['type'] in ('integer', 'numeric'):
+                                param['schema'].update({
+                                    'format': 'int32' if param['schema']['type'] == 'integer' else 'float',
+                                })
+
+
+            # ---------------------------------------------------
             # Delete other http methods: post, put, patch, delete
+            # ---------------------------------------------------
             for m in ('post', 'put', 'patch', 'delete'):
                 if m in dpath:
                     del (dpath[m])

@@ -22,7 +22,7 @@ from qpdnd.views import (
     QPDNDProjectDeleteView
 )
 
-G3W_SITETREE_I18N_ALIAS.append('qprocessing')
+G3W_SITETREE_I18N_ALIAS.append('qpdnd')
 
 urlpatterns = [
 
