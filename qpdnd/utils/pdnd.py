@@ -163,7 +163,7 @@ class QPDNDAdapter():
                 if 'parameters' in dpath['get']:
                     for param in dpath['get']['parameters']:
                         if 'schema' in param:
-                            if 'type' in param['schema'] and param['schema']['type'] in ('integer', 'numeric'):
+                            if 'type' in param['schema'] and param['schema']['type'] in ('integer', 'numeric', 'number'):
                                 param['schema'].update({
                                     'format': 'int32' if param['schema']['type'] == 'integer' else 'float',
                                 })
