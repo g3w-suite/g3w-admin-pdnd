@@ -1,5 +1,6 @@
 # G3W-ADMIN-PDND
 
+[![IRPI_UP CI tests](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/test_runner.yml/badge.svg)](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/test_runner.yml)
 
 ## Installation
 
