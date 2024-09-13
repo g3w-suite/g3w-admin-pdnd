@@ -2,6 +2,9 @@
 
 [![IRPI_UP CI tests](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/test_runner.yml/badge.svg)](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/test_runner.yml)
 
+A [G3W-SUITE](https://github.com/g3w-suite) plugin for [**Piattaforma Digitale Nazionale Dati**](https://innovazione.gov.it/progetti/dati-e-interoperabilita/).
+
+
 ## Installation
 
 Install *qpdnd* module into [`g3w-admin`](https://github.com/g3w-suite/g3w-admin/tree/v.3.6.x/g3w-admin) applications folder:

@@ -86,7 +86,5 @@ class QPDNDProject(models.Model):
 
         super().save(*args, **kwargs)
 
-    # TODO: add check i WFS service is active
-
     class Meta:
         verbose_name = 'PDND Project'
