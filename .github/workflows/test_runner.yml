@@ -52,9 +52,9 @@ jobs:
       run: |
         docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "wait-for-it -h localhost -p 8000 -t 240"
 
-#    - name:  Running QPDND tests
-#      run: |
-#        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/g3w-admin && python3 manage.py test qpdnd"
+    - name:  Running QPDND tests
+      run: |
+        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/g3w-admin && python3 manage.py test qpdnd"
 
     - name: Setup tmate session
       if: ${{ failure() }}
