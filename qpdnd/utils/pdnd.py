@@ -284,7 +284,10 @@ class QPDNDAdapter():
         """
         Set `Content-Disposition` for download of OpenAPI schema
         """
-        self.response.headers['Content-Disposition'] = 'attachment; filename="api.openapi3.json"'
+
+        # Build name: add endpoint
+        filename = f'{self.qdnd_project.endpoint}.api.openapi3.json'
+        self.response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
 
 
 

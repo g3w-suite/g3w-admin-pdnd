@@ -37,6 +37,9 @@ class QDPNDOWSRequestHandler(OWSRequestHandler):
 
 
 class QPDNDAPIOgcView(OWSView):
+    """
+    A wrapper view for QGIS server OCG WFS3 endpoint.
+    """
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -75,6 +78,13 @@ class QPDNDAPIOgcView(OWSView):
         try:
 
             # Management fo `/status` response
+            # https://italia.github.io/api-oas-checker/rulesets/spectral-modi.html
+            # 'paths-status'
+            # You must define a /status path that can be used to health-check the API. Using this path avoids the
+            # arbitrary usage of a server URL for health-check scope.
+            # The /status endpoint should return a application/problem+json response containing a successful status code
+            # if the service is working correctly.
+            # The service provider is free to define the implementation logic for this path.
             if '/wfs3/status' in request.path:
                 return self._make_problem_json_response('', status_code=200, status='OK')
 
