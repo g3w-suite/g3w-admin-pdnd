@@ -1,0 +1,35 @@
+{
+    "links": [
+        {
+            "href": "http://testserver/qpdnd/api/ogc/point/wfs3.json?",
+            "rel": "self",
+            "title": "Landing page as JSON",
+            "type": "application/json"
+        },
+        {
+            "href": "http://testserver/qpdnd/api/ogc/point/wfs3.html?",
+            "rel": "alternate",
+            "title": "Landing page as HTML",
+            "type": "text/html"
+        },
+        {
+            "href": "http://testserver/qpdnd/api/ogc/point/wfs3/collections?",
+            "rel": "data",
+            "title": "Feature collections",
+            "type": "application/json"
+        },
+        {
+            "href": "http://testserver/qpdnd/api/ogc/point/wfs3/conformance?",
+            "rel": "conformance",
+            "title": "Conformance classes",
+            "type": "application/json"
+        },
+        {
+            "href": "http://testserver/qpdnd/api/ogc/point/wfs3/api?",
+            "rel": "service-desc",
+            "title": "API description",
+            "type": "application/vnd.oai.openapi+json;version=3.0"
+        }
+    ],
+    "timeStamp": "2024-09-17T07:35:56Z"
+}

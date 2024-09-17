@@ -41,6 +41,9 @@ class QPDNDAPIOgcView(OWSView):
     A wrapper view for QGIS server OCG WFS3 endpoint.
     """
 
+
+
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
 

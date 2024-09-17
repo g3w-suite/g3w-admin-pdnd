@@ -19,7 +19,7 @@ import copy
 
 class TestQPDNDForms(TestQPDNDBase):
     """
-    Test irpi_up forms module
+    Test QPDND forms module
     """
 
     @classmethod

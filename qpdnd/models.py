@@ -76,13 +76,15 @@ class QPDNDProject(models.Model):
 
         # If is in adding state create a new uuid for x_api_d
         if self._state.adding:
-            self.x_api_id = uuid.uuid4()
+            if not self.x_api_id:
+                self.x_api_id = str(uuid.uuid4())
         else:
-            current_instance = QPDNDProject.objects.get(pk=self.pk)
-            if not current_instance.x_api_id:
-                self.x_api_id = uuid.uuid4()
-            else:
-                self.x_api_id = current_instance.x_api_id
+            if not self.x_api_id:
+                current_instance = QPDNDProject.objects.get(pk=self.pk)
+                if not current_instance.x_api_id:
+                    self.x_api_id = str(uuid.uuid4())
+                else:
+                    self.x_api_id = current_instance.x_api_id
 
         super().save(*args, **kwargs)
 
