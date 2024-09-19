@@ -48,21 +48,10 @@ class TestQPDNDModels(TestQPDNDBase):
         # Test set a custom x_api_id
         # --------------------------
         # Create instance
-        data = {
-            'project': self.project.instance,
-            'endpoint': 'point',
-            'version': '1.0.0',
-            'terms_of_service': 'https://smartbear.com/terms-of-use/',
-            'contact_author': 'Walter Lorenzetti',
-            'contact_email': 'lorenzetti@gis3w.it',
-            'contact_url': 'https://g3wsuite.it',
-            'title': 'Title of service test model',
-            'x_summary': 'Brief description',
-            'license': License.objects.get(pk=2),
+        qpdnd_project = self.create_qpnd_project(udata={
             'x_api_id': 'test_code_api_id'
-        }
+        })
 
-        qpdnd_project = QPDNDProject.objects.create(**data)
         self.assertTrue(qpdnd_project.pk is not None)
 
         self.assertEqual('test_code_api_id', qpdnd_project.x_api_id)
