@@ -14,14 +14,14 @@ __license__ = 'MPL 2.0'
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from django.urls import reverse
 from rest_framework.response import Response
-from OWS.views import OWSView, OWSREQUESTHANDLER_CLASSES
+from OWS.views import OWSView
 from qdjango.ows import OWSRequestHandler
 from qdjango.models import Project
 from core.api.base.views import G3WAPIView
 from qpdnd.models import QPDNDProject
 from qpdnd.utils import QPDNDAdapter
+from .permissions import ProjectEditPermission
 
 from qgis.server import QgsServerProjectUtils
 
@@ -120,8 +120,9 @@ class QPDNDAPIOgcView(OWSView):
 
 class QPDNDInfoProjectAPIView(G3WAPIView):
 
-    # TODO: add permission class for project grant
-    #permission_classes =
+    permission_classes = [
+        ProjectEditPermission
+    ]
 
     def get(self, request, *args, **kwargs):
 

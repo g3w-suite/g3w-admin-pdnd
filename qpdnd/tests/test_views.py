@@ -11,6 +11,7 @@ __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 
 from .base import (
     TestQPDNDBase,
@@ -179,8 +180,31 @@ class TestQPDNDViews(TestQPDNDBase):
 
         url = reverse('qpdnd-api-prj-info', args=[self.project.instance.pk])
 
+        # Test not login user
+        # -------------------
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Test user logged without permission
+        # -----------------------------------
+        self.client.login(username=self.test_editor1.username, password=self.test_editor1.username)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Test user logged with permission
+        # --------------------------------
+        assign_perm('change_project', self.test_editor1, self.project.instance)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+        self.client.logout()
+
+        # Test as admin01
+        # ---------------
+        self.client.login(username=self.test_admin1.username, password=self.test_admin1.username)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
         self.assertEqual(response.headers['Content-Type'], 'application/json')
 
         to_compare = os.path.join(CURRENT_PATH, TEST_BASE_PATH, 'projectinfo/response.json')
@@ -189,6 +213,8 @@ class TestQPDNDViews(TestQPDNDBase):
 
         to_compare_dict = json.loads(to_compare_json)
         self.assertEqual(to_compare_dict, json.loads(response.content))
+
+        self.client.logout()
 
 
 
