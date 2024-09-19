@@ -16,6 +16,7 @@ from django.core.files import File
 from core.models import G3WSpatialRefSys, Group as CoreGroup
 from usersmanage.tests.utils import setup_testing_user
 from qdjango.utils.data import QgisProject
+from qpdnd.models import QPDNDProject, License
 import os
 
 
@@ -79,3 +80,50 @@ class TestQPDNDBase(TestCase):
         cls.project_no_wfs.title = 'OGC API test project NO WFS ACTIVED'
         cls.project_no_wfs.group = cls.project_group
         cls.project_no_wfs.save()
+
+    def create_form_data(self, uform_data: dict={})-> dict:
+        """
+        Create form data for forms and views tests
+        """
+
+        form_data = {
+            'project': self.project.instance,
+            'endpoint': 'point',
+            'version': '1.0.0',
+            'terms_of_service': 'https://smartbear.com/terms-of-use/',
+            'contact_author': 'Walter Lorenzetti',
+            'contact_email': 'lorenzetti@gis3w.it',
+            'contact_url': 'https://gis3w.it',
+            'title': 'Title of service',
+            'x_summary': 'Brief description',
+            'license': '1'
+
+        }
+
+        form_data.update(uform_data)
+
+        return form_data
+
+    def create_qpnd_project(self, udata: dict={}) -> QPDNDProject:
+        """
+        Create qpdndproject instance
+        """
+
+        # Create instance
+        data = {
+            'project': self.project.instance,
+            'endpoint': 'point',
+            'version': '1.0.0',
+            'terms_of_service': 'https://smartbear.com/terms-of-use/',
+            'contact_author': 'Walter Lorenzetti',
+            'contact_email': 'lorenzetti@gis3w.it',
+            'contact_url': 'https://gis3w.it',
+            'title': 'Title of service',
+            'x_summary': 'Brief description',
+            'license': License.objects.get(pk=3),
+            'x_api_id': '0bb5b19c-11e5-4f31-b8a2-6269822b29cc'
+        }
+
+        data.update(udata)
+
+        return QPDNDProject.objects.create(**data)

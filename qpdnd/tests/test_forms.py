@@ -34,19 +34,7 @@ class TestQPDNDForms(TestQPDNDBase):
 
         # Test Create
         # -----------
-        form_data = {
-            'project': self.project.instance,
-            'endpoint': 'point',
-            'version': '1.0.0',
-            'terms_of_service': 'https://smartbear.com/terms-of-use/',
-            'contact_author': 'Walter Lorenzetti',
-            'contact_email': 'lorenzetti@gis3w.it',
-            'contact_url': 'https://gis3w.it',
-            'title': 'Title of service',
-            'x_summary': 'Brief description',
-            'license': '1'
-
-        }
+        form_data = self.create_form_data()
 
         form = QPDNDProjectForm(request=self.request, data=form_data)
         self.assertTrue(form.is_valid())

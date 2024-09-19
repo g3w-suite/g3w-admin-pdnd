@@ -46,18 +46,11 @@ class TestQPDNDViews(TestQPDNDBase):
 
         self.client.login(username=self.test_admin1.username, password=self.test_admin1.username)
 
-        data = {
+        data = self.create_form_data(uform_data={
             'project': self.project.instance.pk,
-            'endpoint': 'point',
-            'version': '1.0.0',
-            'terms_of_service': 'https://smartbear.com/terms-of-use/',
-            'contact_author': 'Walter Lorenzetti',
-            'contact_email': 'lorenzetti@gis3w.it',
-            'contact_url': 'https://gis3w.it',
-            'title': 'Title of service',
-            'x_summary': 'Brief description',
             'license': '2'
-        }
+        })
+
         res = self.client.post(url, data=data)
 
         # Check redirect after save to page list
@@ -97,21 +90,7 @@ class TestQPDNDViews(TestQPDNDBase):
         """
 
         # Create instance
-        data = {
-            'project': self.project.instance,
-            'endpoint': 'point',
-            'version': '1.0.0',
-            'terms_of_service': 'https://smartbear.com/terms-of-use/',
-            'contact_author': 'Walter Lorenzetti',
-            'contact_email': 'lorenzetti@gis3w.it',
-            'contact_url': 'https://gis3w.it',
-            'title': 'Title of service',
-            'x_summary': 'Brief description',
-            'license': License.objects.get(pk=3),
-            'x_api_id': '0bb5b19c-11e5-4f31-b8a2-6269822b29cc'
-        }
-
-        qpdnd_project = QPDNDProject.objects.create(**data)
+        qpdnd_project = self.create_qpnd_project()
         self.assertTrue(qpdnd_project.pk is not None)
 
         # To avoid auto generation of z_api_id
@@ -130,6 +109,8 @@ class TestQPDNDViews(TestQPDNDBase):
         #-----------------
         response = self.client.get(f'{url}')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+
         to_compare = os.path.join(CURRENT_PATH, TEST_BASE_PATH, 'openapi/open.api.landingpage.json')
         with open(to_compare, 'r') as f:
             to_compare_json = f.read()
@@ -141,6 +122,8 @@ class TestQPDNDViews(TestQPDNDBase):
         # /api.openapi3
         # -------------
         response = self.client.get(f'{url}/api.openapi3')
+        self.assertEqual(response.headers['Content-Type'], 'application/vnd.oai.openapi+json;version=3.0')
+
         to_compare = os.path.join(CURRENT_PATH, TEST_BASE_PATH, 'openapi/open.api.schema.json')
         with open(to_compare, 'r') as f:
             to_compare_json = f.read()
@@ -151,6 +134,46 @@ class TestQPDNDViews(TestQPDNDBase):
 
         self.client.logout()
 
+    def test_download_openapi_schema(self):
+        """
+        Test download view for openapi schema
+        """
+
+        # Create instance
+        qpdnd_project = self.create_qpnd_project()
+        self.assertTrue(qpdnd_project.pk is not None)
+
+        url = reverse('qpdnd-api-ogc', args=[qpdnd_project.endpoint])
+        self.client.login(username=self.test_admin1.username, password=self.test_admin1.username)
+
+        response = self.client.get(f'{url}/api.openapi3')
+        self.assertFalse('Content-Disposition' in response.headers)
+
+        response = self.client.get(f'{url}/api.openapi3?download=0')
+        self.assertFalse('Content-Disposition' in response.headers)
+
+        response = self.client.get(f'{url}/api.openapi3?download=1')
+        self.assertTrue('Content-Disposition' in response.headers)
+        self.assertEqual(response.headers['Content-Disposition'], f'attachment; filename="{qpdnd_project.endpoint}.api.openapi3.json"')
+        self.assertEqual(response.headers['Content-Type'], 'application/vnd.oai.openapi+json;version=3.0')
+
+        to_compare = os.path.join(CURRENT_PATH, TEST_BASE_PATH, 'openapi/open.api.schema.json')
+        with open(to_compare, 'r') as f:
+            to_compare_json = f.read()
+
+        to_compare_dict = json.loads(to_compare_json)
+        self.assertEqual(to_compare_dict, json.loads(response.content))
+
+        # Download only for /api.openapi3
+        response = self.client.get(f'{url}')
+        self.assertFalse('Content-Disposition' in response.headers)
+
+        self.client.logout()
+
+    def test_projectinfo_api(self):
+        """
+        Test project info api
+        """
 
 
 
