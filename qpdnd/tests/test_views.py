@@ -11,7 +11,6 @@ __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
 from django.urls import reverse
-from gdown.download import indent
 
 from .base import (
     TestQPDNDBase,
