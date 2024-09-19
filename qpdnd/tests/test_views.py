@@ -175,6 +175,23 @@ class TestQPDNDViews(TestQPDNDBase):
         Test project info api
         """
 
+        # TODO: add test for permissions
+
+        url = reverse('qpdnd-api-prj-info', args=[self.project.instance.pk])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+
+        to_compare = os.path.join(CURRENT_PATH, TEST_BASE_PATH, 'projectinfo/response.json')
+        with open(to_compare, 'r') as f:
+            to_compare_json = f.read()
+
+        to_compare_dict = json.loads(to_compare_json)
+        self.assertEqual(to_compare_dict, json.loads(response.content))
+
+
+
 
 
 
