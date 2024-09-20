@@ -45,8 +45,8 @@ package-dir     = { qpdnd = "qpdnd" }
 #
 # NB: see also: MANIFEST.in
 
-#[tool.setuptools.dynamic]
-#dependencies    = { file = ["requirements.txt"] }
+[tool.setuptools.dynamic]
+dependencies    = { file = ["requirements.txt"] }
 
 [tool.setuptools.dynamic.optional-dependencies]
 dev  = { file = ["requirements_dev.txt"] }

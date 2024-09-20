@@ -41,6 +41,8 @@ class TestQPDNDForms(TestQPDNDBase):
         form.save()
 
         iu_proj = QPDNDProject.objects.get(project=self.project.instance)
+        self.assertEqual(iu_proj.pdnd_env, 'test')
+        self.assertEqual(iu_proj.pdnd_audience, 'test_audience')
 
         # Test Update
         # -----------

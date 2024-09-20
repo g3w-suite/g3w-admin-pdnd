@@ -58,6 +58,11 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
             Field('note', css_class='wys5'),
         ]
 
+        fields_pdnd = [
+            Field('pdnd_env', css_class='select2'),
+            'pdnd_audience'
+        ]
+
         self.helper = FormHelper(self)
         self.helper.form_tag = False
         self.helper.layout = Layout(
@@ -89,6 +94,24 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                                                 ),
                                                 Div(
                                                     *fields_info_data,
+                                                    css_class='box-body',
+                                                ),
+                                                css_class='box box-success'
+                                            ),
+                                            css_class='col-md-12'
+                                        ),
+                                        css_class='row'
+                                    ),
+                                    Div(
+                                        Div(
+                                            Div(
+                                                Div(
+                                                    HTML("<h3 class='box-title'><i class='fa fa-file'></i> {}</h3>".format(
+                                                        _('PDND data'))),
+                                                    css_class='box-header with-border'
+                                                ),
+                                                Div(
+                                                    *fields_pdnd,
                                                     css_class='box-body',
                                                 ),
                                                 css_class='box box-success'

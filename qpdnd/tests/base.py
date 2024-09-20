@@ -96,7 +96,9 @@ class TestQPDNDBase(TestCase):
             'contact_url': 'https://gis3w.it',
             'title': 'Title of service',
             'x_summary': 'Brief description',
-            'license': '1'
+            'license': '1',
+            'pdnd_env': 'test',
+            'pdnd_audience': 'test_audience'
 
         }
 
@@ -121,7 +123,9 @@ class TestQPDNDBase(TestCase):
             'title': 'Title of service',
             'x_summary': 'Brief description',
             'license': License.objects.get(pk=3),
-            'x_api_id': '0bb5b19c-11e5-4f31-b8a2-6269822b29cc'
+            'x_api_id': '0bb5b19c-11e5-4f31-b8a2-6269822b29cc',
+            'pdnd_env': 'test',
+            'pdnd_audience': 'test_audince'
         }
 
         data.update(udata)

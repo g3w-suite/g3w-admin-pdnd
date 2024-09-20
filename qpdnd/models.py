@@ -67,10 +67,10 @@ class QPDNDProject(models.Model):
 
     license = models.ForeignKey(License, on_delete=models.SET_NULL, null=True, blank=True)
 
-    qpdnd_env = models.CharField(max_length=4, null=True, blank=False, choices=ENV_TYPE, default='test',
+    pdnd_env = models.CharField(max_length=4, null=True, blank=False, choices=ENV_TYPE, default='test',
                                  help_text=_('Set the PDND environment for this API (Production, Testing)'))
 
-    qpdnd_audience = models.CharField(max_length=600, null=True, blank=False,
+    pdnd_audience = models.CharField(max_length=600, null=True, blank=False,
                                       help_text=_("PDND Audience of the service, i.e. 'test_cartografico'"))
 
     x_api_id = models.CharField(max_length=36, null=True, blank=True)
