@@ -12,6 +12,7 @@ __license__ = 'MPL 2.0'
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from model_utils import Choices
 from django.core.exceptions import ValidationError
 from qdjango.models import Project, Layer
 import uuid
@@ -32,6 +33,11 @@ class License(models.Model):
 
 class QPDNDProject(models.Model):
     """ Projects to expose """
+
+    ENV_TYPE = Choices(
+        ('prod', _('PRODUCTION')),
+        ('test', _('TESTING'))
+    )
 
     project = models.OneToOneField(Project, on_delete=models.CASCADE, related_name="%(app_label)s_projects")
 
@@ -60,6 +66,12 @@ class QPDNDProject(models.Model):
                                              'API subtitle in catalogs and developer portals)'))
 
     license = models.ForeignKey(License, on_delete=models.SET_NULL, null=True, blank=True)
+
+    qpdnd_env = models.CharField(max_length=4, null=True, blank=False, choices=ENV_TYPE, default='test',
+                                 help_text=_('Set the PDND environment for this API (Production, Testing)'))
+
+    qpdnd_audience = models.CharField(max_length=600, null=True, blank=False,
+                                      help_text=_("PDND Audience of the service, i.e. 'test_cartografico'"))
 
     x_api_id = models.CharField(max_length=36, null=True, blank=True)
 
