@@ -10,18 +10,12 @@ __author__ = 'elpaso@itopen.it'
 __date__ = '2024-09-16'
 __copyright__ = 'Copyright 2024, Gis3w'
 
+from django.http import JsonResponse
+from django.conf import settings
+from qpdnd.models import QPDNDProject
 import json
 import jwt
 import requests
-from django.http import JsonResponse
-
-from django.conf import settings
-
-# Get the settings from the Django settings
-QPDND_WELL_KNOWN_URL = getattr(settings, 'QPDND_WELL_KNOWN_URL', "https://uat.interop.pagopa.it/.well-known/jwks.json")
-# NOTE: Is this audience fixed?
-QPDND_AUDIENCE = getattr(settings, 'QPDND_AUDIENCE', "test_cartografico")
-QPDND_ISSUER = getattr(settings, 'QPDND_ISSUER', "uat.interop.pagopa.it")
 
 
 def pdnd_voucher_required(func):
@@ -34,6 +28,9 @@ def pdnd_voucher_required(func):
         # If user is superuser, skip the check
         if request.user.is_superuser:
             return func(request, *args, **kwargs)
+
+        # Get parameters for OWS:ows-wfs3 url by endpoint url parameter
+        qpdndp = QPDNDProject.objects.get(endpoint=kwargs['endpoint'])
 
         # Extract the JWS token from the request authorization:bearer header
         token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
@@ -93,7 +90,7 @@ def pdnd_voucher_required(func):
 
         # Get the public key from the well-known endpoint
         # TODO: this should be cached!
-        well_known_response = requests.get(QPDND_WELL_KNOWN_URL)
+        well_known_response = requests.get(settings.QPDND_WELL_KNOWN_URL[qpdndp.pdnd_env])
 
         # Search for kid in the json response
         public_key = None
@@ -113,7 +110,10 @@ def pdnd_voucher_required(func):
 
         # Decode and validate the JWS token
         try:
-            payload = jwt.decode(token, public_key, algorithms=[alg], audience=QPDND_AUDIENCE, issuer=QPDND_ISSUER)
+            payload = jwt.decode(token, public_key,
+                                 algorithms=[alg],
+                                 audience=qpdndp.pdnd_audience,
+                                 issuer=settings.QPDND_ISSUER[qpdndp.pdnd_env])
         except Exception as e:
             return JsonResponse({
                 'status': 'Error',
