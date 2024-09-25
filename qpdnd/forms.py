@@ -88,8 +88,9 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                                         Div(
                                             Div(
                                                 Div(
-                                                    HTML("<h3 class='box-title'><i class='fa fa-file'></i> {}</h3>".format(
-                                                        _('Info data'))),
+                                                    HTML(
+                                                        "<h3 class='box-title'><i class='fa fa-file'></i> {}</h3>".format(
+                                                            _('Info data'))),
                                                     css_class='box-header with-border'
                                                 ),
                                                 Div(
@@ -98,16 +99,14 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                                                 ),
                                                 css_class='box box-success'
                                             ),
-                                            css_class='col-md-12'
+                                            css_class='col-md-6'
                                         ),
-                                        css_class='row'
-                                    ),
-                                    Div(
                                         Div(
                                             Div(
                                                 Div(
-                                                    HTML("<h3 class='box-title'><i class='fa fa-file'></i> {}</h3>".format(
-                                                        _('PDND data'))),
+                                                    HTML(
+                                                        "<h3 class='box-title'><i class='fa fa-file'></i> {}</h3>".format(
+                                                            _('PDND data'))),
                                                     css_class='box-header with-border'
                                                 ),
                                                 Div(
@@ -116,7 +115,7 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                                                 ),
                                                 css_class='box box-success'
                                             ),
-                                            css_class='col-md-12'
+                                            css_class='col-md-6'
                                         ),
                                         css_class='row'
                                     ),

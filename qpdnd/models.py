@@ -77,6 +77,13 @@ class QPDNDProject(models.Model):
 
     note = models.TextField('Note', null=True, blank=True)
 
+    def env(self):
+        """
+        Return translated pdnd_env choice
+        """
+        return self.ENV_TYPE[self.pdnd_env] if self.pdnd_env else None
+
+
     def layers(self):
         """
         Return a list of all layers exposed
