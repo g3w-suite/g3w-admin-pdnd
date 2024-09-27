@@ -24,3 +24,5 @@ QPDND_WELL_KNOWN_URL = {
     'test': "https://uat.interop.pagopa.it/.well-known/jwks.json",
     'prod': "https://interop.pagopa.it/.well-known/jwks.json"
 }
+
+QPDND_AUTH_HEADER = 'Authorization'
