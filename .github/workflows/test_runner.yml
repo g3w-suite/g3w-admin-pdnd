@@ -19,7 +19,7 @@ jobs:
         path: 'qpdnd'
 
     - name: Move QPDND inside G3W-ADMIN
-      run: mv qpdnd/qpdnd g3w-admin/ && echo "$(ls -lh g3w-admin/qpdnd)"
+      run: mv qpdnd/qpdnd g3w-admin/ && mv qpdnd/requirements.txt g3w-admin/qpdnd/ && echo "$(ls -lh g3w-admin/qpdnd)"
 
     - name: Starting Docker compose
       run: docker compose -f docker-compose.ltr.yml up -d
@@ -35,6 +35,10 @@ jobs:
     - name: Activate QPDND module
       run: |
         docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "echo \"G3WADMIN_LOCAL_MORE_APPS = ['qpdnd']\" >> /code/settings_docker.py"
+
+    - name: Install QPDND python requirements
+      run: |
+        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/ && pip3 install -r g3w-admin/qpdnd/requirements.txt"
 
     - name: Building g3w-suite
       run: |
