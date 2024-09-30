@@ -12,3 +12,11 @@ class QpdndConfig(AppConfig):
         # registering them directly to QGS_SERVER
         from . import server_filters
         from . import receivers
+
+        # Add default settings for module
+        from django.conf import settings
+        from qpdnd import settings as qpdnd_settings
+
+        for a in dir(qpdnd_settings):
+            if not a.startswith('__') and not hasattr(settings, a):
+                setattr(settings, a, getattr(qpdnd_settings, a))

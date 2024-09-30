@@ -35,6 +35,8 @@
                         <th>{% trans 'Project' %}</th>
                         <th>{% trans 'Endpoint' %}</th>
                         <th>{% trans 'API URLS' %}</th>
+                        <th>{% trans 'PDND environment' %}</th>
+                        <th>{% trans 'PDND audience' %}</th>
                         <th>{% trans 'Note' %}</th>
                     </tr>
                 </thead>
@@ -74,6 +76,14 @@
                                 </span>
                             {% endif %}
                         </td>
+                        <td>
+                            {% if object.pdnd_env == 'test' %}
+                            <span class="label label-success">{{ object.env }}</span>
+                            {% else %}
+                            <span class="label label-danger">{{ object.env }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ object.pdnd_audience }}</td>
                         <td>{{ object.note|safe }}</td>
                     </tr>
                 {% endfor %}

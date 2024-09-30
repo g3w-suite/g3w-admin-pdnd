@@ -22,7 +22,7 @@ from core.api.base.views import G3WAPIView
 from qpdnd.models import QPDNDProject
 from qpdnd.utils import QPDNDAdapter
 from .permissions import ProjectEditPermission
-
+from .decorators.voucher_checker import pdnd_voucher_required
 from qgis.server import QgsServerProjectUtils
 
 from django.test import Client
@@ -42,9 +42,8 @@ class QPDNDAPIOgcView(OWSView):
     """
 
 
-
-
     @method_decorator(csrf_exempt)
+    @method_decorator(pdnd_voucher_required)
     def dispatch(self, request, *args, **kwargs):
 
         # Get parameters for OWS:ows-wfs3 url by endpoint url parameter
