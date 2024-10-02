@@ -104,7 +104,7 @@ class TestQPDNDModels(TestQPDNDBase):
 
         headers = {'HTTP_AUTHORIZATION': 'Bearer ' + voucher}
         response = self.client.get(url, **headers)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200, response.content)
 
         # Admin01 can pass
         # ----------------
