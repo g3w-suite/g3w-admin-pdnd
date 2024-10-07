@@ -227,7 +227,7 @@ def pdnd_voucher_required(func):
                 **{'content_type': 'application/problem+json'})
 
         eserviceId = purpose_verification_response_json.get('eserviceId', False)
-        if not eserviceId or not eserviceId == settings.QPDND_ESERVICE_ID[qpdndp.pdnd_env]:
+        if not eserviceId or not eserviceId == qpdndp.pdnd_eservice_id:
             return JsonResponse({
                 'status': 'Error',
                 'msg': 'PDND purpose eserviceId verification failed'
