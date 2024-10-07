@@ -11,6 +11,8 @@ __date__ = '2024-09-20'
 __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
+import os
+
 
 #############################################################
 # For PDND request authentication
@@ -48,8 +50,8 @@ QPDND_SERVER_SUBJECT = {
 
 # Path to a RSA256 private key file used by G3WSuite to authenticate itself to PDND
 QPDND_SERVER_PRIVKEY_PATH = {
-    'test': '/path/to/privkey.rsa.priv',
-    'prod': '/path/to/privkey.rsa.priv'
+    'test': os.getenv('BARI_PDND_PRIV_KEY', '/path/to/privkey.rsa.priv'),
+    'prod': os.getenv('BARI_PDND_PRIV_KEY', '/path/to/privkey.rsa.priv')
 }
 
 #############################################################
