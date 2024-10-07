@@ -58,7 +58,8 @@ jobs:
 
     - name:  Write PDND priv key to file
       run: |
-        echo ${{ secrets.BARI_PDND_PRIV_KEY }} > /code/g3w-admin/qpdnd/tests/data/pdnd/keys/api-pdnd-coll-keypair.rsa.priv
+        echo ${{ secrets.TESTENV }} >> /code/g3w-admin/qpdnd/tests/data/pdnd/keys/api-pdnd-coll-keypair.rsa.priv && \ 
+        echo ${{ secrets.BARI_PDND_PRIV_KEY }} >> /code/g3w-admin/qpdnd/tests/data/pdnd/keys/api-pdnd-coll-keypair.rsa.priv
 
     - name:  Running QPDND tests
       run: |
