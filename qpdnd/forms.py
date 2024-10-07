@@ -60,7 +60,8 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
 
         fields_pdnd = [
             Field('pdnd_env', css_class='select2'),
-            'pdnd_audience'
+            'pdnd_audience',
+            'pdnd_eservice_oi'
         ]
 
         self.helper = FormHelper(self)
