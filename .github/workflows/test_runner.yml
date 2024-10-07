@@ -58,9 +58,7 @@ jobs:
 
     - name:  Write PDND priv key to file
       run: |
-        ls -lh /code/g3w-admin/qpdnd/tests/ && \
-        touch /code/g3w-admin/qpdnd/tests/data/pdnd/keys/api-pdnd-coll-keypair.rsa.priv && \
-        echo "${{ secrets.BARI_PDND_PRIV_KEY }}" >> /code/g3w-admin/qpdnd/tests/data/pdnd/keys/api-pdnd-coll-keypair.rsa.priv
+        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "echo '${{ secrets.BARI_PDND_PRIV_KEY }}' > /code/g3w-admin/qpdnd/tests/data/pdnd/keys/api-pdnd-coll-keypair.rsa.priv"
 
     - name:  Running QPDND tests
       run: |
