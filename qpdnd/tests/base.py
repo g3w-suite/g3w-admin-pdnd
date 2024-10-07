@@ -98,7 +98,8 @@ class TestQPDNDBase(TestCase):
             'x_summary': 'Brief description',
             'license': '1',
             'pdnd_env': 'test',
-            'pdnd_audience': 'test_audience'
+            'pdnd_audience': 'test_audience',
+            'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d'
 
         }
 
@@ -125,7 +126,8 @@ class TestQPDNDBase(TestCase):
             'license': License.objects.get(pk=3),
             'x_api_id': '0bb5b19c-11e5-4f31-b8a2-6269822b29cc',
             'pdnd_env': 'test',
-            'pdnd_audience': 'test_audince'
+            'pdnd_audience': 'test_audince',
+            'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d'
         }
 
         data.update(udata)

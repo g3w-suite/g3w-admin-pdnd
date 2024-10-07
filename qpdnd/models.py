@@ -73,6 +73,9 @@ class QPDNDProject(models.Model):
     pdnd_audience = models.CharField(max_length=600, null=True, blank=False,
                                       help_text=_("PDND Audience of the service, i.e. 'test_cartografico'"))
 
+    pdnd_eservice_id = models.CharField(max_length=600, null=True, blank=False,
+                                      help_text=_("PDND Eservice ID of the service"))
+
     x_api_id = models.CharField(max_length=36, null=True, blank=True)
 
     note = models.TextField('Note', null=True, blank=True)
