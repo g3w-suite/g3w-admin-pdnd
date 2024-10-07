@@ -58,7 +58,7 @@ jobs:
 
     - name:  Running QPDND tests
       run: |
-        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/g3w-admin && python3 manage.py test qpdnd"
+        printenv && docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/g3w-admin && python3 manage.py test qpdnd"
       env:
         BARI_PDND_PRIV_KEY: ${{secrets.BARI_PDND_PRIV_KEY}}
 
