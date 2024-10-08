@@ -8,10 +8,6 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('qdjango', '0122_auto_20240604_1515'),
-    ]
-
     operations = [
         migrations.CreateModel(
             name='QPDNDProject',
