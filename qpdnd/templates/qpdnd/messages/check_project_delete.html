@@ -1,0 +1,4 @@
+{% load i18n %}
+<div class="callout callout-warning">
+    <p><i>{{ project }}</i> {% trans 'It is project for ' %}<a href="{% url 'qpdnd-project-update' qpdnd_id %}">{% trans 'PDND plugin' %}</a>, {%trans 'make attention on delete it.' %} </p>
+</div>
