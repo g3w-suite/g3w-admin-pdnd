@@ -49,9 +49,10 @@ class QPDNDProject(models.Model):
                                help_text=_('Indicate a version for the API to expose. I.e.: 1.0.0'),
                                default='1.0.0')
 
-    terms_of_service = models.URLField(max_length=255, null=True, blank=False,
+    terms_of_service = models.URLField(max_length=255, null=True, blank=True,
                                help_text=_('Set an url where to find the terms fo service. '
-                                           'I.e.: https://smartbear.com/terms-of-use/'))
+                                           'I.e.: https://smartbear.com/terms-of-use/. '
+                                           'It is required by Italian Guidelines Extended.'))
 
     contact_author = models.CharField(max_length=400, null=True, blank=False, help_text=_('Author of the service'))
     contact_email = models.EmailField(max_length=400, null=True, blank=False, help_text=_('Email reference'))

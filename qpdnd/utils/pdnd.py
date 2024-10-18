@@ -237,9 +237,11 @@ class QPDNDAdapter():
         })
 
         # Fix #/info/termsOfService
-        self._update_structure('#/info', {
-            'termsOfService': self.qdnd_project.terms_of_service
-        })
+        # Only for Italian Guidelines Extended
+        if self.qdnd_project.terms_of_service:
+            self._update_structure('#/info', {
+                'termsOfService': self.qdnd_project.terms_of_service
+            })
 
         self._update_structure('#/info', {
             'title': self.qdnd_project.title
