@@ -97,18 +97,26 @@ class TestQPDNDModels(TestQPDNDBase):
                 'msg': 'Invalid token (empty)'
             },)
 
+        # Admin01 can pass
+        # ----------------
+        self.client.login(username=self.test_admin1.username, password=self.test_admin1.username)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.client.logout()
+
         # Set authorization header
         # ------------------------
 
         voucher = self._get_voucher()
-
         headers = {'HTTP_AUTHORIZATION': 'Bearer ' + voucher}
         response = self.client.get(url, **headers)
-        self.assertEqual(response.status_code, 200, response.content)
 
-        # Admin01 can pass
-        # ----------------
-        self.client.login(username=self.test_admin1.username, password=self.test_admin1.username)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.client.logout()
+        # The following check can works only if a client is set on PDND !!
+        # So activate it if you have set a client on PDND portal.
+        # ----------------------------------------------------------------
+        #self.assertEqual(response.status_code, 200, response.content)
+
+        self.assertEqual(response.status_code, 401, response.content)
+        self.assertEqual(response.content, b'{"status": "Error", "msg": "PDND purpose request verification failed"}')
