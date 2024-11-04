@@ -20,3 +20,20 @@ class QpdndConfig(AppConfig):
         for a in dir(qpdnd_settings):
             if not a.startswith('__') and not hasattr(settings, a):
                 setattr(settings, a, getattr(qpdnd_settings, a))
+
+        # Add a new user backend type
+        from usersmanage.models import USER_BACKEND_TYPES, User, Userbackend
+        ubackend = settings.QPDND_INTERNAL_USERBACKEND
+        USER_BACKEND_TYPES[ubackend[0]] = ubackend[1]
+
+        # If not exists create new pdnd_internal_user
+        try:
+            user, created = User.objects.get_or_create(username=settings.QPDND_INTERNAL_USERNAME)
+            if created:
+                Userbackend(user=user, backend=settings.QPDND_INTERNAL_USERNAME).save()
+            else:
+                user.userbackend.backend = settings.QPDND_INTERNAL_USERNAME
+                user.userbackend.save()
+        except Exception as e:
+            pass
+

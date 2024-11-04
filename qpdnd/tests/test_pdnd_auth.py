@@ -83,11 +83,12 @@ class TestQPDNDModels(TestQPDNDBase):
     def test_auth(self):
         # Create instance
         qpdnd_project = self.create_qpnd_project(udata={
-            "pdnd_audience": "test_cartografico"
+            "pdnd_audience": "areepercorsedalfuoco",
+            "pdnd_eservice_id": "1fe35bd9-d4be-4e10-a4ed-56f98b10f603"
         })
         self.assertTrue(qpdnd_project.pk is not None)
 
-        url = reverse('qpdnd-api-ogc', args=[qpdnd_project.endpoint])
+        url = reverse('qpdnd-api-ogc', args=[qpdnd_project.endpoint]) + "/collections"
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 401)
@@ -116,7 +117,7 @@ class TestQPDNDModels(TestQPDNDBase):
         # The following check can works only if a client is set on PDND !!
         # So activate it if you have set a client on PDND portal.
         # ----------------------------------------------------------------
-        #self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.status_code, 200, response.content)
 
-        self.assertEqual(response.status_code, 401, response.content)
-        self.assertEqual(response.content, b'{"status": "Error", "msg": "PDND purpose request verification failed"}')
+        #self.assertEqual(response.status_code, 401, response.content)
+        #self.assertEqual(response.content, b'{"status": "Error", "msg": "PDND purpose eserviceId verification failed"}')

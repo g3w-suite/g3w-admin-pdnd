@@ -80,3 +80,8 @@ QPDN_AUDIENCE = {
     'prod': "auth.interop.pagopa.it/client-assertion"
 }
 
+# INTERNAL USER FOR PROJECTS AUTHENTICATION
+# -----------------------------------------
+QPDND_INTERNAL_USERNAME = 'qpdnd_internal_user'
+QPDND_INTERNAL_USERBACKEND = ('qpdnd', 'QPDND')
+

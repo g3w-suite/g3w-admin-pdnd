@@ -20,7 +20,7 @@ from qdjango.ows import OWSRequestHandler
 from qdjango.models import Project
 from core.api.base.views import G3WAPIView
 from qpdnd.models import QPDNDProject
-from qpdnd.utils import QPDNDAdapter
+from qpdnd.utils.pdnd import QPDNDAdapter
 from .permissions import ProjectEditPermission
 from .decorators.voucher_checker import pdnd_voucher_required
 from qgis.server import QgsServerProjectUtils

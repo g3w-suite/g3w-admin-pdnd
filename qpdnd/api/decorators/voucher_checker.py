@@ -13,6 +13,7 @@ __copyright__ = 'Copyright 2024, Gis3w'
 from django.http import JsonResponse
 from django.conf import settings
 from qpdnd.models import QPDNDProject
+from qpdnd.utils.general import get_qpdnd_internal_user
 import json
 import jwt
 import requests
@@ -238,6 +239,8 @@ def pdnd_voucher_required(func):
                 **{'content_type': 'application/problem+json'})
 
         # All checks passed, call the view
+        # set internal qdpnd user
+        request.user = get_qpdnd_internal_user()
         return func(request, *args, **kwargs)
 
     return _wrapped_view

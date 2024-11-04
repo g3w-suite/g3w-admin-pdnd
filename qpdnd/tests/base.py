@@ -11,10 +11,11 @@ __date__ = '2023-12-28'
 __copyright__ = 'Copyright 2015 - 2023, Gis3w'
 __license__ = 'MPL 2.0'
 
+from django.conf import settings
 from django.test import TestCase, override_settings
 from django.core.files import File
 from core.models import G3WSpatialRefSys, Group as CoreGroup
-from usersmanage.tests.utils import setup_testing_user
+from usersmanage.tests.utils import setup_testing_user, User, Userbackend
 from qdjango.utils.data import QgisProject
 from qpdnd.models import QPDNDProject, License
 import os
@@ -59,6 +60,13 @@ class TestQPDNDBase(TestCase):
 
         cls.qgis_file = os.path.join(CURRENT_PATH, TEST_BASE_PATH, QGS_PROJECT_FILE)
         cls.qgis_file_no_wfs_actived = os.path.join(CURRENT_PATH, TEST_BASE_PATH, QGS_PROJECT_FILE_NO_WFS_ACTIVED)
+
+        user, created = User.objects.get_or_create(username=settings.QPDND_INTERNAL_USERNAME)
+        if created:
+            Userbackend(user=user, backend=settings.QPDND_INTERNAL_USERNAME).save()
+        else:
+            user.userbackend.backend = settings.QPDND_INTERNAL_USERNAME
+            user.userbackend.save()
 
     @classmethod
     def setUp(cls):
