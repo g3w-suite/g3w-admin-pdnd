@@ -164,7 +164,9 @@ def pdnd_voucher_required(func):
             payload = jwt.decode(token, public_key,
                                  algorithms=[alg],
                                  audience=qpdndp.pdnd_audience,
-                                 issuer=settings.QPDND_ISSUER[qpdndp.pdnd_env])
+                                 issuer=settings.QPDND_ISSUER[qpdndp.pdnd_env],
+                                 options={"verify_iat": False}
+                                 )
         except Exception as e:
             return JsonResponse({
                 'status': 'Error',
