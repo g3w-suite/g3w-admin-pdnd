@@ -63,14 +63,14 @@ class QPDNDAPIOgcView(OWSView):
 
         return super(OWSView, self).dispatch(request, *args, **kwargs)
 
-    def _make_problem_json_response(self, msg:str, status_code:int=500, status='Error') -> JsonResponse:
+    def _make_problem_json_response(self, msg:str, status_code:int=500) -> JsonResponse:
         """
         Return a JsonResponse with a content-type header set to application/problem+json
         """
 
         return JsonResponse({
-            'status': status,
-            'msg': msg
+            'status': status_code,
+            'title': msg
         },
             status=status_code,
             **{'content_type': 'application/problem+json'})

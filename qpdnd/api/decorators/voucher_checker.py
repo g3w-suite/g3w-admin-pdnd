@@ -20,6 +20,25 @@ import requests
 import datetime
 import uuid
 
+def _return_problem_json_response(title, status=401, details=None):
+    """
+    Build a JsonResponse follows RFC: https://datatracker.ietf.org/doc/html/rfc7807#section-3.1
+    """
+
+    data = {
+        'status': status,
+        'title': title
+    }
+
+    if details:
+        data.update({
+            'details': details
+        })
+
+    return JsonResponse(data,
+        status=status,
+        **{'content_type': 'application/problem+json'})
+
 
 def _get_server_client_assertion(audience, client_id, issuer, subject, private_key_path):
     """
@@ -88,57 +107,27 @@ def pdnd_voucher_required(func):
         token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
 
         if not token:
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'Invalid token (empty)'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response('Invalid token (empty)')
 
         try:
             header = jwt.get_unverified_header(token)
         except Exception as e:
-            return JsonResponse({
-                'status': 'Error',
-                'msg': str(e)
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response(str(e))
 
         if not header.get('typ', '') == 'at+jwt':
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'Invalid token (wrong type)'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response('Invalid token (wrong type)')
 
         alg = header.get('alg', '')
         # NOTE: only RS256 is supported?
         if not alg == 'RS256':
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'Invalid token (unsupported algorithm)'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response('Invalid token (unsupported algorithm)')
 
         if not header.get('use', '') == 'sig':
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'Invalid token (invalid use)'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response('Invalid token (invalid use)')
 
         kid = header.get('kid', '')
         if not kid:
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'Invalid token (empty kid)'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response('Invalid token (empty kid)')
 
         # Get the public key from the well-known endpoint
         # TODO: this should be cached!
@@ -152,13 +141,7 @@ def pdnd_voucher_required(func):
                 break
 
         if not public_key:
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'Invalid token (kid not found in .well-known)'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
-
+            return _return_problem_json_response('Invalid token (kid not found in .well-known)')
 
         # Decode and validate the JWS token
         try:
@@ -169,25 +152,14 @@ def pdnd_voucher_required(func):
                                  options={"verify_iat": False}
                                  )
         except Exception as e:
-            return JsonResponse({
-                'status': 'Error',
-                'msg': str(e)
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
-
+            return _return_problem_json_response(str(e))
 
         # Verify that the purposeId in the token is authorized by calling PDND API
         purpose_id = None
         try:
             purpose_id = payload.get('purposeId')
         except Exception as e:
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'Invalid token (missing purposeId)'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response('Invalid token (missing purposeId)')
 
         # Get the voucher from the PDND API
         server_assertion = _get_server_client_assertion(
@@ -200,43 +172,23 @@ def pdnd_voucher_required(func):
         server_result = _get_voucher(settings.QPDND_API_TOKEN_URL[qpdndp.pdnd_env], settings.QPDND_SERVER_ISSUER[qpdndp.pdnd_env], server_assertion)
 
         if server_result.status_code != 200:
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'PDND voucher request failed'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response('PDND voucher request failed')
 
         server_access_token = server_result.json()['access_token']
         purpose_verification_url = settings.QPDND_API_PURPOSE_VERIFICATION_URL[qpdndp.pdnd_env].format(purposeId=purpose_id)
         purpose_verification_response = requests.get(purpose_verification_url, headers={settings.QPDND_AUTH_HEADER: 'Bearer ' + server_access_token})
 
         if purpose_verification_response.status_code != 200:
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'PDND purpose request verification failed'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response('PDND purpose request verification failed')
 
         purpose_verification_response_json = purpose_verification_response.json()
         state = purpose_verification_response_json.get('state', False)
         if state != 'ACTIVE':
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'PDND purpose state verification failed'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response('PDND purpose state verification failed')
 
         eserviceId = purpose_verification_response_json.get('eserviceId', False)
         if not eserviceId or not eserviceId == qpdndp.pdnd_eservice_id:
-            return JsonResponse({
-                'status': 'Error',
-                'msg': 'PDND purpose eserviceId verification failed'
-            },
-                status=401,
-                **{'content_type': 'application/problem+json'})
+            return _return_problem_json_response('PDND purpose eserviceId verification failed')
 
         # All checks passed, call the view
         # set internal qdpnd user

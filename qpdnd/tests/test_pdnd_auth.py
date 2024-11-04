@@ -94,8 +94,8 @@ class TestQPDNDModels(TestQPDNDBase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.headers['Content-Type'], 'application/problem+json')
         self.assertEqual(json.loads(response.content), {
-                'status': 'Error',
-                'msg': 'Invalid token (empty)'
+                'status': 401,
+                'title': 'Invalid token (empty)'
             },)
 
         # Admin01 can pass
@@ -120,4 +120,4 @@ class TestQPDNDModels(TestQPDNDBase):
         self.assertEqual(response.status_code, 200, response.content)
 
         #self.assertEqual(response.status_code, 401, response.content)
-        #self.assertEqual(response.content, b'{"status": "Error", "msg": "PDND purpose eserviceId verification failed"}')
+        #self.assertEqual(response.content, b'{"status": 401, "title": "PDND purpose eserviceId verification failed"}')
