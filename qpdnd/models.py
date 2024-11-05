@@ -16,8 +16,6 @@ from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 from django.core.exceptions import ValidationError
 from qdjango.models import Project, Layer
-from usersmanage.models import User
-from qpdnd.utils.general import get_qpdnd_internal_user
 import uuid
 
 class License(models.Model):
@@ -113,10 +111,6 @@ class QPDNDProject(models.Model):
                     self.x_api_id = current_instance.x_api_id
 
         super().save(*args, **kwargs)
-
-        # Grant view permission to PDND_INTERNAL_USER
-        # -------------------------------------------
-        self.project.addPermissionsToViewers([get_qpdnd_internal_user().pk])
 
 
     class Meta:

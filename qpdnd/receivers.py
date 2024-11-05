@@ -12,6 +12,7 @@ __license__ = 'MPL 2.0'
 
 from django.dispatch import receiver
 from django.template import loader
+from django.db.models.signals import pre_save, post_save
 from qdjango.views import (
     QdjangoProjectUpdateView,
     QdjangoProjectListView
@@ -21,6 +22,8 @@ from core.signals import (
     pre_update_project,
     pre_delete_project
 )
+from usersmanage.models import User
+from .utils.general import get_qpdnd_internal_user
 from .models import QPDNDProject
 
 
@@ -69,3 +72,22 @@ def checkProjectForDelete(sender, **kwargs):
                         'message': msg.render({'qpdnd_id': qpdnd_projects[project].id})})
             if len(messages):
                 return messages
+
+@receiver(pre_save, sender=QPDNDProject)
+def add_remove_permissions(sender, **kwargs):
+    try:
+        kwargs['instance']._meta.old_instance = sender.objects.get(pk=kwargs['instance'].pk)
+    except:
+        pass
+
+@receiver(post_save, sender=QPDNDProject)
+def add_remove_permissions(sender, **kwargs):
+
+    # Remove view permission to PDND_INTERNAL_USER if is an update
+    # ------------------------------------------------------------
+    if hasattr(kwargs['instance']._meta, 'old_instance'):
+        kwargs['instance']._meta.old_instance.project.removePermissionsToViewers([get_qpdnd_internal_user().pk])
+
+    # Grant view permission to PDND_INTERNAL_USER
+    # -------------------------------------------
+    kwargs['instance'].project.addPermissionsToViewers([get_qpdnd_internal_user().pk])
