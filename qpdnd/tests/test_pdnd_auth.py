@@ -10,7 +10,6 @@ __date__ = '2024-09-25'
 __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
-from authlib.common.encoding import json_loads
 from django.urls import reverse
 from .base import TestQPDNDBase, CURRENT_PATH, TEST_BASE_PATH
 from .pdnd_params import *
@@ -97,7 +96,7 @@ class TestQPDNDModels(TestQPDNDBase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json_loads(response.content), {"status": 200, "title": "OK"})
+        self.assertEqual(json.loads(response.content), {"status": 200, "title": "OK"})
         self.assertEqual(response.headers['Content-Type'], 'application/problem+json')
 
         self.client.logout()
