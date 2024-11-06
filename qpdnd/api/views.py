@@ -88,7 +88,7 @@ class QPDNDAPIOgcView(OWSView):
             # if the service is working correctly.
             # The service provider is free to define the implementation logic for this path.
             if '/wfs3/status' in request.path:
-                return self._make_problem_json_response('', status_code=200, status='OK')
+                return self._make_problem_json_response('OK', status_code=200)
 
 
             response = self.OWSRequestHandler(request, **kwargs).doRequest()
