@@ -263,10 +263,11 @@ class QPDNDAdapter():
             'url': self.qdnd_project.contact_url
         })
 
-        self._update_structure('#/info/license', {
-            'name': self.qdnd_project.license.name,
-            'url': self.qdnd_project.license.url
-        })
+        if self.qdnd_project.license:
+            self._update_structure('#/info/license', {
+                'name': self.qdnd_project.license.name,
+                'url': self.qdnd_project.license.url
+            })
 
         self._update_structure('#/info', {
             'x-api-id': self.qdnd_project.x_api_id,

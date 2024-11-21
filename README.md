@@ -29,3 +29,8 @@ pip3 install git+https://github.com/g3w-suite/g3w-admin-pdnd.git@v1.0.0
 # Install module from PyPi (not yet available)
 # pip3 install g3w-admin-pdnd
 ```
+
+### Load lincense fixture data
+```sh
+python3 manaage.py loaddata license
+```
