@@ -18,6 +18,8 @@ import os
 # For PDND request authentication
 #############################################################
 
+# Activate/deactivate the PDND voucher checker
+QPDND_VOUCHER_VALIDATE = True
 
 #############################################################
 # These may be ported to the model settings
