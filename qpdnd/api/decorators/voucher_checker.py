@@ -100,95 +100,97 @@ def pdnd_voucher_required(func):
         if request.user.is_superuser:
             return func(request, *args, **kwargs)
 
-        # Get parameters for OWS:ows-wfs3 url by endpoint url parameter
-        qpdndp = QPDNDProject.objects.get(endpoint=kwargs['endpoint'])
+        if settings.QPDND_VOUCHER_VALIDATE:
 
-        # Extract the JWS token from the request authorization:bearer header
-        token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
+            # Get parameters for OWS:ows-wfs3 url by endpoint url parameter
+            qpdndp = QPDNDProject.objects.get(endpoint=kwargs['endpoint'])
 
-        if not token:
-            return _return_problem_json_response('Invalid token (empty)')
+            # Extract the JWS token from the request authorization:bearer header
+            token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
 
-        try:
-            header = jwt.get_unverified_header(token)
-        except Exception as e:
-            return _return_problem_json_response(str(e))
+            if not token:
+                return _return_problem_json_response('Invalid token (empty)')
 
-        if not header.get('typ', '') == 'at+jwt':
-            return _return_problem_json_response('Invalid token (wrong type)')
+            try:
+                header = jwt.get_unverified_header(token)
+            except Exception as e:
+                return _return_problem_json_response(str(e))
 
-        alg = header.get('alg', '')
-        # NOTE: only RS256 is supported?
-        if not alg == 'RS256':
-            return _return_problem_json_response('Invalid token (unsupported algorithm)')
+            if not header.get('typ', '') == 'at+jwt':
+                return _return_problem_json_response('Invalid token (wrong type)')
 
-        if not header.get('use', '') == 'sig':
-            return _return_problem_json_response('Invalid token (invalid use)')
+            alg = header.get('alg', '')
+            # NOTE: only RS256 is supported?
+            if not alg == 'RS256':
+                return _return_problem_json_response('Invalid token (unsupported algorithm)')
 
-        kid = header.get('kid', '')
-        if not kid:
-            return _return_problem_json_response('Invalid token (empty kid)')
+            if not header.get('use', '') == 'sig':
+                return _return_problem_json_response('Invalid token (invalid use)')
 
-        # Get the public key from the well-known endpoint
-        # TODO: this should be cached!
-        well_known_response = requests.get(settings.QPDND_WELL_KNOWN_URL[qpdndp.pdnd_env])
+            kid = header.get('kid', '')
+            if not kid:
+                return _return_problem_json_response('Invalid token (empty kid)')
 
-        # Search for kid in the json response
-        public_key = None
-        for key in well_known_response.json().get('keys', []):
-            if key.get('kid', '') == kid:
-                public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
-                break
+            # Get the public key from the well-known endpoint
+            # TODO: this should be cached!
+            well_known_response = requests.get(settings.QPDND_WELL_KNOWN_URL[qpdndp.pdnd_env])
 
-        if not public_key:
-            return _return_problem_json_response('Invalid token (kid not found in .well-known)')
+            # Search for kid in the json response
+            public_key = None
+            for key in well_known_response.json().get('keys', []):
+                if key.get('kid', '') == kid:
+                    public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
+                    break
 
-        # Decode and validate the JWS token
-        try:
-            payload = jwt.decode(token, public_key,
-                                 algorithms=[alg],
-                                 audience=qpdndp.pdnd_audience,
-                                 issuer=settings.QPDND_ISSUER[qpdndp.pdnd_env],
-                                 options={"verify_iat": False}
-                                 )
-        except Exception as e:
-            return _return_problem_json_response(str(e))
+            if not public_key:
+                return _return_problem_json_response('Invalid token (kid not found in .well-known)')
 
-        # Verify that the purposeId in the token is authorized by calling PDND API
-        purpose_id = None
-        try:
-            purpose_id = payload.get('purposeId')
-        except Exception as e:
-            return _return_problem_json_response('Invalid token (missing purposeId)')
+            # Decode and validate the JWS token
+            try:
+                payload = jwt.decode(token, public_key,
+                                     algorithms=[alg],
+                                     audience=qpdndp.pdnd_audience,
+                                     issuer=settings.QPDND_ISSUER[qpdndp.pdnd_env],
+                                     options={"verify_iat": False}
+                                     )
+            except Exception as e:
+                return _return_problem_json_response(str(e))
 
-        # Get the voucher from the PDND API
-        server_assertion = _get_server_client_assertion(
-            settings.QPDN_AUDIENCE[qpdndp.pdnd_env],
-            settings.QPDND_SERVER_KID[qpdndp.pdnd_env],
-            settings.QPDND_SERVER_ISSUER[qpdndp.pdnd_env],
-            settings.QPDND_SERVER_SUBJECT[qpdndp.pdnd_env],
-            settings.QPDND_SERVER_PRIVKEY_PATH[qpdndp.pdnd_env])
+            # Verify that the purposeId in the token is authorized by calling PDND API
+            purpose_id = None
+            try:
+                purpose_id = payload.get('purposeId')
+            except Exception as e:
+                return _return_problem_json_response('Invalid token (missing purposeId)')
 
-        server_result = _get_voucher(settings.QPDND_API_TOKEN_URL[qpdndp.pdnd_env], settings.QPDND_SERVER_ISSUER[qpdndp.pdnd_env], server_assertion)
+            # Get the voucher from the PDND API
+            server_assertion = _get_server_client_assertion(
+                settings.QPDN_AUDIENCE[qpdndp.pdnd_env],
+                settings.QPDND_SERVER_KID[qpdndp.pdnd_env],
+                settings.QPDND_SERVER_ISSUER[qpdndp.pdnd_env],
+                settings.QPDND_SERVER_SUBJECT[qpdndp.pdnd_env],
+                settings.QPDND_SERVER_PRIVKEY_PATH[qpdndp.pdnd_env])
 
-        if server_result.status_code != 200:
-            return _return_problem_json_response('PDND voucher request failed')
+            server_result = _get_voucher(settings.QPDND_API_TOKEN_URL[qpdndp.pdnd_env], settings.QPDND_SERVER_ISSUER[qpdndp.pdnd_env], server_assertion)
 
-        server_access_token = server_result.json()['access_token']
-        purpose_verification_url = settings.QPDND_API_PURPOSE_VERIFICATION_URL[qpdndp.pdnd_env].format(purposeId=purpose_id)
-        purpose_verification_response = requests.get(purpose_verification_url, headers={settings.QPDND_AUTH_HEADER: 'Bearer ' + server_access_token})
+            if server_result.status_code != 200:
+                return _return_problem_json_response('PDND voucher request failed')
 
-        if purpose_verification_response.status_code != 200:
-            return _return_problem_json_response('PDND purpose request verification failed')
+            server_access_token = server_result.json()['access_token']
+            purpose_verification_url = settings.QPDND_API_PURPOSE_VERIFICATION_URL[qpdndp.pdnd_env].format(purposeId=purpose_id)
+            purpose_verification_response = requests.get(purpose_verification_url, headers={settings.QPDND_AUTH_HEADER: 'Bearer ' + server_access_token})
 
-        purpose_verification_response_json = purpose_verification_response.json()
-        state = purpose_verification_response_json.get('state', False)
-        if state != 'ACTIVE':
-            return _return_problem_json_response('PDND purpose state verification failed')
+            if purpose_verification_response.status_code != 200:
+                return _return_problem_json_response('PDND purpose request verification failed')
 
-        eserviceId = purpose_verification_response_json.get('eserviceId', False)
-        if not eserviceId or not eserviceId == qpdndp.pdnd_eservice_id:
-            return _return_problem_json_response('PDND purpose eserviceId verification failed')
+            purpose_verification_response_json = purpose_verification_response.json()
+            state = purpose_verification_response_json.get('state', False)
+            if state != 'ACTIVE':
+                return _return_problem_json_response('PDND purpose state verification failed')
+
+            eserviceId = purpose_verification_response_json.get('eserviceId', False)
+            if not eserviceId or not eserviceId == qpdndp.pdnd_eservice_id:
+                return _return_problem_json_response('PDND purpose eserviceId verification failed')
 
         # All checks passed, call the view
         # set internal qdpnd user

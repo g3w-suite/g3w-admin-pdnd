@@ -81,7 +81,7 @@ class TestQPDNDModels(TestQPDNDBase):
         return json.loads(response.content)["access_token"]
 
     def test_status(self):
-        """ Tets /status endpoint """
+        """ Test /status endpoint """
 
         qpdnd_project = self.create_qpnd_project(udata={
             "pdnd_audience": "areepercorsedalfuoco",
@@ -102,7 +102,6 @@ class TestQPDNDModels(TestQPDNDBase):
         self.client.logout()
 
         qpdnd_project.delete()
-
 
 
     def test_auth(self):
@@ -143,6 +142,13 @@ class TestQPDNDModels(TestQPDNDBase):
         # So activate it if you have set a client on PDND portal.
         # ----------------------------------------------------------------
         self.assertEqual(response.status_code, 200, response.content)
+
+        # Remove voucher checks
+        # ----------------------------------------------
+        with self.settings(QPDND_VOUCHER_VALIDATE=False):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200, response.content)
+
 
         #self.assertEqual(response.status_code, 401, response.content)
         #self.assertEqual(response.content, b'{"status": 401, "title": "PDND purpose eserviceId verification failed"}')
