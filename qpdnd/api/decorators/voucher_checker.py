@@ -147,14 +147,25 @@ def pdnd_voucher_required(func):
 
             # Decode and validate the JWS token
             try:
+                options = {
+                    "verify_iat": False
+                }
+
+                # For testing
+                if settings.QPDND_TESTING_RUNNING:
+                    options.update({
+                        "verify_exp": False
+                    })
+
                 payload = jwt.decode(token, public_key,
                                      algorithms=[alg],
                                      audience=qpdndp.pdnd_audience,
                                      issuer=settings.QPDND_ISSUER[qpdndp.pdnd_env],
-                                     options={"verify_iat": False}
+                                     options=options
                                      )
             except Exception as e:
                 return _return_problem_json_response(str(e))
+
 
             # Verify that the purposeId in the token is authorized by calling PDND API
             purpose_id = None
