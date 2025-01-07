@@ -19,7 +19,7 @@ jobs:
         path: 'qpdnd'
 
     - name: Move QPDND inside G3W-ADMIN
-      run: mv qpdnd/qpdnd g3w-admin/ && mv qpdnd/requirements.txt g3w-admin/qpdnd/ && echo "$(ls -lh g3w-admin/qpdnd)"
+      run: mv qpdnd/qpdnd g3w-admin/ && mv qpdnd/requirements.txt && mv qpdnd/requirements_testing.txt g3w-admin/qpdnd/ && echo "$(ls -lh g3w-admin/qpdnd)"
 
     - name: Starting Docker compose
       run: docker compose -f docker-compose.ltr.yml up -d
