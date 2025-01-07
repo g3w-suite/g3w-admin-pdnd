@@ -11,6 +11,8 @@ __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
 from django.urls import reverse
+from vcr_unittest import VCRMixin
+from vcr.record_mode import RecordMode
 from .base import TestQPDNDBase, CURRENT_PATH, TEST_BASE_PATH
 from .pdnd_params import *
 import jwt
@@ -20,16 +22,22 @@ import json
 import os
 import requests
 
-class TestQPDNDModels(TestQPDNDBase):
+class TestQPDNDModels(VCRMixin, TestQPDNDBase):
     """
     Test  Authentication required by PDND
     """
 
-    @classmethod
-    def setUp(cls):
+    def _get_vcr(self, **kwargs):
+
+        myvcr = super()._get_vcr(**kwargs)
+        myvcr.record_mode = RecordMode.NEW_EPISODES
+        return myvcr
+
+    #@classmethod
+    def setUp(self):
         super().setUp()
 
-        cls.voucher_expired = "eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJSUzI1NiIsInVzZSI6InNpZyIsImtpZCI6ImNkYjUyNTMyLWRkOTQtNDBlZi04MjRkLTljNTViMTBlNmJjOSJ9.eyJhdWQiOiJ0ZXN0X2NhcnRvZ3JhZmljbyIsInN1YiI6IjQ1YTA4N2Y4LTY4MDYtNDNmNi04NDMxLWQxNWZhMWM5OGYwYyIsIm5iZiI6MTcyNzI3MDIxMCwicHVycG9zZUlkIjoiMTRkOTZlMjMtMGIyZC00YTg5LTk3MDYtYTIyNTI5NDJmZjRlIiwiaXNzIjoidWF0LmludGVyb3AucGFnb3BhLml0IiwiZXhwIjoxNzI3MjczODEwLCJpYXQiOjE3MjcyNzAyMTAsImNsaWVudF9pZCI6IjQ1YTA4N2Y4LTY4MDYtNDNmNi04NDMxLWQxNWZhMWM5OGYwYyIsImp0aSI6IjgzMTg0Y2FmLTM4ZDktNDQ2NS1iM2JhLTk5NjhhMTQ5YWRjNSJ9.BuHR2cgr8QiGmOUX1rKyEUtvo4tv35VfQYchNPtQ-cgr7fBu0peBJ8tT0Jti3420oulSipvTiVA6M18A9x705j3cckDSUJIUtSjmMWFXJeKgnYMaS58_HvfjHPmcyFyvc8pqaR2wIZ6YAWuVT3rsQWBRySwoXpUGglANDwJ-0IDEpgLHH8n2lDIzGWuss6wKaP2CXdj36savorddN_lL4hCImKYRwVCrWd8eQNpb633mjGzaCe_q7KqqQNoN8OPZAPTU7H3-VKQ_PMUXRPdZc0VasZMRezt6GJ9YRXh-Yv6iKWvwLdzj4-ln6FjdrYIMFAp-_g7_dAbqRYxiFWZv0Q"
+        self.voucher_expired = "eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJSUzI1NiIsInVzZSI6InNpZyIsImtpZCI6ImNkYjUyNTMyLWRkOTQtNDBlZi04MjRkLTljNTViMTBlNmJjOSJ9.eyJhdWQiOiJ0ZXN0X2NhcnRvZ3JhZmljbyIsInN1YiI6IjQ1YTA4N2Y4LTY4MDYtNDNmNi04NDMxLWQxNWZhMWM5OGYwYyIsIm5iZiI6MTcyNzI3MDIxMCwicHVycG9zZUlkIjoiMTRkOTZlMjMtMGIyZC00YTg5LTk3MDYtYTIyNTI5NDJmZjRlIiwiaXNzIjoidWF0LmludGVyb3AucGFnb3BhLml0IiwiZXhwIjoxNzI3MjczODEwLCJpYXQiOjE3MjcyNzAyMTAsImNsaWVudF9pZCI6IjQ1YTA4N2Y4LTY4MDYtNDNmNi04NDMxLWQxNWZhMWM5OGYwYyIsImp0aSI6IjgzMTg0Y2FmLTM4ZDktNDQ2NS1iM2JhLTk5NjhhMTQ5YWRjNSJ9.BuHR2cgr8QiGmOUX1rKyEUtvo4tv35VfQYchNPtQ-cgr7fBu0peBJ8tT0Jti3420oulSipvTiVA6M18A9x705j3cckDSUJIUtSjmMWFXJeKgnYMaS58_HvfjHPmcyFyvc8pqaR2wIZ6YAWuVT3rsQWBRySwoXpUGglANDwJ-0IDEpgLHH8n2lDIzGWuss6wKaP2CXdj36savorddN_lL4hCImKYRwVCrWd8eQNpb633mjGzaCe_q7KqqQNoN8OPZAPTU7H3-VKQ_PMUXRPdZc0VasZMRezt6GJ9YRXh-Yv6iKWvwLdzj4-ln6FjdrYIMFAp-_g7_dAbqRYxiFWZv0Q"
 
 
     def _get_client_assertion(self):

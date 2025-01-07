@@ -42,6 +42,7 @@ QGS_PROJECT_FILE_NO_WFS_ACTIVED = 'projects/test_ogc_api_no_wfs_actived.qgs'
     LANGUAGES = (
         ('en', 'English'),
     ),
+    QPDND_TESTING_RUNNING = True # Use this setting for testing
 )
 class TestQPDNDBase(TestCase):
 

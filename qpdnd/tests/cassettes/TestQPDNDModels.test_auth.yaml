@@ -1,0 +1,221 @@
+interactions:
+- request:
+    body: client_id=45a087f8-6806-43f6-8431-d15fa1c98f0c&client_assertion=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Im9YV2o0MVJmXzNuOFpFa1lMX0QxRnNad2Y5aWoxX0Q3LXhwZ2Q0Y1BqYlkifQ.eyJpc3MiOiI0NWEwODdmOC02ODA2LTQzZjYtODQzMS1kMTVmYTFjOThmMGMiLCJzdWIiOiI0NWEwODdmOC02ODA2LTQzZjYtODQzMS1kMTVmYTFjOThmMGMiLCJhdWQiOiJhdXRoLnVhdC5pbnRlcm9wLnBhZ29wYS5pdC9jbGllbnQtYXNzZXJ0aW9uIiwicHVycG9zZUlkIjoiYTMzOGQ2NTItN2FhMy00MDgzLTgxZTctNzFkNzMyOGJlMDVjIiwianRpIjoiYjNkOWQ2NWUtZTM2OC00OGYxLWIxMzEtMTE4ZjU3Y2IzNWFiIiwiaWF0IjoxNzMzNDE0NjgxLCJleHAiOjE3MzYwMDY2ODF9.eEKKqn_NXXE3zZ6LqCQTrkdA7SglDbwmqLI1hhq6Lp28AbfdHukBN924TuzS0yOA9Nyg-RPN-M3f7kCr-ZoeAxz5Dqtsv-yf_yr7E7pmdSppC226IKb55KNTBf13XAPuJ8qpq6NjVjNPZtqjRWPZSRKmYu7mUVT22x5DxSOsTj4zTF9qHsAbnBEM9mnF9g2dKHY1AepCPr3nyzgqWQtxcv4YJBmMFP67PsKTuYDhPYHSUSnz45b2YzfVef9eY4-R3mLxkwEN2IDcmYEa92znV-VMBUCqEcHqvDwOYK3yMLjrG6wo8DvuFeHpvkL8gbUCqOzc_sJDbdAeKj18FklJcw&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&grant_type=client_credentials
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '995'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://auth.uat.interop.pagopa.it/token.oauth2
+  response:
+    body:
+      string: '{"access_token":"eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJSUzI1NiIsInVzZSI6InNpZyIsImtpZCI6ImNkYjUyNTMyLWRkOTQtNDBlZi04MjRkLTljNTViMTBlNmJjOSJ9.eyJhdWQiOiJhcmVlcGVyY29yc2VkYWxmdW9jbyIsInN1YiI6IjQ1YTA4N2Y4LTY4MDYtNDNmNi04NDMxLWQxNWZhMWM5OGYwYyIsIm5iZiI6MTczMzQxNDY4MiwicHVycG9zZUlkIjoiYTMzOGQ2NTItN2FhMy00MDgzLTgxZTctNzFkNzMyOGJlMDVjIiwiaXNzIjoidWF0LmludGVyb3AucGFnb3BhLml0IiwiZXhwIjoxNzMzNTAxMDgyLCJpYXQiOjE3MzM0MTQ2ODIsImNsaWVudF9pZCI6IjQ1YTA4N2Y4LTY4MDYtNDNmNi04NDMxLWQxNWZhMWM5OGYwYyIsImp0aSI6IjA2ZjM3MWM2LTYwZDktNDM1YS04MTZhLTZiNTQ1ZGE5YTVlOCJ9.aCcRsz-v-__jSaIYzVp425kUIrAmsWGlOnaEqsmkkj1ohIzcW5HwOJrWeG6mdFEfpSyYEfFlyIcubBULiB-pSsXj1n0aGjURXhywT-RK3y3tniyx57bmC8sWKClJHJD8HS6sqHZfW-lqpGE6yogYuajcU80WNfzvJTgLmX-zSKUhr7Z0sVv55sY-fIQ9dMfq1agcaO9m5ybYoQoBPReLiL5Dne9PvXY47uk4I6qefkf-uXFDJ3EOgWZgRwswh9upeGxfS_NflDx5rInlapo7G4C0hMusHu7bp2cCY7JMhhwsTPun98QQZbPzLe-K3FepxX4YawrilLuTVXzmzx8xFQ","expires_in":86400,"token_type":"Bearer"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - Authorization, Content-Type, X-Requested-With, Accept-Language
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '924'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Dec 2024 16:04:42 GMT
+      X-RateLimit-Interval:
+      - '1000'
+      X-RateLimit-Limit:
+      - '10'
+      X-RateLimit-Remaining:
+      - '9'
+      x-amz-apigw-id:
+      - CU1MJHHusu8EoWA=
+      x-amzn-Remapped-Connection:
+      - keep-alive
+      x-amzn-Remapped-Content-Length:
+      - '924'
+      x-amzn-Remapped-Date:
+      - Thu, 05 Dec 2024 16:04:42 GMT
+      x-amzn-Remapped-Server:
+      - akka-http/10.2.10
+      x-amzn-RequestId:
+      - 773c1805-9a8c-4ab0-96f8-7fdf7bb526ca
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.31.0
+    method: GET
+    uri: https://uat.interop.pagopa.it/.well-known/jwks.json
+  response:
+    body:
+      string: "{\n  \"keys\": [\n    {\n      \"kty\": \"RSA\",\n      \"kid\" : \"32d8a321-1568-44f5-9558-a9072f519d2d\",\n
+        \     \"n\": \"48w_yMYGZmYWL3k8OejIYA1vrhDh1nRT6Mvsk10hEP5fCkQfU3eUEK9H9TLpCzOfAchFxs7TokitkniDOoE9oi5OL-qWoYf6XI0-eFk40xv0YZPUteJYoGVLLVjycU3aPwXKidk5Xy3rk8T67p7xjI6XfRJuFia1Zd9R_HBfbelKU565d9qXYHpYrNxuiM8o3cwc6famBeMU7nHhBCpe0FOFsSgyfEACnNral-67T5WO76heqlgwNYPCkVv5Uz7CmfUZ2MzdzAp9ZiPi3B-XlPhhm9STxFsBLEDZLel7M7eHM8q6TmDtxSQEExjLenMzT8IiyU43CCu17Fed7dYVrw\",\n
+        \     \"e\": \"AQAB\"\n    },\n    {\n      \"kty\": \"RSA\",\n      \"n\":
+        \"m26QIbhJyzbwum-_YolgLFLIN6EqGl67jwEOThmmLdXYEyrBoU1qLLdFWyp44k0cBG0NMGRK6twZ6aV-WqcQJjpUyDDP4cLwqFe42jcnLTCrD9ezuSdGyIkuvEFtJ8fpHggWsscihdr-LydAiYyEOWq2tZZ3YexfoMWte8TCZQ9Xg0UpOaXp6xJV9AejiVq18OQtRnJoo7USrvWCnYdghXrGqax02ze7CZAgnZgP8RVQ7AMMtuZvsAwc92v_piHbYjhrRFhGOhV0Nf5NaNiVt62Jmjr1KEKRP6oPD6yqeBXuQ3fWt5htse6SUzIM48xBrJ7AAGhRF19T4ORwbaT4bw\",\n
+        \     \"e\": \"AQAB\",\n      \"kid\": \"cdb52532-dd94-40ef-824d-9c55b10e6bc9\"\n
+        \   }\n  ]\n}\n"
+    headers:
+      Accept-Ranges:
+      - bytes
+      Age:
+      - '27531'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '942'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Dec 2024 08:25:52 GMT
+      ETag:
+      - '"2075e8c0b3a605c58a5d3826411ba5e0"'
+      Last-Modified:
+      - Thu, 29 Aug 2024 13:22:09 GMT
+      Server:
+      - AmazonS3
+      Vary:
+      - accept-encoding
+      Via:
+      - 1.1 4112796e19d8f7c1c420cb3d9f689a00.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - wODeCzWL6Ucs_qHROZej84x9yyw62UlRO-Y6rqxL6gIoJcV-i2B0rg==
+      X-Amz-Cf-Pop:
+      - FCO50-P2
+      X-Cache:
+      - Hit from cloudfront
+      x-amz-replication-status:
+      - REPLICA
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - U2W7d7l2I6lM4zU2lGciqehhgGVbZmyL
+    status:
+      code: 200
+      message: OK
+- request:
+    body: client_id=c2fc3ed2-a096-4a23-bb2e-47c767fa19d6&client_assertion=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IkpfejVzanpaLTd5UnhHejBDel9FdElQU2JwTEUwZDVCSm9CTkdjc1R6ejQifQ.eyJpc3MiOiJjMmZjM2VkMi1hMDk2LTRhMjMtYmIyZS00N2M3NjdmYTE5ZDYiLCJzdWIiOiJjMmZjM2VkMi1hMDk2LTRhMjMtYmIyZS00N2M3NjdmYTE5ZDYiLCJhdWQiOiJhdXRoLnVhdC5pbnRlcm9wLnBhZ29wYS5pdC9jbGllbnQtYXNzZXJ0aW9uIiwianRpIjoiMTFkMTIzMDMtM2ViMS00ZGEzLWE4MGQtMDNlYWY4NjkzMDZmIiwiaWF0IjoxNzMzNDE0NjgyLCJleHAiOjE3MzM0MjE4ODJ9.RChA6f_HuUPitD7JKUpqnZY5Jedqg3Z0lLsjGwv6owguCiqypfarvo3ciVhBRwyYxTZQZuJZ4j5zbq4deMEvYk6kDlQ91wkJzxireqr0t0SIGMvprzxope3WRWW-jPx9Uyg0MCEqChLyWWJweNEdf42GHNo6f3q2rUNp9e4v6a-VX6AgEvOrp_xaQyAt9KYbJhP-vSNaPCQ4CG-InH778yJcz_WMkoxglgHe7wJltVzsMAOtcdjSOdHEqT0UFrle2kNq0umTmwDlV1IbMNr487zBTFPH2OKjSoBABNKDdTcOpsuyotxtZkPpvcbIKYtFJD27z6pVc0pL8eaNW5C5FA&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&grant_type=client_credentials
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '927'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://auth.uat.interop.pagopa.it/token.oauth2
+  response:
+    body:
+      string: '{"access_token":"eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJSUzI1NiIsInVzZSI6InNpZyIsImtpZCI6ImNkYjUyNTMyLWRkOTQtNDBlZi04MjRkLTljNTViMTBlNmJjOSJ9.eyJvcmdhbml6YXRpb25JZCI6ImM1ZDhmOWY2LTdmM2ItNDA2MS1hZDhmLTcwYmI4Zjc5NGU2YSIsImF1ZCI6InVhdC5pbnRlcm9wLnBhZ29wYS5pdC9tMm0iLCJzdWIiOiJjMmZjM2VkMi1hMDk2LTRhMjMtYmIyZS00N2M3NjdmYTE5ZDYiLCJyb2xlIjoibTJtIiwibmJmIjoxNzMzNDE0NjgyLCJpc3MiOiJ1YXQuaW50ZXJvcC5wYWdvcGEuaXQiLCJleHAiOjE3MzM0MTUyODIsImlhdCI6MTczMzQxNDY4MiwiY2xpZW50X2lkIjoiYzJmYzNlZDItYTA5Ni00YTIzLWJiMmUtNDdjNzY3ZmExOWQ2IiwianRpIjoiZGRiYWZmMTAtMTk5My00YmZkLTk3ZTQtOTlkM2FhNjQzYTc3In0.JsMKKBn1IUarP3cIct7L_-QHrrCoYZosrC3Vb7cVv5Kexql1Vz8cjORgDNNPQIAx8gq8HL8Bx8xW5MUo71VEVHzBil0WEPYVbTfpe6FnyRGIPWE3oga36fnc0vsIjhG-QYrGoLWpqXj53PhMq7LzXk7gTmJf-nqrYlLtuPDSA9OXkrkideDt0RrVCfHaaVTcA6kalLF-GDarZAr3sZWKdRN4AOF_l9YManCrHxa0SLEyabaNoPADLj1PvC7PBihCUO39LVr523lXrd23cKwOFl8Sl9uvBg5LD4oip9ppDMJo_08AEo8F0Z-A4wHWK34gFuV81MgRHC3TljpAYtkGUQ","expires_in":600,"token_type":"Bearer"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - Authorization, Content-Type, X-Requested-With, Accept-Language
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '953'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Dec 2024 16:04:42 GMT
+      X-RateLimit-Interval:
+      - '1000'
+      X-RateLimit-Limit:
+      - '10'
+      X-RateLimit-Remaining:
+      - '9'
+      x-amz-apigw-id:
+      - CU1MRGjYMu8EIWg=
+      x-amzn-Remapped-Connection:
+      - keep-alive
+      x-amzn-Remapped-Content-Length:
+      - '953'
+      x-amzn-Remapped-Date:
+      - Thu, 05 Dec 2024 16:04:42 GMT
+      x-amzn-Remapped-Server:
+      - akka-http/10.2.10
+      x-amzn-RequestId:
+      - 29c27139-b6c1-4312-92ac-96ddf6dd665b
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Authorization:
+      - Bearer eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJSUzI1NiIsInVzZSI6InNpZyIsImtpZCI6ImNkYjUyNTMyLWRkOTQtNDBlZi04MjRkLTljNTViMTBlNmJjOSJ9.eyJvcmdhbml6YXRpb25JZCI6ImM1ZDhmOWY2LTdmM2ItNDA2MS1hZDhmLTcwYmI4Zjc5NGU2YSIsImF1ZCI6InVhdC5pbnRlcm9wLnBhZ29wYS5pdC9tMm0iLCJzdWIiOiJjMmZjM2VkMi1hMDk2LTRhMjMtYmIyZS00N2M3NjdmYTE5ZDYiLCJyb2xlIjoibTJtIiwibmJmIjoxNzMzNDE0NjgyLCJpc3MiOiJ1YXQuaW50ZXJvcC5wYWdvcGEuaXQiLCJleHAiOjE3MzM0MTUyODIsImlhdCI6MTczMzQxNDY4MiwiY2xpZW50X2lkIjoiYzJmYzNlZDItYTA5Ni00YTIzLWJiMmUtNDdjNzY3ZmExOWQ2IiwianRpIjoiZGRiYWZmMTAtMTk5My00YmZkLTk3ZTQtOTlkM2FhNjQzYTc3In0.JsMKKBn1IUarP3cIct7L_-QHrrCoYZosrC3Vb7cVv5Kexql1Vz8cjORgDNNPQIAx8gq8HL8Bx8xW5MUo71VEVHzBil0WEPYVbTfpe6FnyRGIPWE3oga36fnc0vsIjhG-QYrGoLWpqXj53PhMq7LzXk7gTmJf-nqrYlLtuPDSA9OXkrkideDt0RrVCfHaaVTcA6kalLF-GDarZAr3sZWKdRN4AOF_l9YManCrHxa0SLEyabaNoPADLj1PvC7PBihCUO39LVr523lXrd23cKwOFl8Sl9uvBg5LD4oip9ppDMJo_08AEo8F0Z-A4wHWK34gFuV81MgRHC3TljpAYtkGUQ
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.31.0
+    method: GET
+    uri: https://api.uat.interop.pagopa.it/1.0/purposes/a338d652-7aa3-4083-81e7-71d7328be05c/agreement
+  response:
+    body:
+      string: '{"id":"007ab057-d00a-43ad-960e-c08d689722bd","eserviceId":"1fe35bd9-d4be-4e10-a4ed-56f98b10f603","descriptorId":"35e02cd2-37cf-4bfe-8ab2-89466f6b01fb","producerId":"c5d8f9f6-7f3b-4061-ad8f-70bb8f794e6a","consumerId":"c5d8f9f6-7f3b-4061-ad8f-70bb8f794e6a","state":"ACTIVE"}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '272'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2024 16:04:43 GMT
+      ETag:
+      - W/"110-/P6fNa81JdTSuEgAXiAArAt/vdc"
+      X-Rate-Limit-Interval:
+      - '1000'
+      X-Rate-Limit-Limit:
+      - '10'
+      X-Rate-Limit-Remaining:
+      - '9'
+      x-amz-apigw-id:
+      - CU1MUEOKsu8EEcA=
+      x-amzn-Remapped-Connection:
+      - keep-alive
+      x-amzn-Remapped-Content-Length:
+      - '272'
+      x-amzn-Remapped-Date:
+      - Thu, 05 Dec 2024 16:04:43 GMT
+      x-amzn-RequestId:
+      - 7e021797-b631-4f5e-b9f1-0987ae7d6a0e
+    status:
+      code: 200
+      message: OK
+version: 1

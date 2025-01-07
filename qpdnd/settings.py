@@ -87,3 +87,6 @@ QPDN_AUDIENCE = {
 QPDND_INTERNAL_USERNAME = 'qpdnd_internal_user'
 QPDND_INTERNAL_USERBACKEND = ('qpdnd', 'QPDND')
 
+# FOR TESTING
+# -----------
+QPDND_TESTING_RUNNING = False
