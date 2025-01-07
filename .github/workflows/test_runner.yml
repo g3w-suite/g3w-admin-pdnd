@@ -6,7 +6,7 @@ jobs:
 
   ci_tests:
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
 
@@ -30,7 +30,7 @@ jobs:
 
     - name: Installing G3W-ADMIN Python requirements
       run: |
-        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/ && pip3 install -r requirements_docker.txt && pip3 install -r requirements_huey.txt"
+        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/ && pip3 install -r requirements_docker.txt --break-system-packages && pip3 install -r requirements_huey.txt --break-system-packages"
 
     - name: Activate QPDND module
       run: |
@@ -38,7 +38,7 @@ jobs:
 
     - name: Install QPDND python requirements
       run: |
-        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/ && pip3 install -r g3w-admin/qpdnd/requirements.txt && pip3 install -r g3w-admin/qpdnd/requirements_testing.txt"
+        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/ && pip3 install -r g3w-admin/qpdnd/requirements.txt --break-system-packages && pip3 install -r g3w-admin/qpdnd/requirements_testing.txt --break-system-packages"
 
     - name: Building g3w-suite
       run: |
