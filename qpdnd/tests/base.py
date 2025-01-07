@@ -17,7 +17,7 @@ from django.core.files import File
 from core.models import G3WSpatialRefSys, Group as CoreGroup
 from usersmanage.tests.utils import setup_testing_user, User, Userbackend
 from qdjango.utils.data import QgisProject
-from qpdnd.models import QPDNDProject, License
+from qpdnd.models import QPDNDProject, License, QPDNDClientSetting
 import os
 
 
@@ -106,9 +106,11 @@ class TestQPDNDBase(TestCase):
             'title': 'Title of service',
             'x_summary': 'Brief description',
             'license': '1',
-            'pdnd_env': 'test',
-            'pdnd_audience': 'test_audience',
-            'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d'
+
+            # Todo: change for new client setting model
+            #'pdnd_env': 'test',
+            #'pdnd_audience': 'test_audience',
+            #'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d'
 
         }
 
@@ -134,11 +136,40 @@ class TestQPDNDBase(TestCase):
             'x_summary': 'Brief description',
             'license': License.objects.get(pk=3),
             'x_api_id': '0bb5b19c-11e5-4f31-b8a2-6269822b29cc',
-            'pdnd_env': 'test',
-            'pdnd_audience': 'test_audince',
-            'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d'
+
+            # Todo: change for nuw client config model
+            #'pdnd_env': 'test',
+            #'pdnd_audience': 'test_audince',
+            #'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d'
         }
 
         data.update(udata)
 
         return QPDNDProject.objects.create(**data)
+
+    def create_qpnd_client_setting(self, udata: dict={}) -> QPDNDClientSetting:
+        """
+        Create qpdndpclientsetting instance
+        """
+
+        # Create instance
+        data = {
+            'name': self.project.instance,
+            'pdnd_env': 'test',
+            'pdnd_server_kid': 'J_z5sjzZ-7yRxGz0Cz_EtIPSbpLE0d5BJoBNGcsTzz4',
+            'pdnd_issuer': 'uat.interop.pagopa.it',
+            'pdnd_server_issuer': 'c2fc3ed2-a096-4a23-bb2e-47c767fa19d6',
+            'pdnd_server_subject': 'c2fc3ed2-a096-4a23-bb2e-47c767fa19d6',
+            'pdnd_well_known_url': 'https://uat.interop.pagopa.it/.well-known/jwks.json',
+            'pdnd_api_purpose_verification_url': 'https://api.uat.interop.pagopa.it/1.0/purposes/{purposeId}/agreement',
+            'pdnd_api_token_url': 'https://auth.uat.interop.pagopa.it/token.oauth2',
+
+            # Todo: change for nuw client config model
+            'pdnd_audience': 'test_audience',
+            'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d',
+            'note': 'note test'
+        }
+
+        data.update(udata)
+
+        return QPDNDClientSetting.objects.create(**data)

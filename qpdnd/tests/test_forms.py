@@ -34,15 +34,19 @@ class TestQPDNDForms(TestQPDNDBase):
 
         # Test Create
         # -----------
-        form_data = self.create_form_data()
+        qpdnd_cs = self.create_qpnd_client_setting()
+        form_data = self.create_form_data(uform_data={
+            'client_setting': qpdnd_cs
+        })
 
         form = QPDNDProjectForm(request=self.request, data=form_data)
         self.assertTrue(form.is_valid())
         form.save()
 
         iu_proj = QPDNDProject.objects.get(project=self.project.instance)
-        self.assertEqual(iu_proj.pdnd_env, 'test')
-        self.assertEqual(iu_proj.pdnd_audience, 'test_audience')
+        self.assertEqual(iu_proj.contact_author, 'Walter Lorenzetti')
+        self.assertEqual(iu_proj.client_setting.pdnd_env, 'test')
+        self.assertEqual(iu_proj.client_setting.pdnd_audience, 'test_audience')
 
         # Test Update
         # -----------

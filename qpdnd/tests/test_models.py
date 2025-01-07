@@ -15,6 +15,7 @@ __license__ = 'MPL 2.0'
 from .base import TestQPDNDBase
 from qpdnd.models import (
     QPDNDProject,
+    QPDNDClientSetting,
     License
 )
 import copy
@@ -27,8 +28,11 @@ class TestQPDNDModels(TestQPDNDBase):
 
     def test_project(self):
 
+        qpdnd_cs = self.create_qpnd_client_setting()
+
         qpdnd_project = self.create_qpnd_project(udata={
             'license': License.objects.get(pk=2),
+            'client_setting': qpdnd_cs
         })
         self.assertTrue(qpdnd_project.pk is not None)
 
@@ -80,5 +84,14 @@ class TestQPDNDModels(TestQPDNDBase):
         self.assertEqual('1.0.2', qpdnd_project.version)
         self.assertEqual('test_for_update_id', qpdnd_project.x_api_id)
 
+    def test_client_setting(self):
+        """ Test for QDPDNClientSetting model """
 
+        qpdnd_cs = self.create_qpnd_client_setting()
 
+        self.assertTrue(qpdnd_cs.pk is not None)
+
+        # Reload data from db
+        qpdnd_project = QPDNDClientSetting.objects.get(pk=qpdnd_cs.pk)
+
+        self.assertEqual(qpdnd_cs.pdnd_server_kid, qpdnd_project.pdnd_server_kid)
