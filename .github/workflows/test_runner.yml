@@ -1,4 +1,4 @@
-name: IRPI_UP CI tests
+name: QPDND CI tests
 
 on: [push, pull_request]
 
