@@ -118,7 +118,8 @@ class QPDNDClientSetting(models.Model):
                                        help_text=_('PDND Server KID of the service'))
 
     pdnd_issuer = models.CharField(max_length=600, null=True, blank=False,
-                                       help_text=_('PDND Client Issuer of the service'))
+                                       help_text=_('PDND Client Issuer of the service: '
+                                                   'i.e. <i>uat.interop.pagopa.it</i>'))
 
     pdnd_server_issuer = models.CharField(max_length=600, null=True, blank=False,
                                    help_text=_('PDND Server Issuer of the service'))
@@ -127,13 +128,16 @@ class QPDNDClientSetting(models.Model):
                                           help_text=_('PDND Server Subject of the service'))
 
     pdnd_well_known_url = models.URLField(max_length=1200, null=True, blank=False,
-                                           help_text=_("PDND 'Well Known URL' of the service"))
+                                           help_text=_("PDND 'Well Known URL' of the service: "
+                                                   "i.e. <i>https://uat.interop.pagopa.it/.well-known/jwks.json</i>"))
 
     pdnd_api_purpose_verification_url = models.URLField(max_length=1200, null=True, blank=False,
-                                          help_text=_("PDND API Purpose Verification URL"))
+                                          help_text=_("PDND API Purpose Verification URL: "
+                              "i.e. <i>https://api.uat.interop.pagopa.it/1.0/purposes/{purposeId}/agreement</i>"))
 
     pdnd_api_token_url = models.URLField(max_length=1200, null=True, blank=False,
-                                                         help_text=_("PDND API Token URL"))
+                                                         help_text=_("PDND API Token URL: "
+                                                         "i.e. <i>https://auth.uat.interop.pagopa.it/token.oauth2</i>"))
 
     pdnd_audience = models.CharField(max_length=600, null=True, blank=False,
                                      help_text=_("PDND Audience of the service, i.e. 'test_cartografico'"))
