@@ -7,6 +7,13 @@ sitetrees = (
   G3Wtree('qpdnd', title='PDND', module='qpdnd', items=[
       # Then define items and their children with `item` function.
       item('PDND (OGC API)', '#', type_header=True),
+      item('Client settings', '#', icon_css_class='fa fa-globe', children=[
+          item('Aggiungi client setting', 'qpdnd-client-setting-add', url_as_pattern=True, icon_css_class='fa fa-plus',
+               access_by_perms=['qpdnd.add_qpdndclientsetting']),
+          item('Lista client settings', 'qpdnd-client-setting-list', url_as_pattern=True, icon_css_class='fa fa-list'),
+          item('Agg. client setting {{ object.name }}', 'qpdnd-client-setting-update object.pk', url_as_pattern=True,
+               icon_css_class='fa fa-edit', in_menu=False, alias='qpdnd-clint-setting-update'),
+      ]),
       item('Servizi', '#', icon_css_class='fa fa-globe', children=[
           item('Aggiungi servizio', 'qpdnd-project-add', url_as_pattern=True, icon_css_class='fa fa-plus',
                access_by_perms=['qpdnd.add_qpdndproject']),
@@ -19,6 +26,13 @@ sitetrees = (
   G3Wtree('qpdnd_en', title='PDND', module='qpdnd', items=[
       # Then define items and their children with `item` function.
       item('PDND (OGC API)', '#', type_header=True),
+      item('Client settings', '#', icon_css_class='fa fa-globe', children=[
+          item('Add client setting', 'qpdnd-client-setting-add', url_as_pattern=True, icon_css_class='fa fa-plus',
+               access_by_perms=['qpdnd.add_qpdndclientsetting']),
+          item('Client settings list', 'qpdnd-client-setting-list', url_as_pattern=True, icon_css_class='fa fa-list'),
+          item('Update client setting {{ object.name }}', 'qpdnd-client-setting-update object.pk', url_as_pattern=True,
+               icon_css_class='fa fa-edit', in_menu=False, alias='qpdnd-clint-setting-update'),
+      ]),
       item('Services', '#', icon_css_class='fa fa-globe', children=[
           item('Add reporting', 'qpdnd-project-add', url_as_pattern=True, icon_css_class='fa fa-plus',
                access_by_perms=['qpdnd.add_qpdndproject']),

@@ -35,12 +35,10 @@ class License(models.Model):
 class QPDNDProject(models.Model):
     """ Projects to expose """
 
-    ENV_TYPE = Choices(
-        ('prod', _('PRODUCTION')),
-        ('test', _('TESTING'))
-    )
 
     project = models.OneToOneField(Project, on_delete=models.CASCADE, related_name="%(app_label)s_projects")
+
+    client_setting = models.ForeignKey('QPDNDClientSetting', on_delete=models.CASCADE, null=True, blank=False)
 
     endpoint = models.CharField(max_length=255, null=False, blank=False,
                                 help_text=_('Select API endpoint for PDND layer. must be unique'),
@@ -69,24 +67,9 @@ class QPDNDProject(models.Model):
 
     license = models.ForeignKey(License, on_delete=models.SET_NULL, null=True, blank=True)
 
-    pdnd_env = models.CharField(max_length=4, null=True, blank=False, choices=ENV_TYPE, default='test',
-                                 help_text=_('Set the PDND environment for this API (Production, Testing)'))
-
-    pdnd_audience = models.CharField(max_length=600, null=True, blank=False,
-                                      help_text=_("PDND Audience of the service, i.e. 'test_cartografico'"))
-
-    pdnd_eservice_id = models.CharField(max_length=600, null=True, blank=False,
-                                      help_text=_("PDND Eservice ID of the service"))
-
     x_api_id = models.CharField(max_length=36, null=True, blank=True)
 
     note = models.TextField('Note', null=True, blank=True)
-
-    def env(self):
-        """
-        Return translated pdnd_env choice
-        """
-        return self.ENV_TYPE[self.pdnd_env] if self.pdnd_env else None
 
 
     def layers(self):
@@ -115,3 +98,59 @@ class QPDNDProject(models.Model):
 
     class Meta:
         verbose_name = 'PDND Project'
+
+
+class QPDNDClientSetting(models.Model):
+    """
+    Model contain information about PDND client settings
+    """
+
+    ENV_TYPE = Choices(
+        ('prod', _('PRODUCTION')),
+        ('test', _('TESTING'))
+    )
+
+    name = models.CharField(max_length=400, null=False, blank=False)
+    pdnd_env = models.CharField(max_length=4, null=True, blank=False, choices=ENV_TYPE, default='test',
+                                help_text=_('Set the PDND environment for this API (Production, Testing)'))
+
+    pdnd_server_kid = models.CharField(max_length=600, null=True, blank=False,
+                                       help_text=_('PDND Server KID of the service'))
+
+    pdnd_issuer = models.CharField(max_length=600, null=True, blank=False,
+                                       help_text=_('PDND Client Issuer of the service'))
+
+    pdnd_server_issuer = models.CharField(max_length=600, null=True, blank=False,
+                                   help_text=_('PDND Server Issuer of the service'))
+
+    pdnd_server_subject = models.CharField(max_length=600, null=True, blank=False,
+                                          help_text=_('PDND Server Subject of the service'))
+
+    pdnd_well_known_url = models.URLField(max_length=1200, null=True, blank=False,
+                                           help_text=_("PDND 'Well Known URL' of the service"))
+
+    pdnd_api_purpose_verification_url = models.URLField(max_length=1200, null=True, blank=False,
+                                          help_text=_("PDND API Purpose Verification URL"))
+
+    pdnd_api_token_url = models.URLField(max_length=1200, null=True, blank=False,
+                                                         help_text=_("PDND API Token URL"))
+
+    pdnd_audience = models.CharField(max_length=600, null=True, blank=False,
+                                     help_text=_("PDND Audience of the service, i.e. 'test_cartografico'"))
+
+    pdnd_eservice_id = models.CharField(max_length=600, null=True, blank=False,
+                                        help_text=_("PDND Eservice ID of the service"))
+
+    note = models.TextField('Note', null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'PDND Client Setting'
+
+    def env(self):
+        """
+        Return translated pdnd_env choice
+        """
+        return self.ENV_TYPE[self.pdnd_env] if self.pdnd_env else None
