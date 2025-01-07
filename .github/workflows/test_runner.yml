@@ -38,7 +38,7 @@ jobs:
 
     - name: Install QPDND python requirements
       run: |
-        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/ && pip3 install -r g3w-admin/qpdnd/requirements.txt"
+        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/ && pip3 install -r g3w-admin/qpdnd/requirements.txt && pip3 install -r g3w-admin/qpdnd/requirements_testing.txt"
 
     - name: Building g3w-suite
       run: |
