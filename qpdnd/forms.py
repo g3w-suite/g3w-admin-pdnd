@@ -62,11 +62,11 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
             Field('note', css_class='wys5'),
         ]
 
-        # fields_pdnd = [
-        #     Field('pdnd_env', css_class='select2'),
-        #     'pdnd_audience',
-        #     'pdnd_eservice_id'
-        # ]
+        fields_pdnd = [
+            Field('pdnd_env', css_class='select2'),
+            'pdnd_audience',
+            'pdnd_eservice_id'
+        ]
 
         self.helper = FormHelper(self)
         self.helper.form_tag = False
@@ -115,7 +115,7 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                                                     css_class='box-header with-border'
                                                 ),
                                                 Div(
-                                                    #*fields_pdnd,
+                                                    *fields_pdnd,
                                                     css_class='box-body',
                                                 ),
                                                 css_class='box box-success'
@@ -170,11 +170,10 @@ class QPDNDClientSettingForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
             'pdnd_server_kid',
             'pdnd_server_issuer',
             'pdnd_server_subject',
+            'pdnd_private_key',
             'pdnd_well_known_url',
             'pdnd_api_purpose_verification_url',
             'pdnd_api_token_url',
-            'pdnd_audience',
-            'pdnd_eservice_id',
             'note'
         ]
 

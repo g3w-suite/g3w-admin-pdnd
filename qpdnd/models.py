@@ -69,6 +69,12 @@ class QPDNDProject(models.Model):
 
     x_api_id = models.CharField(max_length=36, null=True, blank=True)
 
+    pdnd_audience = models.CharField(max_length=600, null=True, blank=False,
+                                     help_text=_("PDND Audience of the service, i.e. 'test_cartografico'"))
+
+    pdnd_eservice_id = models.CharField(max_length=600, null=True, blank=False,
+                                        help_text=_("PDND Eservice ID of the service"))
+
     note = models.TextField('Note', null=True, blank=True)
 
 
@@ -121,6 +127,8 @@ class QPDNDClientSetting(models.Model):
                                        help_text=_('PDND Client Issuer of the service: '
                                                    'i.e. <i>uat.interop.pagopa.it</i>'))
 
+    pdnd_private_key = models.TextField(null=True, blank=False, help_text=_('You private key in PEM format'))
+
     pdnd_server_issuer = models.CharField(max_length=600, null=True, blank=False,
                                    help_text=_('PDND Server Issuer of the service'))
 
@@ -138,12 +146,6 @@ class QPDNDClientSetting(models.Model):
     pdnd_api_token_url = models.URLField(max_length=1200, null=True, blank=False,
                                                          help_text=_("PDND API Token URL: "
                                                          "i.e. <i>https://auth.uat.interop.pagopa.it/token.oauth2</i>"))
-
-    pdnd_audience = models.CharField(max_length=600, null=True, blank=False,
-                                     help_text=_("PDND Audience of the service, i.e. 'test_cartografico'"))
-
-    pdnd_eservice_id = models.CharField(max_length=600, null=True, blank=False,
-                                        help_text=_("PDND Eservice ID of the service"))
 
     note = models.TextField('Note', null=True, blank=True)
 

@@ -33,14 +33,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RemoveField(
             model_name='qpdndproject',
-            name='pdnd_audience',
-        ),
-        migrations.RemoveField(
-            model_name='qpdndproject',
             name='pdnd_env',
-        ),
-        migrations.RemoveField(
-            model_name='qpdndproject',
-            name='pdnd_eservice_id',
-        ),
+        )
     ]
