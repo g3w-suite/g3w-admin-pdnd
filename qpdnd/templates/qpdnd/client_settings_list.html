@@ -23,11 +23,11 @@
                     <tr>
                         <th style="width:120px">{% trans 'Actions' %}</th>
                         <th>{% trans 'Name' %}</th>
+                        <th>{% trans 'PDND environment' %}</th>
                         <th>{% trans 'Note' %}</th>
                     </tr>
                 </thead>
                 {% for object in object_list %}
-                    {% get_obj_perms user for object.project as "userObj_perms" %}
                     <tr id="qpdnd_client_setting_{{ object.pk }}">
                         <td>
                             <span class="col-xs-4 icon">
@@ -38,6 +38,14 @@
                             </span>
                         </td>
                         <td>{{ object.name }}</td>
+                        <td>
+                            {% if object.pdnd_env == 'test' %}
+                            <span class="label label-success">{{ object.env }}</span>
+                            {% else %}
+                            <span class="label label-danger">{{ object.env }}</span>
+                            {% endif %}
+                        </td>
+
                         <td>{{ object.note|safe }}</td>
                     </tr>
                 {% endfor %}
