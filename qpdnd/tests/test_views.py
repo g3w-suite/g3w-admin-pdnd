@@ -18,12 +18,6 @@ from .base import (
     CURRENT_PATH,
     TEST_BASE_PATH
 )
-from qpdnd.views import (
-    QPDNDProjectDeleteView,
-    QPDNDProjectsListView,
-    QPDNDProjectAddView,
-    QPDNDProjectUpdateView
-)
 from qpdnd.models import QPDNDProject, License
 import json
 import os
@@ -47,8 +41,11 @@ class TestQPDNDViews(TestQPDNDBase):
 
         self.client.login(username=self.test_admin1.username, password=self.test_admin1.username)
 
+        # Create client settings item
+        cs = self.create_qpnd_client_setting()
         data = self.create_form_data(uform_data={
             'project': self.project.instance.pk,
+            'client_setting': cs.pk,
             'license': '2'
         })
 
@@ -91,7 +88,10 @@ class TestQPDNDViews(TestQPDNDBase):
         """
 
         # Create instance
-        qpdnd_project = self.create_qpnd_project()
+        cs = self.create_qpnd_client_setting()
+        qpdnd_project = self.create_qpnd_project(udata={
+            'client_setting': cs
+        })
         self.assertTrue(qpdnd_project.pk is not None)
 
         # To avoid auto generation of z_api_id

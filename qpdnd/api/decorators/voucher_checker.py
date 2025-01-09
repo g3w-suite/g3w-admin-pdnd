@@ -40,7 +40,7 @@ def _return_problem_json_response(title, status=401, details=None):
         **{'content_type': 'application/problem+json'})
 
 
-def _get_server_client_assertion(audience, client_id, issuer, subject, private_key_path):
+def _get_server_client_assertion(audience, client_id, issuer, subject, private_key):
     """
     Create a client assertion (where G3WSuite is the client) to get PDND a voucher
     """
@@ -66,11 +66,7 @@ def _get_server_client_assertion(audience, client_id, issuer, subject, private_k
         "exp": expire_in
     }
 
-    key_path = private_key_path
-    with open(key_path, "rb") as private_key:
-        rsaKey = private_key.read()
-
-    return jwt.encode(payload, rsaKey, algorithm="RS256", headers=headers_rsa)
+    return jwt.encode(payload, private_key, algorithm="RS256", headers=headers_rsa)
 
 
 def _get_voucher(url, client_id, client_assertion):
@@ -104,6 +100,7 @@ def pdnd_voucher_required(func):
 
             # Get parameters for OWS:ows-wfs3 url by endpoint url parameter
             qpdndp = QPDNDProject.objects.get(endpoint=kwargs['endpoint'])
+            qpdndcs = qpdndp.client_setting
 
             # Extract the JWS token from the request authorization:bearer header
             token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
@@ -133,7 +130,7 @@ def pdnd_voucher_required(func):
 
             # Get the public key from the well-known endpoint
             # TODO: this should be cached!
-            well_known_response = requests.get(settings.QPDND_WELL_KNOWN_URL[qpdndp.pdnd_env])
+            well_known_response = requests.get(qpdndcs.pdnd_well_known_url)
 
             # Search for kid in the json response
             public_key = None
@@ -160,7 +157,7 @@ def pdnd_voucher_required(func):
                 payload = jwt.decode(token, public_key,
                                      algorithms=[alg],
                                      audience=qpdndp.pdnd_audience,
-                                     issuer=settings.QPDND_ISSUER[qpdndp.pdnd_env],
+                                     issuer=qpdndcs.pdnd_issuer,
                                      options=options
                                      )
             except Exception as e:
@@ -176,19 +173,20 @@ def pdnd_voucher_required(func):
 
             # Get the voucher from the PDND API
             server_assertion = _get_server_client_assertion(
-                settings.QPDN_AUDIENCE[qpdndp.pdnd_env],
-                settings.QPDND_SERVER_KID[qpdndp.pdnd_env],
-                settings.QPDND_SERVER_ISSUER[qpdndp.pdnd_env],
-                settings.QPDND_SERVER_SUBJECT[qpdndp.pdnd_env],
-                settings.QPDND_SERVER_PRIVKEY_PATH[qpdndp.pdnd_env])
+                qpdndcs.pdnd_env,
+                qpdndcs.pdnd_server_kid,
+                qpdndcs.pdnd_server_issuer,
+                qpdndcs.pdnd_server_subject,
+                qpdndcs.pdnd_private_key
+            )
 
-            server_result = _get_voucher(settings.QPDND_API_TOKEN_URL[qpdndp.pdnd_env], settings.QPDND_SERVER_ISSUER[qpdndp.pdnd_env], server_assertion)
+            server_result = _get_voucher(qpdndcs.pdnd_api_token_url, qpdndcs.pdnd_server_issuer, server_assertion)
 
             if server_result.status_code != 200:
                 return _return_problem_json_response('PDND voucher request failed')
 
             server_access_token = server_result.json()['access_token']
-            purpose_verification_url = settings.QPDND_API_PURPOSE_VERIFICATION_URL[qpdndp.pdnd_env].format(purposeId=purpose_id)
+            purpose_verification_url = qpdndcs.pdnd_api_purpose_verification_url.format(purposeId=purpose_id)
             purpose_verification_response = requests.get(purpose_verification_url, headers={settings.QPDND_AUTH_HEADER: 'Bearer ' + server_access_token})
 
             if purpose_verification_response.status_code != 200:

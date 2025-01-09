@@ -28,7 +28,7 @@ DATASOURCE_PATH = '{}/{}project_data'.format(CURRENT_PATH, TEST_BASE_PATH)
 QGS_PROJECT_FILE = 'projects/test_ogc_api.qgs'
 QGS_PROJECT_FILE_NO_WFS_ACTIVED = 'projects/test_ogc_api_no_wfs_actived.qgs'
 
-
+PRIVKEY = "pdnd/keys/g3w-coll-keypair.rsa.priv"
 
 @override_settings(
     CACHES={
@@ -106,11 +106,36 @@ class TestQPDNDBase(TestCase):
             'title': 'Title of service',
             'x_summary': 'Brief description',
             'license': '1',
+            'pdnd_audience': 'test_audience',
+            'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d'
 
-            # Todo: change for new client setting model
-            #'pdnd_env': 'test',
-            #'pdnd_audience': 'test_audience',
-            #'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d'
+        }
+
+        form_data.update(uform_data)
+
+        return form_data
+
+    def create_client_setting_form_data(self, uform_data: dict={})-> dict:
+        """
+        Create form data for forms and views tests for client setting model
+        """
+
+        key_path = os.path.join(CURRENT_PATH, TEST_BASE_PATH, PRIVKEY)
+        with open(key_path, "rb") as private_key:
+            rsaKey = private_key.read()
+
+        form_data = {
+            'name': 'Cliente setting test form data',
+            'pdnd_env': 'test',
+            'pdnd_server_kid': 'J_z5sjzZ-7yRxGz0Cz_EtIPSbpLE0d5BJoBNGcsTzz4',
+            'pdnd_issuer': 'uat.interop.pagopa.it',
+            'pdnd_server_issuer': 'c2fc3ed2-a096-4a23-bb2e-47c767fa19d6',
+            'pdnd_server_subject': 'c2fc3ed2-a096-4a23-bb2e-47c767fa19d6',
+            'pdnd_well_known_url': 'https://uat.interop.pagopa.it/.well-known/jwks.json',
+            'pdnd_api_purpose_verification_url': 'https://api.uat.interop.pagopa.it/1.0/purposes/{purposeId}/agreement',
+            'pdnd_api_token_url': 'https://auth.uat.interop.pagopa.it/token.oauth2',
+            'pdnd_private_key': rsaKey,
+            'note': 'note test'
 
         }
 
@@ -136,11 +161,8 @@ class TestQPDNDBase(TestCase):
             'x_summary': 'Brief description',
             'license': License.objects.get(pk=3),
             'x_api_id': '0bb5b19c-11e5-4f31-b8a2-6269822b29cc',
-
-            # Todo: change for nuw client config model
-            #'pdnd_env': 'test',
-            #'pdnd_audience': 'test_audince',
-            #'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d'
+            'pdnd_audience': 'test_audince',
+            'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d'
         }
 
         data.update(udata)
@@ -152,9 +174,13 @@ class TestQPDNDBase(TestCase):
         Create qpdndpclientsetting instance
         """
 
+        key_path = os.path.join(CURRENT_PATH, TEST_BASE_PATH, PRIVKEY)
+        with open(key_path, "rb") as private_key:
+            rsaKey = private_key.read()
+
         # Create instance
         data = {
-            'name': self.project.instance,
+            'name': 'Test Client Setting Name',
             'pdnd_env': 'test',
             'pdnd_server_kid': 'J_z5sjzZ-7yRxGz0Cz_EtIPSbpLE0d5BJoBNGcsTzz4',
             'pdnd_issuer': 'uat.interop.pagopa.it',
@@ -163,10 +189,7 @@ class TestQPDNDBase(TestCase):
             'pdnd_well_known_url': 'https://uat.interop.pagopa.it/.well-known/jwks.json',
             'pdnd_api_purpose_verification_url': 'https://api.uat.interop.pagopa.it/1.0/purposes/{purposeId}/agreement',
             'pdnd_api_token_url': 'https://auth.uat.interop.pagopa.it/token.oauth2',
-
-            # Todo: change for nuw client config model
-            'pdnd_audience': 'test_audience',
-            'pdnd_eservice_id': '929ce5a1-2e82-4e37-bdce-c76bfd66407d',
+            'pdnd_private_key': rsaKey,
             'note': 'note test'
         }
 

@@ -114,7 +114,9 @@ class TestQPDNDModels(VCRMixin, TestQPDNDBase):
 
     def test_auth(self):
         # Create instance
+        cs = self.create_qpnd_client_setting()
         qpdnd_project = self.create_qpnd_project(udata={
+            "client_setting": cs,
             "pdnd_audience": "areepercorsedalfuoco",
             "pdnd_eservice_id": "1fe35bd9-d4be-4e10-a4ed-56f98b10f603"
         })
