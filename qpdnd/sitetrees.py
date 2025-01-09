@@ -34,7 +34,7 @@ sitetrees = (
                icon_css_class='fa fa-edit', in_menu=False, alias='qpdnd-clint-setting-update'),
       ]),
       item('Services', '#', icon_css_class='fa fa-globe', children=[
-          item('Add reporting', 'qpdnd-project-add', url_as_pattern=True, icon_css_class='fa fa-plus',
+          item('Add service', 'qpdnd-project-add', url_as_pattern=True, icon_css_class='fa fa-plus',
                access_by_perms=['qpdnd.add_qpdndproject']),
           item('Services list', 'qpdnd-project-list', url_as_pattern=True, icon_css_class='fa fa-list'),
           item('Update service {{ object.title }}', 'qpdnd-project-update object.pk', url_as_pattern=True,
