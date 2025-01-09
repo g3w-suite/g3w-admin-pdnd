@@ -127,6 +127,7 @@ class TestQPDNDBase(TestCase):
         form_data = {
             'name': 'Cliente setting test form data',
             'pdnd_env': 'test',
+            'pdnd_audience': 'auth.uat.interop.pagopa.it/client-assertion',
             'pdnd_server_kid': 'J_z5sjzZ-7yRxGz0Cz_EtIPSbpLE0d5BJoBNGcsTzz4',
             'pdnd_issuer': 'uat.interop.pagopa.it',
             'pdnd_server_issuer': 'c2fc3ed2-a096-4a23-bb2e-47c767fa19d6',
@@ -182,6 +183,7 @@ class TestQPDNDBase(TestCase):
         data = {
             'name': 'Test Client Setting Name',
             'pdnd_env': 'test',
+            'pdnd_audience': 'auth.uat.interop.pagopa.it/client-assertion',
             'pdnd_server_kid': 'J_z5sjzZ-7yRxGz0Cz_EtIPSbpLE0d5BJoBNGcsTzz4',
             'pdnd_issuer': 'uat.interop.pagopa.it',
             'pdnd_server_issuer': 'c2fc3ed2-a096-4a23-bb2e-47c767fa19d6',

@@ -120,6 +120,9 @@ class QPDNDClientSetting(models.Model):
     pdnd_env = models.CharField(max_length=4, null=True, blank=False, choices=ENV_TYPE, default='test',
                                 help_text=_('Set the PDND environment for this API (Production, Testing)'))
 
+    pdnd_audience = models.CharField(max_length=600, null=True, blank=False, help_text=_('PDND Audience of the service: '
+                                                                    'i.e. auth.uat.interop.pagopa.it/client-assertion'))
+
     pdnd_server_kid = models.CharField(max_length=600, null=True, blank=False,
                                        help_text=_('PDND Server KID of the service'))
 

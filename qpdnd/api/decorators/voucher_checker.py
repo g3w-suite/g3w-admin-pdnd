@@ -173,7 +173,7 @@ def pdnd_voucher_required(func):
 
             # Get the voucher from the PDND API
             server_assertion = _get_server_client_assertion(
-                qpdndcs.pdnd_env,
+                qpdndcs.pdnd_audience,
                 qpdndcs.pdnd_server_kid,
                 qpdndcs.pdnd_server_issuer,
                 qpdndcs.pdnd_server_subject,

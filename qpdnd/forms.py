@@ -166,6 +166,7 @@ class QPDNDClientSettingForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
             'name',
             Field('pdnd_env', css_class='select2'),
             'pdnd_issuer',
+            'pdnd_audience',
             'pdnd_server_kid',
             'pdnd_server_issuer',
             'pdnd_server_subject',
