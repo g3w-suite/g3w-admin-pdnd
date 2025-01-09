@@ -28,7 +28,7 @@ DATASOURCE_PATH = '{}/{}project_data'.format(CURRENT_PATH, TEST_BASE_PATH)
 QGS_PROJECT_FILE = 'projects/test_ogc_api.qgs'
 QGS_PROJECT_FILE_NO_WFS_ACTIVED = 'projects/test_ogc_api_no_wfs_actived.qgs'
 
-PRIVKEY = "pdnd/keys/g3w-coll-keypair.rsa.priv"
+PRIVKEY = "pdnd/keys/api-pdnd-coll-keypair.rsa.priv"
 
 @override_settings(
     CACHES={
@@ -135,7 +135,7 @@ class TestQPDNDBase(TestCase):
             'pdnd_well_known_url': 'https://uat.interop.pagopa.it/.well-known/jwks.json',
             'pdnd_api_purpose_verification_url': 'https://api.uat.interop.pagopa.it/1.0/purposes/{purposeId}/agreement',
             'pdnd_api_token_url': 'https://auth.uat.interop.pagopa.it/token.oauth2',
-            'pdnd_private_key': rsaKey,
+            'pdnd_private_key': rsaKey.decode(),
             'note': 'note test'
 
         }
@@ -191,7 +191,7 @@ class TestQPDNDBase(TestCase):
             'pdnd_well_known_url': 'https://uat.interop.pagopa.it/.well-known/jwks.json',
             'pdnd_api_purpose_verification_url': 'https://api.uat.interop.pagopa.it/1.0/purposes/{purposeId}/agreement',
             'pdnd_api_token_url': 'https://auth.uat.interop.pagopa.it/token.oauth2',
-            'pdnd_private_key': rsaKey,
+            'pdnd_private_key': rsaKey.decode(),
             'note': 'note test'
         }
 
