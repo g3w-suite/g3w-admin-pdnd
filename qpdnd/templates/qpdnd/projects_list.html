@@ -75,10 +75,10 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if object.pdnd_env == 'test' %}
-                            <span class="label label-success">{{ object.env }}</span>
+                            {% if object.client_setting.pdnd_env == 'test' %}
+                            <span class="label label-success">{{ object.client_setting.pdnd_env }}</span>
                             {% else %}
-                            <span class="label label-danger">{{ object.env }}</span>
+                            <span class="label label-danger">{{ object.client_setting.pdnd_env }}</span>
                             {% endif %}
                         </td>
                         <td>{{ object.pdnd_audience }}</td>
