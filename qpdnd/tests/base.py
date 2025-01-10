@@ -28,7 +28,7 @@ DATASOURCE_PATH = '{}/{}project_data'.format(CURRENT_PATH, TEST_BASE_PATH)
 QGS_PROJECT_FILE = 'projects/test_ogc_api.qgs'
 QGS_PROJECT_FILE_NO_WFS_ACTIVED = 'projects/test_ogc_api_no_wfs_actived.qgs'
 
-PRIVKEY = "pdnd/keys/api-pdnd-coll-keypair.rsa.priv"
+PRIVKEY = "pdnd/keys/g3w-coll-keypair.rsa.priv"
 
 @override_settings(
     CACHES={
