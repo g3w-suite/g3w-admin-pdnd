@@ -21,6 +21,8 @@ import os
 # Activate/deactivate the PDND voucher checker
 QPDND_VOUCHER_VALIDATE = True
 
+QPDND_AUTH_HEADER = 'Authorization'
+
 #############################################################
 # These may be ported to the model settings
 
@@ -64,8 +66,6 @@ QPDND_WELL_KNOWN_URL = {
     'test': "https://uat.interop.pagopa.it/.well-known/jwks.json",
     'prod': "https://interop.pagopa.it/.well-known/jwks.json"
 }
-
-QPDND_AUTH_HEADER = 'Authorization'
 
 QPDND_API_PURPOSE_VERIFICATION_URL = {
     'test': "https://api.uat.interop.pagopa.it/1.0/purposes/{purposeId}/agreement",

@@ -10,8 +10,11 @@ __author__ = 'elpaso@itopen.it'
 __date__ = '2024-09-16'
 __copyright__ = 'Copyright 2024, Gis3w'
 
+from xml.dom.domreg import well_known_implementations
+
 from django.http import JsonResponse
 from django.conf import settings
+from django.core.cache import cache
 from qpdnd.models import QPDNDProject
 from qpdnd.utils.general import get_qpdnd_internal_user
 import json
@@ -19,6 +22,7 @@ import jwt
 import requests
 import datetime
 import uuid
+import time
 
 def _return_problem_json_response(title, status=401, details=None):
     """
@@ -102,6 +106,10 @@ def pdnd_voucher_required(func):
             qpdndp = QPDNDProject.objects.get(endpoint=kwargs['endpoint'])
             qpdndcs = qpdndp.client_setting
 
+            # Caching well-known endpoint response
+            # Caching by key for qpdndclientsetting model instance pk
+            wn_cache_key = f'qpdnd_well_known_{qpdndcs.pk}'
+
             # Extract the JWS token from the request authorization:bearer header
             token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
 
@@ -129,8 +137,12 @@ def pdnd_voucher_required(func):
                 return _return_problem_json_response('Invalid token (empty kid)')
 
             # Get the public key from the well-known endpoint
-            # TODO: this should be cached!
-            well_known_response = requests.get(qpdndcs.pdnd_well_known_url)
+            # Try to get cached response
+            well_known_response = cache.get(wn_cache_key)
+
+            if not well_known_response:
+                print('chiamata well known')
+                well_known_response = requests.get(qpdndcs.pdnd_well_known_url)
 
             # Search for kid in the json response
             public_key = None
@@ -163,6 +175,8 @@ def pdnd_voucher_required(func):
             except Exception as e:
                 return _return_problem_json_response(str(e))
 
+            # Caching well-known endpoint response
+            cache.set(wn_cache_key, well_known_response.json(), int(payload['exp'] - time.time()))
 
             # Verify that the purposeId in the token is authorized by calling PDND API
             purpose_id = None
