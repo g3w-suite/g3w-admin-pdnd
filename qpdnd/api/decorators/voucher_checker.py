@@ -141,7 +141,10 @@ def pdnd_voucher_required(func):
             well_known_response = cache.get(wn_cache_key)
 
             if not well_known_response:
+                print('chiamate well none')
                 well_known_response = requests.get(qpdndcs.pdnd_well_known_url)
+            else:
+                print('chiamate well cache')
 
             # Search for kid in the json response
             public_key = None
@@ -174,8 +177,12 @@ def pdnd_voucher_required(func):
             except Exception as e:
                 return _return_problem_json_response(str(e))
 
+            # For testing
+            if settings.QPDND_TESTING_RUNNING:
+                payload['exp'] = settings.QPDND_TESTING_VOUCHER_EXP
+
             # Caching well-known endpoint response
-            cache.set(wn_cache_key, well_known_response.json(), int(payload['exp'] - time.time()))
+            cache.set(wn_cache_key, well_known_response, int(payload['exp'] - time.time()))
 
             # Verify that the purposeId in the token is authorized by calling PDND API
             purpose_id = None

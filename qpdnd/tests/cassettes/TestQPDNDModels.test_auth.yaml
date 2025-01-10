@@ -218,4 +218,222 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.31.0
+    method: GET
+    uri: https://uat.interop.pagopa.it/.well-known/jwks.json
+  response:
+    body:
+      string: "{\n  \"keys\": [\n    {\n      \"kty\": \"RSA\",\n      \"kid\" : \"32d8a321-1568-44f5-9558-a9072f519d2d\",\n
+        \     \"n\": \"48w_yMYGZmYWL3k8OejIYA1vrhDh1nRT6Mvsk10hEP5fCkQfU3eUEK9H9TLpCzOfAchFxs7TokitkniDOoE9oi5OL-qWoYf6XI0-eFk40xv0YZPUteJYoGVLLVjycU3aPwXKidk5Xy3rk8T67p7xjI6XfRJuFia1Zd9R_HBfbelKU565d9qXYHpYrNxuiM8o3cwc6famBeMU7nHhBCpe0FOFsSgyfEACnNral-67T5WO76heqlgwNYPCkVv5Uz7CmfUZ2MzdzAp9ZiPi3B-XlPhhm9STxFsBLEDZLel7M7eHM8q6TmDtxSQEExjLenMzT8IiyU43CCu17Fed7dYVrw\",\n
+        \     \"e\": \"AQAB\"\n    },\n    {\n      \"kty\": \"RSA\",\n      \"n\":
+        \"m26QIbhJyzbwum-_YolgLFLIN6EqGl67jwEOThmmLdXYEyrBoU1qLLdFWyp44k0cBG0NMGRK6twZ6aV-WqcQJjpUyDDP4cLwqFe42jcnLTCrD9ezuSdGyIkuvEFtJ8fpHggWsscihdr-LydAiYyEOWq2tZZ3YexfoMWte8TCZQ9Xg0UpOaXp6xJV9AejiVq18OQtRnJoo7USrvWCnYdghXrGqax02ze7CZAgnZgP8RVQ7AMMtuZvsAwc92v_piHbYjhrRFhGOhV0Nf5NaNiVt62Jmjr1KEKRP6oPD6yqeBXuQ3fWt5htse6SUzIM48xBrJ7AAGhRF19T4ORwbaT4bw\",\n
+        \     \"e\": \"AQAB\",\n      \"kid\": \"cdb52532-dd94-40ef-824d-9c55b10e6bc9\"\n
+        \   }\n  ]\n}\n"
+    headers:
+      Accept-Ranges:
+      - bytes
+      Age:
+      - '82346'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '942'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 09 Jan 2025 12:05:08 GMT
+      ETag:
+      - '"2075e8c0b3a605c58a5d3826411ba5e0"'
+      Last-Modified:
+      - Thu, 29 Aug 2024 13:22:09 GMT
+      Server:
+      - AmazonS3
+      Via:
+      - 1.1 02b3125b6cf024d5eb793b2d2badcb68.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - 16HoSe2hCo-FaEaDm8XqugDgobGb5xaarnGxf2Qhix5aY4HhYccY-Q==
+      X-Amz-Cf-Pop:
+      - MXP53-P5
+      X-Cache:
+      - Hit from cloudfront
+      x-amz-replication-status:
+      - REPLICA
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - U2W7d7l2I6lM4zU2lGciqehhgGVbZmyL
+    status:
+      code: 200
+      message: OK
+- request:
+    body: client_id=c2fc3ed2-a096-4a23-bb2e-47c767fa19d6&client_assertion=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IkpfejVzanpaLTd5UnhHejBDel9FdElQU2JwTEUwZDVCSm9CTkdjc1R6ejQifQ.eyJpc3MiOiJjMmZjM2VkMi1hMDk2LTRhMjMtYmIyZS00N2M3NjdmYTE5ZDYiLCJzdWIiOiJjMmZjM2VkMi1hMDk2LTRhMjMtYmIyZS00N2M3NjdmYTE5ZDYiLCJhdWQiOiJhdXRoLnVhdC5pbnRlcm9wLnBhZ29wYS5pdC9jbGllbnQtYXNzZXJ0aW9uIiwianRpIjoiNTA4OTMwMTUtYWQ3NS00NWZlLWE5ZDAtMmY1NWMxYjg5MmEzIiwiaWF0IjoxNzM2NTA2NjUzLCJleHAiOjE3MzY1MTM4NTN9.DoSlwk3lov-97wI9gZev4v-QRN7l2Q6bzJQXwxgWR57ATbp7TsGdLYL143kubr3ZGvcGo7CB3FqgNaFf---csXywwGrggMcLpFZ3bOITKbtzTqr8Wc9eKJtOVCW2obw1m_LbxuUgvc3h1X5hZIBxLvxwkNqx6h_czPA29x_5lCV4K7OiasXXuMJkXHE3X87gSCXeVezRxfTbZxPmrPJJMOlSMBNNQoi0BOOGOrY41JiyFxEZjgAc0If0ON2NPaZwSEcw08Qh68UgqNQrOCr7gJ4_dWzTknLCDEZr9AXhvj7kXtbHWPQhQWIyk6Qkf-PQsb-V8B7ui220uP8FVzjXpg&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&grant_type=client_credentials
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '927'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://auth.uat.interop.pagopa.it/token.oauth2
+  response:
+    body:
+      string: '{"correlationId":"a2ddb861-6f0b-46c9-9930-81185085e386","errors":[{"code":"015-0008","detail":"Unable
+        to generate a token for the given request"}],"status":400,"title":"The request
+        contains bad syntax or cannot be fulfilled.","type":"about:blank"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - Authorization, Content-Type, X-Requested-With, Accept-Language
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '247'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 10 Jan 2025 10:57:33 GMT
+      x-amz-apigw-id:
+      - EKx8uHldMu8EpDw=
+      x-amzn-Remapped-Connection:
+      - keep-alive
+      x-amzn-Remapped-Content-Length:
+      - '247'
+      x-amzn-Remapped-Date:
+      - Fri, 10 Jan 2025 10:57:33 GMT
+      x-amzn-Remapped-Server:
+      - akka-http/10.2.10
+      x-amzn-RequestId:
+      - 87c43e73-7e6b-4dc0-8bac-3bca06aa7cb2
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.31.0
+    method: GET
+    uri: https://uat.interop.pagopa.it/.well-known/jwks.json
+  response:
+    body:
+      string: "{\n  \"keys\": [\n    {\n      \"kty\": \"RSA\",\n      \"kid\" : \"32d8a321-1568-44f5-9558-a9072f519d2d\",\n
+        \     \"n\": \"48w_yMYGZmYWL3k8OejIYA1vrhDh1nRT6Mvsk10hEP5fCkQfU3eUEK9H9TLpCzOfAchFxs7TokitkniDOoE9oi5OL-qWoYf6XI0-eFk40xv0YZPUteJYoGVLLVjycU3aPwXKidk5Xy3rk8T67p7xjI6XfRJuFia1Zd9R_HBfbelKU565d9qXYHpYrNxuiM8o3cwc6famBeMU7nHhBCpe0FOFsSgyfEACnNral-67T5WO76heqlgwNYPCkVv5Uz7CmfUZ2MzdzAp9ZiPi3B-XlPhhm9STxFsBLEDZLel7M7eHM8q6TmDtxSQEExjLenMzT8IiyU43CCu17Fed7dYVrw\",\n
+        \     \"e\": \"AQAB\"\n    },\n    {\n      \"kty\": \"RSA\",\n      \"n\":
+        \"m26QIbhJyzbwum-_YolgLFLIN6EqGl67jwEOThmmLdXYEyrBoU1qLLdFWyp44k0cBG0NMGRK6twZ6aV-WqcQJjpUyDDP4cLwqFe42jcnLTCrD9ezuSdGyIkuvEFtJ8fpHggWsscihdr-LydAiYyEOWq2tZZ3YexfoMWte8TCZQ9Xg0UpOaXp6xJV9AejiVq18OQtRnJoo7USrvWCnYdghXrGqax02ze7CZAgnZgP8RVQ7AMMtuZvsAwc92v_piHbYjhrRFhGOhV0Nf5NaNiVt62Jmjr1KEKRP6oPD6yqeBXuQ3fWt5htse6SUzIM48xBrJ7AAGhRF19T4ORwbaT4bw\",\n
+        \     \"e\": \"AQAB\",\n      \"kid\": \"cdb52532-dd94-40ef-824d-9c55b10e6bc9\"\n
+        \   }\n  ]\n}\n"
+    headers:
+      Accept-Ranges:
+      - bytes
+      Age:
+      - '82571'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '942'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 09 Jan 2025 12:05:08 GMT
+      ETag:
+      - '"2075e8c0b3a605c58a5d3826411ba5e0"'
+      Last-Modified:
+      - Thu, 29 Aug 2024 13:22:09 GMT
+      Server:
+      - AmazonS3
+      Via:
+      - 1.1 bb3ccff56090ee7d63292b810dab92bc.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - 0Fuuf0DR7lF7V0GCp1K5Q8gFVIOQeDHu8utxj-VJHL3iZdQw8Yi_2Q==
+      X-Amz-Cf-Pop:
+      - MXP53-P5
+      X-Cache:
+      - Hit from cloudfront
+      x-amz-replication-status:
+      - REPLICA
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - U2W7d7l2I6lM4zU2lGciqehhgGVbZmyL
+    status:
+      code: 200
+      message: OK
+- request:
+    body: client_id=c2fc3ed2-a096-4a23-bb2e-47c767fa19d6&client_assertion=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IkpfejVzanpaLTd5UnhHejBDel9FdElQU2JwTEUwZDVCSm9CTkdjc1R6ejQifQ.eyJpc3MiOiJjMmZjM2VkMi1hMDk2LTRhMjMtYmIyZS00N2M3NjdmYTE5ZDYiLCJzdWIiOiJjMmZjM2VkMi1hMDk2LTRhMjMtYmIyZS00N2M3NjdmYTE5ZDYiLCJhdWQiOiJhdXRoLnVhdC5pbnRlcm9wLnBhZ29wYS5pdC9jbGllbnQtYXNzZXJ0aW9uIiwianRpIjoiYzBhMzI4ZjItMTdkOC00MzY1LWEzZDEtNGVmMzAxZWNmOTBiIiwiaWF0IjoxNzM2NTA2ODc4LCJleHAiOjE3MzY1MTQwNzh9.bsPkP7YTY-50fMWnZzI5ZMhgD1e5gidEqC5wrVZJDBDYNkMEBFzGjR3-CsZLSmNpn9JgPHD4qeg7c3YqXzJP-9n9KHmoVGC8mcuxfG2Vk4J_A5VjbgrbSf4c5CwKKQ2rMbJN1KSsX244-LH9qJ_ayx9ioaEzMYDhMd98MOQ9P4FeLyEPAIfhw3uYsH8v_S5gMRijiKAzosj7u0Q6RkHpZwCj6RsZYsB55IHDu2PC1IDXKfL54gSeGoJSUx6AOF8QOsdpono4qL_3hCDXau8A_YRIdL9dG_EZ-8haq5YkDKgEOIkZAMzTpy6jDqTgMyo5-pIzLqWtWzL8uePLSt4d2Q&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&grant_type=client_credentials
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '927'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://auth.uat.interop.pagopa.it/token.oauth2
+  response:
+    body:
+      string: '{"correlationId":"73a34111-dd60-4962-8463-275866ef124e","errors":[{"code":"015-0008","detail":"Unable
+        to generate a token for the given request"}],"status":400,"title":"The request
+        contains bad syntax or cannot be fulfilled.","type":"about:blank"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - Authorization, Content-Type, X-Requested-With, Accept-Language
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '247'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 10 Jan 2025 11:01:19 GMT
+      x-amz-apigw-id:
+      - EKyf6GJosu8Ehjw=
+      x-amzn-Remapped-Connection:
+      - keep-alive
+      x-amzn-Remapped-Content-Length:
+      - '247'
+      x-amzn-Remapped-Date:
+      - Fri, 10 Jan 2025 11:01:19 GMT
+      x-amzn-Remapped-Server:
+      - akka-http/10.2.10
+      x-amzn-RequestId:
+      - 408e58a2-6691-49d4-a2a4-a0d12af1d1dd
+    status:
+      code: 400
+      message: Bad Request
 version: 1
