@@ -141,7 +141,6 @@ def pdnd_voucher_required(func):
             well_known_response = cache.get(wn_cache_key)
 
             if not well_known_response:
-                print('chiamata well known')
                 well_known_response = requests.get(qpdndcs.pdnd_well_known_url)
 
             # Search for kid in the json response
