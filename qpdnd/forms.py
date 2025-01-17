@@ -24,7 +24,10 @@ from core.mixins.forms import (
     G3WRequestFormMixin,
     G3WFormMixin
 )
-from .models import QPDNDProject
+from .models import (
+    QPDNDProject,
+    QPDNDClientSetting
+)
 import re
 
 
@@ -42,6 +45,7 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
 
         fields = [
             Field('project', css_class='select2'),
+            Field('client_setting', css_class='select2'),
         ]
 
         fields_info_data = [
@@ -59,7 +63,6 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
         ]
 
         fields_pdnd = [
-            Field('pdnd_env', css_class='select2'),
             'pdnd_audience',
             'pdnd_eservice_id'
         ]
@@ -145,3 +148,54 @@ class QPDNDProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
         if not wfs_active:
             raise ValidationError(_("The project must have almost one vector layer exposed as WFS service!"))
         return prj
+
+
+class QPDNDClientSettingForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
+    """
+    Form for QPDNDClientSetting model.
+    """
+
+    class Meta:
+        model = QPDNDClientSetting
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        fields = [
+            'name',
+            Field('pdnd_env', css_class='select2'),
+            'pdnd_issuer',
+            'pdnd_audience',
+            'pdnd_server_kid',
+            'pdnd_server_issuer',
+            'pdnd_server_subject',
+            'pdnd_private_key',
+            'pdnd_well_known_url',
+            'pdnd_api_purpose_verification_url',
+            'pdnd_api_token_url',
+            'note'
+        ]
+
+        self.helper = FormHelper(self)
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+                                Div(
+                                    Div(
+                                        Div(
+                                            Div(
+                                                HTML("<h3 class='box-title'><i class='fa fa-file'></i> {}</h3>".format(
+                                                    _('Client Setting'))),
+                                                css_class='box-header with-border'
+                                            ),
+                                            Div(
+                                                *fields,
+                                                css_class='box-body',
+                                            ),
+                                            css_class='box box-success'
+                                        ),
+                                        css_class='col-md-12'
+                                    ),
+                                    css_class='row'
+                                )
+                            )

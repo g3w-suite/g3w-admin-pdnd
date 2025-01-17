@@ -11,9 +11,10 @@ __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
 from django.urls import reverse
+from django.core.cache import cache
 from vcr_unittest import VCRMixin
 from vcr.record_mode import RecordMode
-from .base import TestQPDNDBase, CURRENT_PATH, TEST_BASE_PATH
+from .base import TestQPDNDBase, CURRENT_PATH, TEST_BASE_PATH, override_settings
 from .pdnd_params import *
 import jwt
 import datetime
@@ -21,6 +22,7 @@ import uuid
 import json
 import os
 import requests
+import time
 
 class TestQPDNDModels(VCRMixin, TestQPDNDBase):
     """
@@ -111,13 +113,19 @@ class TestQPDNDModels(VCRMixin, TestQPDNDBase):
 
         qpdnd_project.delete()
 
-
+    @override_settings(
+        QPDND_TESTING_VOUCHER_EXP=time.time() + 60
+    )
     def test_auth(self):
         # Create instance
+        cs = self.create_qpnd_client_setting()
         qpdnd_project = self.create_qpnd_project(udata={
+            "client_setting": cs,
             "pdnd_audience": "areepercorsedalfuoco",
             "pdnd_eservice_id": "1fe35bd9-d4be-4e10-a4ed-56f98b10f603"
         })
+
+        wn_cache_key = f'qpdnd_well_known_{cs.pk}'
         self.assertTrue(qpdnd_project.pk is not None)
 
         url = reverse('qpdnd-api-ogc', args=[qpdnd_project.endpoint]) + "/collections"
@@ -149,7 +157,17 @@ class TestQPDNDModels(VCRMixin, TestQPDNDBase):
         # The following check can works only if a client is set on PDND !!
         # So activate it if you have set a client on PDND portal.
         # ----------------------------------------------------------------
+        # Test caching well-known endpoint response timing
         self.assertEqual(response.status_code, 200, response.content)
+        self.assertTrue(cache.get(wn_cache_key) is not None)
+        self.client.get(url, **headers)
+        self.assertTrue(cache.get(wn_cache_key) is not None)
+
+        # Wait for 30 and check again
+        time.sleep(50)
+        self.client.get(url, **headers)
+        self.assertTrue(cache.get(wn_cache_key) is None)
+
 
         # Remove voucher checks
         # ----------------------------------------------

@@ -23,9 +23,7 @@
 <div class="col-md-12 col-xs-12">
     <div class="box">
         <div class="box-header">
-            {% if perms.auth.add_simplereopoproject %}
             <a href="{% url 'qpdnd-project-add' %}" class="btn btn-info" id="btn-add-project"><i class="ion ion-plus-circled"></i> {% trans 'Project' %}</a>
-            {% endif %}
         </div>
         <div class="box-body">
             <table id="qpdndprojects_table" class="table table-hover table-striped" data-widget-type="dataTable">
@@ -77,10 +75,10 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if object.pdnd_env == 'test' %}
-                            <span class="label label-success">{{ object.env }}</span>
+                            {% if object.client_setting.pdnd_env == 'test' %}
+                            <span class="label label-success">{{ object.client_setting.pdnd_env }}</span>
                             {% else %}
-                            <span class="label label-danger">{{ object.env }}</span>
+                            <span class="label label-danger">{{ object.client_setting.pdnd_env }}</span>
                             {% endif %}
                         </td>
                         <td>{{ object.pdnd_audience }}</td>

@@ -19,12 +19,42 @@ from qpdnd.views import (
     QPDNDProjectsListView,
     QPDNDProjectAddView,
     QPDNDProjectUpdateView,
-    QPDNDProjectDeleteView
+    QPDNDProjectDeleteView,
+    QPDNDClientSettingListView,
+    QPDNDClientSettingAddView,
+    QPDNDClientSettingUpdateView,
+    QPDNDClientSettingDeleteView
 )
 
 G3W_SITETREE_I18N_ALIAS.append('qpdnd')
 
 urlpatterns = [
+
+    # For client settings
+    # -------------------
+    path(
+        'client_settings/',
+        login_required(QPDNDClientSettingListView.as_view()),
+        name='qpdnd-client-setting-list'
+    ),
+
+    path(
+        'client_settings/add/',
+        login_required(QPDNDClientSettingAddView.as_view()),
+        name='qpdnd-client-setting-add'
+    ),
+
+    path(
+        'client_settings/update/<int:pk>/',
+        login_required(QPDNDClientSettingUpdateView.as_view()),
+        name='qpdnd-client-setting-update'
+    ),
+
+    path(
+        'client_settings/delete/<int:pk>/',
+        login_required(QPDNDClientSettingDeleteView.as_view()),
+        name='qpdnd-client-setting-delete'
+    ),
 
     # For projects
     # ------------
