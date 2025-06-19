@@ -4,6 +4,8 @@
 
 A [G3W-SUITE](https://github.com/g3w-suite) plugin for [**Piattaforma Digitale Nazionale Dati**](https://innovazione.gov.it/progetti/dati-e-interoperabilita/) (PDND).
 
+![PDND schema](doc/img/pdnd_schema.png)
+
 ### Auhtentication
 The plugin support the first level of authentication required by **PDND** based con `voucher token` analisys.
 
