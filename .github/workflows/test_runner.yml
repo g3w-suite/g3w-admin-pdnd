@@ -35,6 +35,11 @@ jobs:
     - name: Activate QPDND module
       run: |
         docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "printf '\nG3WADMIN_LOCAL_MORE_APPS = [\"qpdnd\"]\n' >> /code/settings_docker.py"
+    
+    - name: TEST
+      run: |
+        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cat /code/settings_docker.py"
+
 
     - name: Install QPDND python requirements
       run: |
