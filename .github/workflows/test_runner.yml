@@ -30,11 +30,15 @@ jobs:
 
     - name: Installing G3W-ADMIN Python requirements
       run: |
-        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/ && pip3 install -r requirements_docker.txt --break-system-packages && pip3 install -r requirements_huey.txt --break-system-packages && pip3 install -r g3w-admin/openrouteservice/requirements.txt --break-system-packages"
+        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cd /code/ && pip3 install -r requirements_docker.txt --break-system-packages && pip3 install -r requirements_huey.txt --break-system-packages"
 
     - name: Activate QPDND module
       run: |
         docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "echo \"G3WADMIN_LOCAL_MORE_APPS = ['qpdnd']\" >> /code/settings_docker.py"
+    
+    - name: TEST
+      run: |
+        docker compose -f docker-compose.ltr.yml exec -T g3w-suite sh -c "cat /code/settings_docker.py"
 
     - name: Install QPDND python requirements
       run: |
