@@ -25,7 +25,8 @@ from qpdnd.views import (
     QPDNDClientSettingUpdateView,
     QPDNDClientSettingDeleteView,
     ANNCSUProjectsListView, 
-    ANNCSUProjectCreateView,
+    ANNCSUProjectCreateView, 
+    LayersConfigView
 )
 
 G3W_SITETREE_I18N_ALIAS.append('qpdnd')
@@ -109,10 +110,10 @@ urlpatterns = [
     #     login_required(IntercadConfigDeleteView.as_view()),
     #     name='intercad-config-delete'),
 
-    # # Path to get layers list of a project
-    # path(
-    #     'jx/config/project_layers/', 
-    #     login_required(LayersConfigView.as_view()),
-    #     name='qpdnd-project-layers'),
+    # Path to get layers list of a project
+    path(
+        'jx/config/project_layers/', 
+        login_required(LayersConfigView.as_view()),
+        name='qpdnd-project-layers'),
 ]
 

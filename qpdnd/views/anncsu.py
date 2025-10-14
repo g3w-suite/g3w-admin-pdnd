@@ -84,33 +84,33 @@ class ANNCSUProjectCreateView(G3WRequestViewMixin, CreateView):
 #         return super().dispatch(*args, **kwargs)
     
 
-# class LayersConfigView(View):
-#     """
-#     Return layers for project
-#     """
+class LayersConfigView(View):
+    """
+    Return layers for project
+    """
 
-#     @method_decorator(permission_required('qpdnd.add_anncsuproject', return_403=True))
-#     def dispatch(self, request, *args, **kwargs):
-#         return super().dispatch(request, *args, **kwargs)
+    @method_decorator(permission_required('qpdnd.add_anncsuproject', return_403=True))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
-#     def get(self, *args, **kwargs):
-#         # get viewer users
-#         layers = Project.objects.get(pk=self.request.GET['project_id']).layer_set.all()
-#         try:
-#             config = ANNCSUProject.objects.get(pk=self.request.GET['config_id'])
-#         except:
-#             config = None
+    def get(self, *args, **kwargs):
 
-#         clayers = []
-#         if config:
-#             clayers = [config.layer]
+        layers = Project.objects.get(pk=self.request.GET['project_id']).layer_set.all()
+        try:
+            config = ANNCSUProject.objects.get(pk=self.request.GET['config_id'])
+        except:
+            config = None
 
-#         return JsonResponse({
-#             'layers': [
-#                 {
-#                     'id': layer.pk,
-#                     'text': layer.title,
-#                     'selected': layer in clayers
-#                 } for layer in layers
-#             ]
-#         })
+        clayers = []
+        if config:
+            clayers = [config.layer]
+
+        return JsonResponse({
+            'layers': [
+                {
+                    'id': layer.pk,
+                    'text': layer.title,
+                    'selected': layer in clayers
+                } for layer in layers
+            ]
+        })

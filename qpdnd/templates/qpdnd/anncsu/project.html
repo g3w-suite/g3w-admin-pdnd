@@ -4,7 +4,7 @@
 {% load crispy_forms_tags %}
 
 
-{% comment %} {% block custom_js_links_page %}
+{% block custom_js_links_page %}
 <script>
 
     config_id = {% if form.instance.pk %}'{{ form.instance.pk }}'{% else %}''{% endif %};
@@ -21,7 +21,7 @@
         var $layers_select = $("#id_layer");
         if (value) {
             $.ajax({
-                url: '{% url 'intercad-config-project-layers' %}' + '?project_id='+value+'&config_id='+config_id,
+                url: '{% url 'qpdnd-project-layers' %}' + '?project_id='+value+'&config_id='+config_id,
                 success:function(res){
                     $layers_select.html('');
                     $layers_select.select2({data: res.layers});
@@ -42,7 +42,6 @@
 
 </script>
 {% endblock %}
-{% endcomment %}
 
 {% block page_header %}
     <h1>{% trans 'ANNCSU' %}
