@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load g3wadmin_tags %}
+{% load crispy_forms_tags %}
+
+
+{% comment %} {% block custom_js_links_page %}
+<script>
+
+    config_id = {% if form.instance.pk %}'{{ form.instance.pk }}'{% else %}''{% endif %};
+
+    ga.$projectSelect = $('#id_project');
+    ga.$layerSelect = $('#id_layer');
+
+    ga.$projectSelect.on('change', function(e){
+
+        var value = $(this).val();
+
+
+        // For layers
+        var $layers_select = $("#id_layer");
+        if (value) {
+            $.ajax({
+                url: '{% url 'intercad-config-project-layers' %}' + '?project_id='+value+'&config_id='+config_id,
+                success:function(res){
+                    $layers_select.html('');
+                    $layers_select.select2({data: res.layers});
+
+                    $(document).ready(ga.$layerSelect.trigger('change'));
+                }
+            });
+        } else {
+            $layers_select.html('');
+            $layers_select.select2({data: []});
+           
+        } 
+
+    });
+
+    // to start
+    $(document).ready(ga.$projectSelect.trigger('change'));
+
+</script>
+{% endblock %}
+{% endcomment %}
+
+{% block page_header %}
+    <h1>{% trans 'ANNCSU' %}
+    <small>{% trans 'Projects' %}</small>
+    </h1>
+{% endblock %}
+
+{% block main_content %}
+    <form method="post">
+    {% crispy form %}
+    {% g3wadmin_add_button_form redo=False %}
+    </form>
+{% endblock %}

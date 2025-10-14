@@ -1,6 +1,7 @@
 from django.contrib import admin
 from qpdnd.models import (
-    QPDNDProject,
+    QPDNDProject, 
+    ANNCSUProject,
     License
 )
 
@@ -15,3 +16,10 @@ class QPDNDProjectAdmin(admin.ModelAdmin):
 @admin.register(License)
 class LicenseAdmin(admin.ModelAdmin):
    pass
+
+@admin.register(ANNCSUProject)
+class ANNCSUProjectAdmin(admin.ModelAdmin):
+   list_display = [
+       'project',
+       'layer'
+   ]

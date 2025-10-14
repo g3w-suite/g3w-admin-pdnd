@@ -11,7 +11,7 @@ __copyright__ = 'Copyright Gis3w'
 
 
 from django.core.exceptions import ValidationError
-from django.forms.models import ModelForm
+from django.forms import ModelForm, Select
 from django.utils.translation import gettext_lazy as _
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import (
@@ -24,7 +24,7 @@ from core.mixins.forms import (
     G3WRequestFormMixin,
     G3WFormMixin
 )
-from .models import (
+from qpdnd.models import (
     QPDNDProject,
     QPDNDClientSetting
 )
