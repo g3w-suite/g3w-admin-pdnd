@@ -49,12 +49,12 @@
                     <td>
                         <span class="col-xs-6 icon">
                             {% if "change_anncsuproject" in userObj_perms %}
-                            {% comment %} <a href="{% url 'qpdnd-anncsu-config-update' object.id %}" data-toggle="tooltip" data-placement="top" title="{% trans 'Edit' %}" ><i class="ion ion-edit"></i></a> {% endcomment %}
+                            <a href="{% url 'qpdnd-anncsu-project-update' object.id %}" data-toggle="tooltip" data-placement="top" title="{% trans 'Edit' %}" ><i class="ion ion-edit"></i></a>
                             {% endif %}
                         </span>
                         <span class="col-xs-6 icon">
                             {% if "delete_anncsuproject" in userObj_perms %}
-                            {% comment %} <a href="#" data-toggle="tooltip" data-placement="top" title="{% trans 'Delete' %}"  data-widget-type="deleteItem" data-delete-url="{% url 'qpdnd-anncsu-config-delete' object.pk %}" data-item-selector="#config_{{ object.pk }}"><i class="ion ion-trash-b"></i></a> {% endcomment %}
+                            <a href="#" data-toggle="tooltip" data-placement="top" title="{% trans 'Delete' %}"  data-widget-type="deleteItem" data-delete-url="{% url 'qpdnd-anncsu-project-delete' object.pk %}" data-item-selector="#config_{{ object.pk }}"><i class="ion ion-trash-b"></i></a>
                             {% endif %}
                         </span>
                     </td>

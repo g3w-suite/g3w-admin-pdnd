@@ -59,30 +59,41 @@ class ANNCSUProjectCreateView(G3WRequestViewMixin, CreateView):
         return reverse('qpdnd-anncsu-project-list')
     
 
-# class ANNCSUProjectUpdateView(G3WRequestViewMixin, UpdateView):
+class ANNCSUProjectUpdateView(G3WRequestViewMixin, UpdateView):
 
-#     form_class = ANNCSUProjectForm
-#     model = ANNCSUProject
-#     template_name = 'qpdnd/anncsu/config.html'
+    form_class = ANNCSUProjectForm
+    model = ANNCSUProject
+    template_name = 'qpdnd/anncsu/project.html'
 
-#     @method_decorator(permission_required('qpdnd.add_anncsuproject', return_403=True))
-#     def dispatch(self, request, *args, **kwargs):
-#         return super().dispatch(request, *args, **kwargs)
+    @method_decorator(permission_required('qpdnd.add_anncsuproject', return_403=True))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
-#     def get_success_url(self):
-#         return reverse('intercad-config-list')
+    def get_success_url(self):
+        return reverse('qpdnd-anncsu-project-list')
     
 
-# class ANNCSUProjectDeleteView(G3WAjaxDeleteViewMixin, G3WRequestViewMixin, SingleObjectMixin, View):
-#     '''
-#     Delete config Ajax view
-#     '''
-#     model = ANNCSUProject
+class ANNCSUProjectDeleteView(G3WAjaxDeleteViewMixin, G3WRequestViewMixin, SingleObjectMixin, View):
+    '''
+    Delete config Ajax view
+    '''
+    model = ANNCSUProject
 
-#     @method_decorator(permission_required('qpdnd.add_anncsuproject', return_403=True))
-#     def dispatch(self, *args, **kwargs):
-#         return super().dispatch(*args, **kwargs)
-    
+    @method_decorator(permission_required('qpdnd.add_anncsuproject', return_403=True))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+
+class ANNCSUProjectDeleteView(G3WAjaxDeleteViewMixin, SingleObjectMixin, View):
+    """
+    Delete ANNCSUProject model instance Ajax view
+    """
+    model = ANNCSUProject
+
+    @method_decorator(
+        permission_required('qpdnd.delete_anncsuproject', (ANNCSUProject, 'pk', 'pk'), return_403=True))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
 class LayersConfigView(View):
     """

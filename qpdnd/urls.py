@@ -26,6 +26,8 @@ from qpdnd.views import (
     QPDNDClientSettingDeleteView,
     ANNCSUProjectsListView, 
     ANNCSUProjectCreateView, 
+    ANNCSUProjectUpdateView, 
+    ANNCSUProjectDeleteView,
     LayersConfigView
 )
 
@@ -99,16 +101,17 @@ urlpatterns = [
         name='qpdnd-anncsu-project-add'
     ),
 
-    # path(
-    #     'anncsu/projects/update/<int:pk>/', 
-    #     login_required(IntercadConfigUpdateView.as_view()),
-    #     name='intercad-config-update'
-    # ),
+    path(
+        'anncsu/projects/update/<int:pk>/', 
+        login_required(ANNCSUProjectUpdateView.as_view()),
+        name='qpdnd-anncsu-project-update'
+    ),
 
-    # path(
-    #     'anncsu/projects/delete/<int:pk>/', 
-    #     login_required(IntercadConfigDeleteView.as_view()),
-    #     name='intercad-config-delete'),
+    path(
+        'anncsu/projects/delete/<int:pk>/', 
+        login_required(ANNCSUProjectDeleteView.as_view()),
+        name='qpdnd-anncsu-project-delete'
+        ),
 
     # Path to get layers list of a project
     path(
