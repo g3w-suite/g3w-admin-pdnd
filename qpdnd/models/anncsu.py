@@ -20,6 +20,8 @@ class ANNCSUProject(models.Model):
 
     project = models.OneToOneField('qdjango.Project', on_delete=models.CASCADE, related_name="%(app_label)s_anncsu_projects")
 
+    client_setting = models.ForeignKey('QPDNDClientSetting', on_delete=models.CASCADE, null=True, blank=False)
+
     layer = models.ForeignKey('qdjango.Layer', models.CASCADE, related_name="%(app_label)s_anncsu_layers_related")
     note = models.TextField(blank=True, null=True, help_text="Optional note for the configuration.")
 

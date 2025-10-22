@@ -39,6 +39,7 @@
                     <th style="width:120px">Actions</th>
                     <th>{% trans 'Projects' %}</th>
                     <th>{% trans 'Layers' %}</th>
+                    <th>{% trans 'PDND environment' %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,6 +61,13 @@
                     </td>
                     <td>{{ object.project }}</td>
                     <td>{{ object.layer }}</td>
+                    <td>
+                            {% if object.client_setting.pdnd_env == 'test' %}
+                            <span class="label label-success">{{ object.client_setting.pdnd_env }}</span>
+                            {% else %}
+                            <span class="label label-danger">{{ object.client_setting.pdnd_env }}</span>
+                            {% endif %}
+                        </td>
                 </tr>
                 {% endfor %}
             </tbody>

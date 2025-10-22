@@ -16,6 +16,7 @@ from .base import TestQPDNDBase
 from qpdnd.models import (
     QPDNDProject,
     QPDNDClientSetting,
+    ANNCSUProject,
     License
 )
 import copy
@@ -95,3 +96,4 @@ class TestQPDNDModels(TestQPDNDBase):
         qpdnd_project = QPDNDClientSetting.objects.get(pk=qpdnd_cs.pk)
 
         self.assertEqual(qpdnd_cs.pdnd_server_kid, qpdnd_project.pdnd_server_kid)
+
