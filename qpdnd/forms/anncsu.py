@@ -76,7 +76,9 @@ Form for ANNCSUProject model.
                                             Div(
                                                 Field('project', css_class='select2'),
                                                 Field('layer', css_class='select2'),
-                                                Field('client_setting', css_class='select2'),
+                                                Field('env_type', css_class='select2'),
+                                                Field('codice_comune', css_class='select2'),
+                                                'govway_api_endpoint',
                                                 Field('note', rows="3"),
 
                                                 css_class='box-body',

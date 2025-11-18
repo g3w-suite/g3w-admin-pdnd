@@ -23,3 +23,4 @@ class ANNCSUProjectAdmin(admin.ModelAdmin):
        'project',
        'layer'
    ]
+

@@ -13,17 +13,66 @@ __copyright__ = 'Copyright Gis3w'
 
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+from model_utils import Choices
 
+
+
+class IstatCodiciUi(models.Model):
+    codice_regione = models.CharField(max_length=255, blank=True, null=True)
+    codice_citta_metropolitana = models.CharField(max_length=255, blank=True, null=True)
+    codice_provincia_1 = models.CharField(max_length=255, blank=True, null=True)
+    progressivo_del_comune_2 = models.CharField(max_length=255, blank=True, null=True)
+    codice_comune_formato_alfanumerico = models.CharField(max_length=255, blank=True, null=True)
+    denominazione_in_italiano = models.CharField(max_length=255, blank=True, null=True)
+    denominazione_in_tedesco = models.CharField(max_length=255, blank=True, null=True)
+    codice_ripartizione_geografica = models.CharField(max_length=255, blank=True, null=True)
+    ripartizione_geografica = models.CharField(max_length=255, blank=True, null=True)
+    denominazione_regione = models.CharField(max_length=255, blank=True, null=True)
+    denominazione_citta_metropolitana = models.CharField(max_length=255, blank=True, null=True)
+    denominazione_provincia = models.CharField(max_length=255, blank=True, null=True)
+    flag_comune_capoluogo_di_provincia = models.CharField(max_length=255, blank=True, null=True)
+    sigla_automobilistica = models.CharField(max_length=255, blank=True, null=True)
+    codice_comune_formato_numerico = models.CharField(primary_key=True, max_length=255)
+    codice_comune_numerico_con_107_province_dal_2006_al_2009 = models.CharField(max_length=255, blank=True, null=True)
+    codice_comune_numerico_con_103_province_dal_1995_al_2005 = models.CharField(max_length=255, blank=True, null=True)
+    codice_catastale_del_comune = models.CharField(max_length=255, blank=True, null=True)
+    popolazione_legale_2011_09_10_2011 = models.CharField(max_length=255, blank=True, null=True)
+    codice_nuts1_2010 = models.CharField(max_length=255, blank=True, null=True)
+    codice_nuts2_2010_3 = models.CharField(max_length=255, blank=True, null=True)
+    codice_nuts3_2010 = models.CharField(max_length=255, blank=True, null=True)
+    codice_nuts1_2006 = models.CharField(max_length=255, blank=True, null=True)
+    codice_nuts2_2006_3 = models.CharField(max_length=255, blank=True, null=True)
+    codice_nuts3_2006 = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.codice_catastale_del_comune} - {self.denominazione_in_italiano}"
+
+    class Meta:
+        verbose_name_plural = 'ISTAT Codici UI'
+        verbose_name = 'ISTAT Codici UI'
 
 class ANNCSUProject(models.Model):
     """ Projects to expose with ANNCSU PDND extension """
 
+    ENV_TYPE = Choices(
+        ('prod', _('PRODUCTION')),
+        ('test', _('TESTING'))
+    )
+
     project = models.OneToOneField('qdjango.Project', on_delete=models.CASCADE, related_name="%(app_label)s_anncsu_projects")
 
-    client_setting = models.ForeignKey('QPDNDClientSetting', on_delete=models.CASCADE, null=True, blank=False)
-
     layer = models.ForeignKey('qdjango.Layer', models.CASCADE, related_name="%(app_label)s_anncsu_layers_related")
-    note = models.TextField(blank=True, null=True, help_text="Optional note for the configuration.")
+
+    codice_comune  = models.ForeignKey(IstatCodiciUi, help_text=_('Municipality code (ISTAT code).'), on_delete=models.DO_NOTHING, null=True, blank=False)
+    
+    env_type = models.CharField(max_length=10, choices=ENV_TYPE, default=ENV_TYPE.test)
+
+    govway_api_endpoint = models.URLField(max_length=200, null=True, blank=False, help_text=_('GovWay API endpoint URL'))
+    
+    note = models.TextField(blank=True, null=True, help_text=_("Optional note for the configuration."))
+
+    
 
     def clean(self):
 
