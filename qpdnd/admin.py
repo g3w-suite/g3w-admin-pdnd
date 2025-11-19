@@ -2,7 +2,8 @@ from django.contrib import admin
 from qpdnd.models import (
     QPDNDProject, 
     ANNCSUProject,
-    License
+    License, 
+    IstatCodiciUi
 )
 
 @admin.register(QPDNDProject)
@@ -24,3 +25,6 @@ class ANNCSUProjectAdmin(admin.ModelAdmin):
        'layer'
    ]
 
+@admin.register(IstatCodiciUi)
+class IstatCodiciUiAdmin(admin.ModelAdmin):
+   pass

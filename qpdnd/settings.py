@@ -94,3 +94,13 @@ QPDND_TESTING_VOUCHER_EXP = None
 #     'test': "auth.uat.interop.pagopa.it/client-assertion",
 #     'prod': "auth.interop.pagopa.it/client-assertion"
 # }
+
+
+#############################################################
+# For ANNCSU 
+#############################################################
+
+# GovWay API auth user
+ANNCSU_GOVWAY_API_USER = 'your_govway_user'
+ANNCSU_GOVWAY_API_PASSWORD = 'your_govway_password'
+
