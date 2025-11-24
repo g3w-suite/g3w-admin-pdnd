@@ -70,7 +70,7 @@ def db_task(*args, **kwargs):
 
 def test_send(anncsu_project_id):
 
-    anncsu_project = ANNCSUProject.objects.get(pk=anncsu_project_id)
+    #anncsu_project = ANNCSUProject.objects.get(pk=anncsu_project_id)
 
    
 
@@ -78,14 +78,14 @@ def test_send(anncsu_project_id):
     flags = Qgis.ProjectReadFlags()
     #flags |= Qgis.ProjectReadFlag.DontLoadLayouts
     flags |= Qgis.ProjectReadFlag.DontResolveLayers
-    print('arriva')
-    qgs_project.read(anncsu_project.project.qgis_file.path, flags)
-    #qgs_project.read('/data/www/g3w_suite_data/media/projects/anncsu-la-spezia_anncsu-la-spezia.qgs', flags)
+    #qgs_project.read(anncsu_project.project.qgis_file.path, flags)
+    qgs_project.read('/data/www/g3w_suite_data/media/projects/anncsu-la-spezia_anncsu-la-spezia.qgs', flags)
     #qgs_project.read('/data/www/g3w_suite_data/media/projects/processing_qprocessing.qgs', flags)
-    print('arriv2')
-    qlayer = qgs_project.mapLayers()[anncsu_project.layer.qgs_layer_id]
-    print('arriv3')
-    print(qlayer.isValid())
+
+
+    #qlayer = qgs_project.mapLayers()[anncsu_project.layer.qgs_layer_id]
+    qlayer = qgs_project.mapLayers()['aaaaaaaaaaa']
+
     cont = 0
     while not qlayer.isValid() and cont < 20:
         print('pre time')
@@ -93,8 +93,6 @@ def test_send(anncsu_project_id):
         QGS_APPLICATION.processEvents()
         print(cont)
         cont += 1
-
-    print(qlayer)
 
     return {}
 
