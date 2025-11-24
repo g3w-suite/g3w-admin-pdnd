@@ -14,7 +14,8 @@ __license__ = 'MPL 2.0'
 from django.urls import path, re_path
 from .api.views import (
     QPDNDAPIOgcView,
-    QPDNDInfoProjectAPIView
+    QPDNDInfoProjectAPIView, 
+    ANNCSUGestioneCoordinateAPIView
 )
 
 BASE_URLS = 'qpdnd'
@@ -29,6 +30,13 @@ urlpatterns = [
     path('api/infoproject/<int:project_id>',
          QPDNDInfoProjectAPIView.as_view(),
          name='qpdnd-api-prj-info'
+    ),
+
+    # Send ANNCSU data to PDND API
+    # --------------------------------
+    path('api/anncsu/gestionecoordinate/<int:anncsu_project_id>',
+         ANNCSUGestioneCoordinateAPIView.as_view(),
+         name='anncsu-api-gestionecoordinate'
     )
 
 ]

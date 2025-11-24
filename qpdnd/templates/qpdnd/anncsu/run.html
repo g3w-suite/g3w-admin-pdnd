@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load g3wadmin_tags %}
+
+
+{% block page_header %}
+    <h1>{% trans 'ANNCSU' %}
+    <small>{% trans 'Send to PDND API and reports' %}</small>
+    </h1>
+{% endblock %}
+
+{% block main_content %}
+<div class="box box-abstract">
+    <div class="box-body">
+    <div class="row">
+        <div class="col-md-8">
+            <h5><strong>Project</strong>: {{ anncsu_project.project.title }} </h5>
+            <h5><strong>Layer</strong>: {{ layer }}</h5>
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-lg btn-primary" id="sendToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send to PDND API" %}</button>
+
+            <script>
+            document.getElementById('sendToPdnd').addEventListener('click', function() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', "{% url 'anncsu-api-gestionecoordinate' anncsu_project.id %}", true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        console.log('Success:', xhr.responseText);
+                        alert('Request completed successfully');
+                    } else {
+                        console.error('Error:', xhr.status);
+                        alert('Request failed with status: ' + xhr.status);
+                    }
+                };
+                xhr.onerror = function() {
+                    console.error('Request failed');
+                    alert('Request failed');
+                };
+                xhr.send();
+            });
+            </script>
+        </div>
+    </div>
+    </div>
+</div>
+
+<div class="row">
+        <div class="col-md-4 col-xs-12">
+            <div class="small-box bg-aqua">
+            <div class="inner">
+              <h3>{{ num_features }}</h3>
+
+              <p>{% trans 'Features' %}</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-location-pin"></i>
+            </div>
+          </div>
+        </div>
+    </div>
+    
+{% endblock %}

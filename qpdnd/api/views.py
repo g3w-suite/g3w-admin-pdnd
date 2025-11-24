@@ -21,6 +21,10 @@ from qdjango.models import Project
 from core.api.base.views import G3WAPIView
 from qpdnd.models import QPDNDProject
 from qpdnd.utils.pdnd import QPDNDAdapter
+from qpdnd.tasks import (
+    send_anncsu_pdnd_task, 
+    send_anncsu_pdnd_ceery_task
+)
 from .permissions import ProjectEditPermission
 from .decorators.voucher_checker import pdnd_voucher_required
 from qgis.server import QgsServerProjectUtils
@@ -142,6 +146,34 @@ class QPDNDInfoProjectAPIView(G3WAPIView):
               service_property: getattr(
                 QgsServerProjectUtils, f'owsService{service_property}')(qprj)
             })
+
+        self.results.results.update(toret)
+        return Response(self.results.results)
+
+class ANNCSUGestioneCoordinateAPIView(G3WAPIView):
+    """
+    ANNCSU gestione coordinate API view
+    """
+
+    # permission_classes = [
+    #     ProjectEditPermission
+    # ]
+
+    def get(self, request, *args, **kwargs):
+
+        toret= {}
+
+        # Send on Huey
+        task = send_anncsu_pdnd_task(kwargs['anncsu_project_id'])
+
+        # Send on Celery
+        # task = object()
+        # task.id = send_anncsu_pdnd_ceery_task.delay(kwargs['anncsu_project_id'])
+
+
+        toret.update({
+            'task_id': task.id,
+        })
 
         self.results.results.update(toret)
         return Response(self.results.results)

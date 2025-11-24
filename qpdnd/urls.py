@@ -28,7 +28,8 @@ from qpdnd.views import (
     ANNCSUProjectCreateView, 
     ANNCSUProjectUpdateView, 
     ANNCSUProjectDeleteView,
-    LayersConfigView
+    LayersConfigView, 
+    ANNCSURunView
 )
 
 G3W_SITETREE_I18N_ALIAS.append('qpdnd')
@@ -118,5 +119,11 @@ urlpatterns = [
         'jx/config/project_layers/', 
         login_required(LayersConfigView.as_view()),
         name='qpdnd-project-layers'),
+
+    # To Run and reports page
+    path(
+        'anncsu/projects/run/<int:pk>/', 
+        login_required(ANNCSURunView.as_view()),
+        name='qpdnd-anncsu-project-run'),
 ]
 

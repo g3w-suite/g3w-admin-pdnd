@@ -14,6 +14,7 @@ __copyright__ = 'Copyright Gis3w'
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from core.utils.qgisapi import get_qgis_features
 from model_utils import Choices
 
 
@@ -72,7 +73,11 @@ class ANNCSUProject(models.Model):
     
     note = models.TextField(blank=True, null=True, help_text=_("Optional note for the configuration."))
 
-    
+    def get_features(self):
+        """
+        Get QGIS features from the configured layer.
+        :return: list of QGIS features"""
+        return get_qgis_features(self.layer.qgis_layer)
 
     def clean(self):
 
@@ -82,4 +87,4 @@ class ANNCSUProject(models.Model):
 
 
     def __str__(self):
-        return f'ANNCSU PDND Project: {self.project.name}'
+        return f'ANNCSU PDND Project: {self.project}'

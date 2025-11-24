@@ -39,6 +39,7 @@
                     <th style="width:120px">Actions</th>
                     <th>{% trans 'Projects' %}</th>
                     <th>{% trans 'Layers' %}</th>
+                    <th>{% trans 'Comune code' %}</th>
                     <th>{% trans 'PDND environment' %}</th>
                 </tr>
             </thead>
@@ -48,26 +49,33 @@
                 {% get_obj_perms user for object.project as "userObj_project_perms" %}
                 <tr id="config_{{ object.pk }}">
                     <td>
-                        <span class="col-xs-6 icon">
+                        <span class="col-xs-4 icon">
                             {% if "change_anncsuproject" in userObj_perms %}
                             <a href="{% url 'qpdnd-anncsu-project-update' object.id %}" data-toggle="tooltip" data-placement="top" title="{% trans 'Edit' %}" ><i class="ion ion-edit"></i></a>
                             {% endif %}
                         </span>
-                        <span class="col-xs-6 icon">
+                        <span class="col-xs-4 icon">
                             {% if "delete_anncsuproject" in userObj_perms %}
                             <a href="#" data-toggle="tooltip" data-placement="top" title="{% trans 'Delete' %}"  data-widget-type="deleteItem" data-delete-url="{% url 'qpdnd-anncsu-project-delete' object.pk %}" data-item-selector="#config_{{ object.pk }}"><i class="ion ion-trash-b"></i></a>
                             {% endif %}
                         </span>
+                        <span class="col-xs-4 icon">
+                            {% if "change_anncsuproject" in userObj_perms %}
+                            <a href="{% url 'qpdnd-anncsu-project-run' object.id %}" data-toggle="tooltip" data-placement="top" title="{% trans 'RUN' %}" ><i class="ion ion-play"></i></a>
+                            {% endif %}
+                        </span>
+
                     </td>
                     <td>{{ object.project }}</td>
                     <td>{{ object.layer }}</td>
+                    <td>{{ object.codice_comune }}</td>
                     <td>
-                            {% if object.client_setting.pdnd_env == 'test' %}
-                            <span class="label label-success">{{ object.client_setting.pdnd_env }}</span>
+                            {% if object.env_type == 'test' %}
+                            <span class="label label-success">{{ object.env_type }}</span>
                             {% else %}
-                            <span class="label label-danger">{{ object.client_setting.pdnd_env }}</span>
+                            <span class="label label-danger">{{ object.env_type }}</span>
                             {% endif %}
-                        </td>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
