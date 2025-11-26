@@ -16,6 +16,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from core.utils.qgisapi import get_qgis_features
 from model_utils import Choices
+from qgis.core import QgsSettings
 
 
 
@@ -72,6 +73,8 @@ class ANNCSUProject(models.Model):
     govway_api_endpoint = models.URLField(max_length=200, null=True, blank=False, help_text=_('GovWay API endpoint URL'))
     
     note = models.TextField(blank=True, null=True, help_text=_("Optional note for the configuration."))
+
+    task_id = models.CharField(max_length=255, blank=True, null=True, help_text=_('Asynchronous task ID.'))
 
     def get_features(self):
         """

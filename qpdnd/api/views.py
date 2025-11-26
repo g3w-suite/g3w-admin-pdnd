@@ -14,12 +14,18 @@ __license__ = 'MPL 2.0'
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from huey.contrib.djhuey import HUEY
+from huey.exceptions import TaskException
+from huey_monitor.models import TaskModel
 from rest_framework.response import Response
 from OWS.views import OWSView
 from qdjango.ows import OWSRequestHandler
 from qdjango.models import Project
 from core.api.base.views import G3WAPIView
-from qpdnd.models import QPDNDProject
+from qpdnd.models import (
+    QPDNDProject, 
+    ANNCSUProject
+)
 from qpdnd.utils.pdnd import QPDNDAdapter
 from qpdnd.tasks import (
     send_anncsu_pdnd_task, 
@@ -163,13 +169,17 @@ class ANNCSUGestioneCoordinateAPIView(G3WAPIView):
 
         toret= {}
 
+        anncsu_project = ANNCSUProject.objects.get(pk=kwargs['anncsu_project_id'])
+
         # Send on Huey
-        task = send_anncsu_pdnd_task(kwargs['anncsu_project_id'])
+        task = send_anncsu_pdnd_task(anncsu_project)
 
         # Send on Celery
         # task = object()
         # task.id = send_anncsu_pdnd_ceery_task.delay(kwargs['anncsu_project_id'])
 
+        anncsu_project.task_id = task.id
+        anncsu_project.save()
 
         toret.update({
             'task_id': task.id,
@@ -177,3 +187,56 @@ class ANNCSUGestioneCoordinateAPIView(G3WAPIView):
 
         self.results.results.update(toret)
         return Response(self.results.results)
+    
+class ANNCSURunInfoTaskView(G3WAPIView):
+    """
+    ANNCSU view to get progess state ok a huey/celery task.
+    """
+
+    def get(self, request, task_id):
+
+        #TODO: add code for celery tasks.
+
+        try:
+
+            # Try to retrieve the task result, may throw an exception
+            try:
+                result = HUEY.result(task_id)
+                ret_status = 200
+            except TaskException:
+                result = None
+                ret_status = 500
+
+            task_model = TaskModel.objects.get(task_id=task_id)
+            progress_info = task_model.progress_info
+
+            try:
+                progress_percentage = int(
+                    100 * progress_info[0] / task_model.total)
+            except:
+                progress_percentage = 0
+
+            try:
+                return JsonResponse({
+                    'status': task_model.state.signal_name,
+                    'exception': task_model.state.exception_line,
+                    'progress': progress_percentage,
+                    'task_result': result
+                }, status=ret_status)
+            except:
+                return JsonResponse({
+                    'status': 'error',
+                    'exception': 'Error retrieving task informations',
+                    'progress': 0,
+                    'task_result': result,
+                }, status=500)
+
+        except TaskModel.DoesNotExist:
+
+            # Handle pending
+            pending_task_ids = [task.id for task in HUEY.pending()]
+
+            if task_id in pending_task_ids:
+                return JsonResponse({'result': True, 'status': 'pending'})
+
+            return JsonResponse({'result': False, 'error': _('Task not found!')}, status=404)

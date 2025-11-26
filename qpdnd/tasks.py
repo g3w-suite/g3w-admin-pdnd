@@ -18,11 +18,11 @@ from celery import shared_task, current_task
 from celery.utils.log import get_task_logger
 from .utils.anncsu import ANNCSUPDND_GestioneCoordinate_API
 from .models import ANNCSUProject
-from qdjango.apps import  QGS_APPLICATION
 
 from qgis.core import (
     QgsProject, 
-    Qgis
+    Qgis,
+    QgsSettings
 )
 
 from functools import wraps
@@ -62,69 +62,64 @@ def db_task(*args, **kwargs):
     """
 
     def decorator(fn):
+
+        # This workaround is needed to avoid parallel loading of providers
+        # By Alessandro Pasotti 2025-11-26
+        # ----------------------------------------------------------------
+        QgsSettings().setValue("core/provider-parallel-loading", False)
+
         ret = task(*args, **kwargs)(close_db(fn))
         ret.call_local = fn
         return ret
     return decorator
 
 
-def test_send(anncsu_project_id):
+# def test_send(anncsu_project_id):
 
-    #anncsu_project = ANNCSUProject.objects.get(pk=anncsu_project_id)
+#     anncsu_project = ANNCSUProject.objects.get(pk=anncsu_project_id)
 
-   
+#     print(anncsu_project.project.qgis_project)
 
-    qgs_project = QgsProject()
-    flags = Qgis.ProjectReadFlags()
-    #flags |= Qgis.ProjectReadFlag.DontLoadLayouts
-    flags |= Qgis.ProjectReadFlag.DontResolveLayers
-    #qgs_project.read(anncsu_project.project.qgis_file.path, flags)
-    qgs_project.read('/data/www/g3w_suite_data/media/projects/anncsu-la-spezia_anncsu-la-spezia.qgs', flags)
-    #qgs_project.read('/data/www/g3w_suite_data/media/projects/processing_qprocessing.qgs', flags)
+#     qgs_project = QgsProject()
+#     flags = Qgis.ProjectReadFlags()
+#     #flags |= Qgis.ProjectReadFlag.DontLoadLayouts
+#     #flags |= Qgis.ProjectReadFlag.DontResolveLayers
+#     qgs_project.read(anncsu_project.project.qgis_file.path, flags)
+#     #qgs_project.read('/data/www/g3w_suite_data/media/projects/anncsu-la-spezia_anncsu-la-spezia.qgs', flags)
+#     #qgs_project.read('/data/www/g3w_suite_data/media/projects/processing_qprocessing.qgs', flags)
 
 
-    #qlayer = qgs_project.mapLayers()[anncsu_project.layer.qgs_layer_id]
-    qlayer = qgs_project.mapLayers()['aaaaaaaaaaa']
+#     qlayer = qgs_project.mapLayers()[anncsu_project.layer.qgs_layer_id]
+#     #qlayer = qgs_project.mapLayers()['aaaaaaaaaaa']
 
-    cont = 0
-    while not qlayer.isValid() and cont < 20:
-        print('pre time')
-        time.sleep(0.5)
-        QGS_APPLICATION.processEvents()
-        print(cont)
-        cont += 1
-
-    return {}
+#     for feature in qlayer.getFeatures():
+#         print(feature.id())
+#         print(feature['comune'])
 
 
 @db_task(context=True)
-def send_anncsu_pdnd_task(anncsu_project_id, task):
+def send_anncsu_pdnd_task(anncsu_project, task):
     """
     Task to send ANNCSU PDND data to API.
     """
 
-    #anncsu_project = ANNCSUProject.objects.get(pk=anncsu_project_id)
-
-    # process_info = ProcessInfo(
-    #     task,
-    #     desc='Send ANNCSU PDND data',
-    #     total=len(anncsu_project.get_features())
-    # )
-
-    process_info = None
-
-    print('passato tasks')
-
-
-    # gc = ANNCSUPDND_GestioneCoordinate_API(anncsu_project, process_info)
+    if not isinstance(anncsu_project, ANNCSUProject):
+        anncsu_project = ANNCSUProject.objects.get(pk=anncsu_project)
     
-    # gc.send_features()
 
-    res = test_send(anncsu_project_id)
+    process_info = ProcessInfo(
+        task,
+        desc='Send ANNCSU PDND data',
+        total=len(anncsu_project.get_features())
+    )
 
-    print('passato dopo tasks')
 
-    return res
+    gc = ANNCSUPDND_GestioneCoordinate_API(anncsu_project, process_info)
+    
+    gc.send_features()
+
+
+    return {}
 
 @shared_task(name='send_anncsu_pdnd_ceery_task', bind=True)
 def send_anncsu_pdnd_ceery_task(self, anncsu_project_id, **kwargs):

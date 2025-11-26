@@ -67,8 +67,6 @@ class ANNCSUPDNDAPI(object):
         Send ANNCSU features to PDND API.
         """
 
-        print('passato send_features')
-        
         features = self.anncsu_project.get_features()
         for feature in features:
             
@@ -99,6 +97,8 @@ class ANNCSUPDNDAPI(object):
 
         # Prepare authentication
         auth = (settings.ANNCSU_GOVWAY_API_USER, settings.ANNCSU_GOVWAY_API_PASSWORD)
+
+        print(pdata.model_dump())
 
         return {}
         

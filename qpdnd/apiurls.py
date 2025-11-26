@@ -15,7 +15,8 @@ from django.urls import path, re_path
 from .api.views import (
     QPDNDAPIOgcView,
     QPDNDInfoProjectAPIView, 
-    ANNCSUGestioneCoordinateAPIView
+    ANNCSUGestioneCoordinateAPIView, 
+    ANNCSURunInfoTaskView
 )
 
 BASE_URLS = 'qpdnd'
@@ -37,6 +38,10 @@ urlpatterns = [
     path('api/anncsu/gestionecoordinate/<int:anncsu_project_id>',
          ANNCSUGestioneCoordinateAPIView.as_view(),
          name='anncsu-api-gestionecoordinate'
-    )
+    ),
+    # Use for asyncronous task
+    path('api/infotask/<str:task_id>/',
+         ANNCSURunInfoTaskView.as_view(),
+         name='anncsu-api-infotask'),
 
 ]
