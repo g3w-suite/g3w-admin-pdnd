@@ -2,6 +2,20 @@
 {% load i18n %}
 {% load g3wadmin_tags %}
 
+{% block custom_js_links_page %}
+<script>
+    ga.QPDND.ANNCSU.init();
+    ga.QPDND.ANNCSU.run("{% url 'anncsu-api-gestionecoordinate' anncsu_project.id %}");
+    ga.QPDND.ANNCSU.base_url_info_task = '{{ BASE_URL_INFO_TASK }}';
+    {% if anncsu_project.task_id %}
+    ga.QPDND.ANNCSU.task_id = "{{ anncsu_project.task_id }}";
+    if ('{{ task_model.state.signal_name }}' == 'executing') {
+        ga.QPDND.ANNCSU.taskInfo();
+        ga.QPDND.ANNCSU.disable_run_btn();
+    }
+    {% endif %}
+</script>
+{% endblock %}
 
 {% block page_header %}
     <h1>{% trans 'ANNCSU' %}
@@ -16,30 +30,15 @@
         <div class="col-md-8">
             <h5><strong>Project</strong>: {{ anncsu_project.project.title }} </h5>
             <h5><strong>Layer</strong>: {{ layer }}</h5>
+            <h5><strong>Task ID</strong>: <span id="task_id">{{ anncsu_project.task_id }}</span> - <em>Status: <span id="task_status">{{ task_model.state.signal_name|upper }}</span></em></h5>
+            <div class="progress progress-md active">
+                <div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <span class="sr-only">0% Complete</span>
+                </div>
+            </div>
         </div>
         <div class="col-md-4">
-            <button class="btn btn-lg btn-primary" id="sendToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send to PDND API" %}</button>
-
-            <script>
-            document.getElementById('sendToPdnd').addEventListener('click', function() {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', "{% url 'anncsu-api-gestionecoordinate' anncsu_project.id %}", true);
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        console.log('Success:', xhr.responseText);
-                        alert('Request completed successfully');
-                    } else {
-                        console.error('Error:', xhr.status);
-                        alert('Request failed with status: ' + xhr.status);
-                    }
-                };
-                xhr.onerror = function() {
-                    console.error('Request failed');
-                    alert('Request failed');
-                };
-                xhr.send();
-            });
-            </script>
+            <button class="btn btn-lg btn-primary" id="anncsu_sendToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send to PDND API" %}</button>
         </div>
     </div>
     </div>

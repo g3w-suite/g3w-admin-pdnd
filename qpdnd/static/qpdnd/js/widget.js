@@ -74,3 +74,103 @@ ga.QPDND = {
         });
     }
 }
+
+/// For ANNCSU project
+ga.QPDND.ANNCSU = {
+
+    init: function(){
+        this.run_btn = $("#anncsu_sendToPdnd");
+        this.progress_bar = $(".progress-bar");
+        this.task_id_container = $("#task_id");
+        this.task_status_container = $("#task_status");
+        this.base_url_info_task = null;
+        this.task_id = null;
+    },
+
+    disable_run_btn: function(){
+        this.run_btn.prop('disabled', true);
+    },
+
+    run: function(run_url){
+         var that = this;
+         this.run_btn.on("click", function(){
+            
+            $.ajax({
+                    method: 'get',
+                    url: run_url,
+                    success: function (res) {
+                        console.log(res);
+                        if (res['result']) {
+                            that.task_id = res['task_id'];
+
+                            that.disable_run_btn();
+                            // Show task id
+                            that.task_id_container.text(that.task_id);
+                            that.task_status_container.text('EXECUTING');
+                            
+
+                            that.taskInfo();
+                        } else {
+                            throw Error(res['error_message']);
+                        }
+                    },
+                    error: function (xhr, textStatus, errorMessage) {
+                        ga.widget.showError(ga.utils.buildAjaxErrorMessage(xhr.status, errorMessage));
+                    }
+
+            });
+        });
+    },
+
+    taskInfo: function(){
+        try {           
+            var that = this;
+            //call ajax info url
+            var _taskinfo = function () {
+                $.ajax({
+                    method: 'get',
+                    url: '/qpdnd/' + that.base_url_info_task + that.task_id + '/',
+                    success: function (res) {
+                        var current_progress = 0;
+                        if (res['status'] == 'executing' || res['status'] == 'PENDING') {
+                            current_progress = res['progress'];
+                            that.progress_bar.css("width", current_progress + "%")
+                              .attr("aria-valuenow", current_progress)
+                              .text(current_progress + "% Complete");
+                        }
+
+                        if (current_progress >= 100 || res['status'] == 'SUCCESS' || res['status'] == 'complete') {
+                          clearInterval(interval);
+                          that.progress_bar.css("width",  "100%")
+                              .attr("aria-valuenow", '100')
+                              .text("100% Complete");
+
+                        //   //reload page after 1sec
+                        //   setTimeout(function(){
+                        //        window.location.reload(1);
+                        //        }, 5000);
+                        }
+
+                        if (res['status'] == 'UNKNOWN' || res['status'] == 'unknown') {
+                            //reload page after 1sec
+                            setTimeout(function(){
+                               window.location.reload(1);
+                               }, 5000);
+                        }
+                    },
+                    error: function (xhr, textStatus, errorMessage) {
+                        ga.widget.showError(ga.utils.buildAjaxErrorMessage(xhr.status, errorMessage));
+                    }
+
+
+                });
+            };
+
+            var interval = setInterval(_taskinfo, 1000)
+
+
+        } catch (e) {
+            this.showError(e.message);
+        }
+    },
+};

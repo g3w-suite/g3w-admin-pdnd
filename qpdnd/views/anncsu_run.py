@@ -12,8 +12,12 @@ __copyright__ = 'Copyright Gis3w'
 
 
 from django.views.generic import TemplateView
+from huey.contrib.djhuey import HUEY
+from huey.exceptions import TaskException
+from huey_monitor.models import TaskModel
 from core.utils.qgisapi import count_qgis_features
 from qpdnd.models import ANNCSUProject
+from qpdnd.settings import _BASE_URL_INFO_TASK
 
 
 
@@ -33,5 +37,10 @@ class ANNCSURunView(TemplateView):
 
         # Feacture count
         ctx['num_features'] = count_qgis_features(ctx['qgs_layer'])
+
+        # Task id
+        ctx['BASE_URL_INFO_TASK'] = _BASE_URL_INFO_TASK
+        if ctx['anncsu_project'].task_id:
+            ctx['task_model'] = ctx['anncsu_project'].get_task()
 
         return ctx

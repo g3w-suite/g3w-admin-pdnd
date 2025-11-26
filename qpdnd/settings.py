@@ -13,6 +13,9 @@ __license__ = 'MPL 2.0'
 
 import os
 
+# Base urls
+_BASE_URL_INFO_TASK = 'api/infotask/'
+
 
 #############################################################
 # For PDND request authentication
@@ -98,7 +101,7 @@ QPDND_TESTING_VOUCHER_EXP = None
 
 #############################################################
 # For ANNCSU 
-#############################################################
+#############################################################'
 
 # GovWay API auth user
 ANNCSU_GOVWAY_API_USER = 'your_govway_user'

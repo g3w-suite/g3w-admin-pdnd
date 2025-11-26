@@ -14,6 +14,9 @@ __copyright__ = 'Copyright Gis3w'
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from huey.contrib.djhuey import HUEY
+from huey.exceptions import TaskException
+from huey_monitor.models import TaskModel
 from core.utils.qgisapi import get_qgis_features
 from model_utils import Choices
 from qgis.core import QgsSettings
@@ -81,6 +84,21 @@ class ANNCSUProject(models.Model):
         Get QGIS features from the configured layer.
         :return: list of QGIS features"""
         return get_qgis_features(self.layer.qgis_layer)
+    
+    def get_task(self):
+        """
+        Get the associated task.
+        :return: task instance or None
+        """
+        if self.task_id:
+             # Get current status
+            try:
+                result = HUEY.result(self.task_id)
+            except TaskException:
+                result = None
+
+            return TaskModel.objects.get(task_id=self.task_id)
+        return None
 
     def clean(self):
 

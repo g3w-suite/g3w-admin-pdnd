@@ -12,6 +12,7 @@ __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
 from django.urls import path, re_path
+from .settings import _BASE_URL_INFO_TASK
 from .api.views import (
     QPDNDAPIOgcView,
     QPDNDInfoProjectAPIView, 
@@ -40,7 +41,7 @@ urlpatterns = [
          name='anncsu-api-gestionecoordinate'
     ),
     # Use for asyncronous task
-    path('api/infotask/<str:task_id>/',
+    path(f'{_BASE_URL_INFO_TASK}<str:task_id>/',
          ANNCSURunInfoTaskView.as_view(),
          name='anncsu-api-infotask'),
 
