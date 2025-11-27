@@ -42,3 +42,11 @@ class Accesso(BaseModel):
         if not re.match(pattern, value):
             raise ValueError("codcom deve essere nel formato: 1 carattere alfanumerico + 3 cifre (es. B432)")
         return value
+
+    @field_validator("progr_civico")
+    def validate_prog_civico(cls, value):
+        try:
+            int(value)
+        except ValueError:
+            raise ValueError("prog_civico deve essere un valore numerico rappresentato come stringa")
+        return value

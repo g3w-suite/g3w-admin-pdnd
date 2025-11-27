@@ -43,4 +43,10 @@ class ANNCSURunView(TemplateView):
         if ctx['anncsu_project'].task_id:
             ctx['task_model'] = ctx['anncsu_project'].get_task()
 
+            # Get tasks results
+            try:
+                ctx['task_results'] = HUEY.result(ctx['anncsu_project'].task_id)
+            except TaskException:
+                ctx['task_results'] = None
+
         return ctx

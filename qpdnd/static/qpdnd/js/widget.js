@@ -82,9 +82,11 @@ ga.QPDND.ANNCSU = {
         this.run_btn = $("#anncsu_sendToPdnd");
         this.progress_bar = $(".progress-bar");
         this.task_id_container = $("#task_id");
+        this.task_results_container = $("#task_results");
         this.task_status_container = $("#task_status");
         this.base_url_info_task = null;
         this.task_id = null;
+        this.task_results = null;
     },
 
     disable_run_btn: function(){
@@ -173,4 +175,54 @@ ga.QPDND.ANNCSU = {
             this.showError(e.message);
         }
     },
+
+    render_task_results: function(){
+
+        if (this.task_results){
+            var total = this.task_results['success'] + this.task_results['failed'];
+            var perc_success = total > 0 ? (this.task_results['success'] / total * 100).toFixed(2) : 0;
+            var perc_failed = total > 0 ? (this.task_results['failed'] / total * 100).toFixed(2) : 0;
+            
+            this.task_results_container.html(this.template_task_results({
+                success: this.task_results['success'],
+                failed: this.task_results['failed'],
+                perc_success: perc_success,
+                perc_failed: perc_failed,
+            }));
+        }
+    },
+
+    template_task_results: _.template(`
+        <div class="info-box bg-green">
+            <span class="info-box-icon"><i class="ion ion-ios-heart-outline"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">Feature sent</span>
+                <span class="info-box-number"> <%= success %></span>
+
+                <div class="progress">
+                    <div class="progress-bar" style="width: <%= perc_success %>%"></div>
+                </div>
+                <span class="progress-description">
+                    <%= perc_success %>%                 
+                </span>
+            </div>
+        </div>
+
+        <div class="info-box bg-red">
+            <span class="info-box-icon"><i class="ion ion-ios-cloud-download-outline"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">Errors</span>
+                <span class="info-box-number"><%= failed %></span>
+
+                <div class="progress">
+                    <div class="progress-bar" style="width: <%= perc_failed %>%"></div>
+                </div>
+                <span class="progress-description">
+                    <%= perc_failed %>%
+                </span>
+            </div>
+        </div>
+    `),
 };

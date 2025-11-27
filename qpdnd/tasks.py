@@ -116,10 +116,9 @@ def send_anncsu_pdnd_task(anncsu_project, task):
 
     gc = ANNCSUPDND_GestioneCoordinate_API(anncsu_project, process_info)
     
-    gc.send_features()
+    return gc.send_features()
 
 
-    return {}
 
 @shared_task(name='send_anncsu_pdnd_ceery_task', bind=True)
 def send_anncsu_pdnd_ceery_task(self, anncsu_project_id, **kwargs):

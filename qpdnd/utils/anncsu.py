@@ -77,15 +77,20 @@ class ANNCSUPDNDAPI(object):
                     self.process_info.update(n=1)
 
                 self.send_feature(feature)
+
+                # Update results
+                self.results['success'] += 1
                 
             except HTTPError as http_err:    
                 print(f"HTTP error sending feature ID {feature.id()}: {http_err}")
+                self.results['failed'] += 1
                 continue
             except Exception as e:
                 print(f"Error sending feature ID {feature.id()}: {e}")
+                self.results['failed'] += 1
                 continue
 
-        return True
+        return self.results
     
     def send_feature(self, feature):
         """
@@ -97,8 +102,6 @@ class ANNCSUPDNDAPI(object):
 
         # Prepare authentication
         auth = (settings.ANNCSU_GOVWAY_API_USER, settings.ANNCSU_GOVWAY_API_PASSWORD)
-
-        print(pdata.model_dump())
 
         return {}
         
@@ -139,7 +142,7 @@ class ANNCSUPDND_GestioneCoordinate_API(ANNCSUPDNDAPI):
 
         toret = {
                 'codcom': self.anncsu_project.codice_comune.codice_catastale_del_comune,
-                'progr_civico': str(feature['progr_nazionale_ac']),
+                'progr_civico': str(int(feature['progr_nazionale_ac'])),
                 'coordinate': {
                     'x': str(feature['longitudine']),
                     'y': str(feature['latitudine']),
