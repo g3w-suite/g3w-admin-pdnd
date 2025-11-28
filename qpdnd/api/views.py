@@ -15,6 +15,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from huey.contrib.djhuey import HUEY
+from huey import signals
 from huey.exceptions import TaskException
 from huey_monitor.models import TaskModel
 from rest_framework.response import Response
@@ -240,3 +241,68 @@ class ANNCSURunInfoTaskView(G3WAPIView):
                 return JsonResponse({'result': True, 'status': 'pending'})
 
             return JsonResponse({'result': False, 'error': _('Task not found!')}, status=404)
+        
+
+class ANNCSURunKillTaskView(G3WAPIView):
+    """
+    ANNCSU view to kill a huey/celery task.
+    """
+
+    def get(self, request, task_id):
+        """
+        Stops a Huey task given the task_id
+        """
+        try:
+            # Check if the task exists in the database
+            task_model = TaskModel.objects.get(task_id=task_id)
+            
+            # Check if the task is still running
+            if task_model.state.signal_name in [
+                signals.SIGNAL_EXECUTING, 
+                #signals.SIGNAL_ENQUEUED, 
+                signals.SIGNAL_SCHEDULED
+                ]:
+                
+                try:
+                    
+                    # For running tasks, Huey does not support direct interruption
+                    # You can only mark the task as revoked
+                    HUEY.revoke_by_id(task_id)
+                    
+                    # Update the state in the database
+                    task_model.state.signal_name = signals.SIGNAL_REVOKED
+                    task_model.state.save()
+                    
+                    return JsonResponse({
+                        'status': signals.SIGNAL_REVOKED,
+                        'message': 'Task revoked (may continue if already executing)',
+                        'warning': 'Huey does not support forced interruption of running tasks'
+                    }, status=200)
+                    
+                except Exception as e:
+                    return JsonResponse({
+                        'status': signals.SIGNAL_ERROR,
+                        'error': f'Error revoking task: {str(e)}'
+                    }, status=500)
+            
+            else:
+                return JsonResponse({
+                    'status': signals.SIGNAL_COMPLETE,
+                    'message': f'Task already completed with state: {task_model.state.signal_name}'
+                }, status=400)
+                
+        except TaskModel.DoesNotExist:
+
+            # Handle pending
+            pending_task_ids = [task.id for task in HUEY.pending()]
+
+            if task_id in pending_task_ids:
+                return JsonResponse({'result': True, 'status': 'pending'})
+
+            return JsonResponse({'result': False, 'error': _('Task not found!')}, status=404)
+        
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'error': str(e)
+            }, status=500)

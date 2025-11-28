@@ -15,6 +15,7 @@ import os
 
 # Base urls
 _BASE_URL_INFO_TASK = 'api/infotask/'
+_BASE_URL_KILL_TASK = 'api/killtask/'
 
 
 #############################################################

@@ -12,12 +12,16 @@ __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
 from django.urls import path, re_path
-from .settings import _BASE_URL_INFO_TASK
+from .settings import (
+    _BASE_URL_INFO_TASK, 
+    _BASE_URL_KILL_TASK
+)
 from .api.views import (
     QPDNDAPIOgcView,
     QPDNDInfoProjectAPIView, 
     ANNCSUGestioneCoordinateAPIView, 
-    ANNCSURunInfoTaskView
+    ANNCSURunInfoTaskView,
+    ANNCSURunKillTaskView
 )
 
 BASE_URLS = 'qpdnd'
@@ -40,9 +44,14 @@ urlpatterns = [
          ANNCSUGestioneCoordinateAPIView.as_view(),
          name='anncsu-api-gestionecoordinate'
     ),
+    
     # Use for asyncronous task
     path(f'{_BASE_URL_INFO_TASK}<str:task_id>/',
          ANNCSURunInfoTaskView.as_view(),
          name='anncsu-api-infotask'),
+
+    path(f'{_BASE_URL_KILL_TASK}<str:task_id>/',
+         ANNCSURunKillTaskView.as_view(),
+         name='anncsu-api-killtask'),
 
 ]

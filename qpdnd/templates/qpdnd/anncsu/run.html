@@ -7,16 +7,35 @@
     ga.QPDND.ANNCSU.init();
     ga.QPDND.ANNCSU.run("{% url 'anncsu-api-gestionecoordinate' anncsu_project.id %}");
     ga.QPDND.ANNCSU.base_url_info_task = '{{ BASE_URL_INFO_TASK }}';
+    ga.QPDND.ANNCSU.disable_stop_btn();
     {% if anncsu_project.task_id %}
     ga.QPDND.ANNCSU.task_id = "{{ anncsu_project.task_id }}";
-    ga.QPDND.ANNCSU.task_results = {{ task_results|safe }};
-    if ('{{ task_model.state.signal_name }}' == 'executing') {
+    ga.QPDND.ANNCSU.task_results = {% if task_results %}{{ task_results|safe }}{% else %}null{% endif %};
+    if ('{{ task_model.state.signal_name }}' == '{{ huey_signals.SIGNAL_EXECUTING }}') {
         ga.QPDND.ANNCSU.taskInfo();
         ga.QPDND.ANNCSU.disable_run_btn();
+        ga.QPDND.ANNCSU.stop("{% url 'anncsu-api-killtask' anncsu_project.task_id %}");
+        ga.QPDND.ANNCSU.enable_stop_btn();
     }
-    if ('{{ task_model.state.signal_name }}' != 'executing') {
+    if ('{{ task_model.state.signal_name }}' != '{{ huey_signals.SIGNAL_EXECUTING }}') {
         ga.QPDND.ANNCSU.render_task_results();
     }
+
+    // Set huey signals
+    ga.QPDND.ANNCSU.huey_signals = {
+            'CANCELLED': '{{ huey_signals.SIGNAL_CANCELED }}',
+            'COMPLETE': '{{ huey_signals.SIGNAL_COMPLETE }}',
+            {% comment %} 'ENQUEUED': '{{ huey_signals.SIGNAL_ENQUEUED }}', {% endcomment %}
+            'ERROR': '{{ huey_signals.SIGNAL_ERROR }}',
+            'EXECUTING': '{{ huey_signals.SIGNAL_EXECUTING }}',
+            'EXPIRED': '{{ huey_signals.SIGNAL_EXPIRED }}',
+            'LOCKED': '{{ huey_signals.SIGNAL_LOCKED }}',
+            'RETRYING': '{{ huey_signals.SIGNAL_RETRYING }}',
+            'REVOKED': '{{ huey_signals.SIGNAL_REVOKED }}',
+            'SCHEDULED': '{{ huey_signals.SIGNAL_SCHEDULED }}',
+            'INTERRUPTED': '{{ huey_signals.SIGNAL_INTERRUPTED }}'
+    };
+    
 
     {% endif %}
 </script>
@@ -44,6 +63,7 @@
         </div>
         <div class="col-md-4">
             <button class="btn btn-lg btn-primary" id="anncsu_sendToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send to PDND API" %}</button>
+            <button class="btn btn-lg btn-danger" id="anncsu_stopSendToPdnd"><i class="glyphicon glyphicon-stop"></i> {% trans "STOP send to PDND API" %}</button>
         </div>
     </div>
     </div>

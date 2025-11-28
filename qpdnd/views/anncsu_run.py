@@ -15,6 +15,7 @@ from django.views.generic import TemplateView
 from huey.contrib.djhuey import HUEY
 from huey.exceptions import TaskException
 from huey_monitor.models import TaskModel
+from huey import signals
 from core.utils.qgisapi import count_qgis_features
 from qpdnd.models import ANNCSUProject
 from qpdnd.settings import _BASE_URL_INFO_TASK
@@ -48,5 +49,8 @@ class ANNCSURunView(TemplateView):
                 ctx['task_results'] = HUEY.result(ctx['anncsu_project'].task_id)
             except TaskException:
                 ctx['task_results'] = None
+        
+        # Task huey signals
+        ctx['huey_signals'] = signals
 
         return ctx

@@ -80,6 +80,7 @@ ga.QPDND.ANNCSU = {
 
     init: function(){
         this.run_btn = $("#anncsu_sendToPdnd");
+        this.stop_btn = $("#anncsu_stopSendToPdnd");
         this.progress_bar = $(".progress-bar");
         this.task_id_container = $("#task_id");
         this.task_results_container = $("#task_results");
@@ -87,10 +88,48 @@ ga.QPDND.ANNCSU = {
         this.base_url_info_task = null;
         this.task_id = null;
         this.task_results = null;
+        this.huey_signals = null;
     },
 
     disable_run_btn: function(){
         this.run_btn.prop('disabled', true);
+    },
+
+    enable_run_btn: function(){
+        this.run_btn.prop('disabled', false);
+    },
+
+    disable_stop_btn: function(){
+        this.stop_btn.prop('disabled', true);
+    },
+
+    enable_stop_btn: function(){
+        this.stop_btn.prop('disabled', false);
+    },
+
+    stop: function(kill_url){
+        var that = this;
+        this.stop_btn.on("click", function(){
+           
+           $.ajax({
+                   method: 'get',
+                   url: kill_url,
+                   success: function (res) {
+                       console.log(res);
+                       if (res['result']) {
+                           that.enable_run_btn();
+                           that.disable_stop_btn();
+                           that.task_status_container.text('INTERRUPTED');
+                       } else {
+                           throw (res['error_message']);
+                       }
+                   },
+                   error: function (xhr, textStatus, errorMessage) {
+                       ga.widget.showError(ga.utils.buildAjaxErrorMessage(xhr.status, errorMessage));
+                   }
+
+           });
+       });
     },
 
     run: function(run_url){
@@ -106,6 +145,7 @@ ga.QPDND.ANNCSU = {
                             that.task_id = res['task_id'];
 
                             that.disable_run_btn();
+                            that.enable_stop_btn();
                             // Show task id
                             that.task_id_container.text(that.task_id);
                             that.task_status_container.text('EXECUTING');
@@ -134,26 +174,26 @@ ga.QPDND.ANNCSU = {
                     url: '/qpdnd/' + that.base_url_info_task + that.task_id + '/',
                     success: function (res) {
                         var current_progress = 0;
-                        if (res['status'] == 'executing' || res['status'] == 'PENDING') {
+                        if (res['status'] == that.huey_signals.EXECUTING) {
                             current_progress = res['progress'];
                             that.progress_bar.css("width", current_progress + "%")
                               .attr("aria-valuenow", current_progress)
                               .text(current_progress + "% Complete");
                         }
 
-                        if (current_progress >= 100 || res['status'] == 'SUCCESS' || res['status'] == 'complete') {
-                          clearInterval(interval);
-                          that.progress_bar.css("width",  "100%")
-                              .attr("aria-valuenow", '100')
-                              .text("100% Complete");
+                        if (res['progress'] == 100 && res['status'] == that.huey_signals.COMPLETE) {
+                            clearInterval(interval);
+                            that.progress_bar.css("width",  "100%")
+                                .attr("aria-valuenow", '100')
+                                .text("100% Complete");
 
-                        //   //reload page after 1sec
-                        //   setTimeout(function(){
-                        //        window.location.reload(1);
-                        //        }, 5000);
+                            that.enable_run_btn();  
+                            that.task_status_container.text(res['status'].toUpperCase());
+                            that.task_results = res['task_result'];
+                            that.render_task_results();
                         }
 
-                        if (res['status'] == 'UNKNOWN' || res['status'] == 'unknown') {
+                        if (res['status'] == 'unknown' || res['status'] == that.huey_signals.INTERRUPTED) {
                             //reload page after 1sec
                             setTimeout(function(){
                                window.location.reload(1);
