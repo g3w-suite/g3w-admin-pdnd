@@ -86,9 +86,11 @@ ga.QPDND.ANNCSU = {
         this.task_results_container = $("#task_results");
         this.task_status_container = $("#task_status");
         this.base_url_info_task = null;
+        this.base_url_kill_task = null;
         this.task_id = null;
         this.task_results = null;
         this.huey_signals = null;
+        this.task_info_interval = null;
     },
 
     disable_run_btn: function(){
@@ -116,10 +118,11 @@ ga.QPDND.ANNCSU = {
                    url: kill_url,
                    success: function (res) {
                        console.log(res);
-                       if (res['result']) {
+                       if (res['status'] == that.huey_signals.REVOKED) {
                            that.enable_run_btn();
                            that.disable_stop_btn();
-                           that.task_status_container.text('INTERRUPTED');
+                           that.task_status_container.text(that.huey_signals.REVOKED.toUpperCase());
+                           clearInterval(that.task_info_interval);
                        } else {
                            throw (res['error_message']);
                        }
@@ -145,12 +148,15 @@ ga.QPDND.ANNCSU = {
                             that.task_id = res['task_id'];
 
                             that.disable_run_btn();
+                            that.stop("/qpdnd/" + that.base_url_kill_task + that.task_id);
                             that.enable_stop_btn();
+
                             // Show task id
                             that.task_id_container.text(that.task_id);
-                            that.task_status_container.text('EXECUTING');
+                            that.task_status_container.text(that.huey_signals.EXECUTING.toUpperCase());
                             
 
+                            // Start task info polling
                             that.taskInfo();
                         } else {
                             throw Error(res['error_message']);
@@ -182,7 +188,7 @@ ga.QPDND.ANNCSU = {
                         }
 
                         if (res['progress'] == 100 && res['status'] == that.huey_signals.COMPLETE) {
-                            clearInterval(interval);
+                            clearInterval(that.task_info_interval);
                             that.progress_bar.css("width",  "100%")
                                 .attr("aria-valuenow", '100')
                                 .text("100% Complete");
@@ -208,7 +214,7 @@ ga.QPDND.ANNCSU = {
                 });
             };
 
-            var interval = setInterval(_taskinfo, 1000)
+            this.task_info_interval = setInterval(_taskinfo, 1000)
 
 
         } catch (e) {

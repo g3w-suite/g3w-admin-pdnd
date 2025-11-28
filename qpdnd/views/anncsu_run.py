@@ -18,7 +18,10 @@ from huey_monitor.models import TaskModel
 from huey import signals
 from core.utils.qgisapi import count_qgis_features
 from qpdnd.models import ANNCSUProject
-from qpdnd.settings import _BASE_URL_INFO_TASK
+from qpdnd.settings import (
+    _BASE_URL_INFO_TASK, 
+    _BASE_URL_KILL_TASK
+)
 
 
 
@@ -41,6 +44,7 @@ class ANNCSURunView(TemplateView):
 
         # Task id
         ctx['BASE_URL_INFO_TASK'] = _BASE_URL_INFO_TASK
+        ctx['BASE_URL_KILL_TASK'] = _BASE_URL_KILL_TASK
         if ctx['anncsu_project'].task_id:
             ctx['task_model'] = ctx['anncsu_project'].get_task()
 
