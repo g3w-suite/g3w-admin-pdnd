@@ -107,8 +107,11 @@ class ANNCSUPDNDAPI(object):
         send_date = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         
         features = self.anncsu_project.get_features()
-        for feature in features:
-            
+
+        findex = 0
+        while findex < len(features):
+
+            feature = features[findex]               
             # Here would be the logic to send each feature to the PDND API
             try:
                 # Inform progress also for not good features
@@ -116,30 +119,90 @@ class ANNCSUPDNDAPI(object):
                     self.process_info.update(n=1)
 
                 # Try to check signal interruption(revoked) to exit
+                # ==================================================
                 if self.task_model:
                 
                     # reload from db
                     self.task_model.refresh_from_db()
                     if self.task_model.state.signal_name == signals.SIGNAL_REVOKED:
                         logger.info(f"Task {self.task_model.task_id} revoked. Stopping feature sending.")
+                        findex = len(features)
                         break
 
                 self.send_feature(feature)
 
                 # Update results
                 self.results['success'] += 1
-                qgis_layer.dataProvider().changeAttributeValues({feature.id(): {fmapping['stato_invio']: 'INVIATO', fmapping['data_invio']: send_date}})
+                qgis_layer.dataProvider().changeAttributeValues({
+                    feature.id(): {
+                        fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: 'INVIATO', 
+                        fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
+                        #fmapping[settings.ANNCSU_FIELD_DIRTY]: False
+                        }
+                    })
                 
             except HTTPError as http_err:    
                 logger.error(f"HTTP error sending feature ID {feature.id()}: {http_err}")
+                
+                # Check if it's a specific error that requires waiting (e.g., 429 Too Many Requests or 503)
+                # if http_err.response.status_code in [429, 503]:
+                #     logger.warning(f"Rate limit or service unavailable error. Waiting until 1 AM next day.")
+                    
+                #     # Calculate wait time until 1 AM next day
+                #     now = datetime.datetime.now()
+                #     next_day_1am = (now + datetime.timedelta(days=1)).replace(hour=1, minute=0, second=0, microsecond=0)
+                #     wait_seconds = (next_day_1am - now).total_seconds()
+                    
+                #     logger.info(f"Waiting {wait_seconds} seconds until {next_day_1am}")
+                #     time.sleep(wait_seconds)
+                    
+                #     # Retry the same feature (don't increment findex)
+                #     continue
+                
                 self._register_error(feature.id(), str(http_err))
-                qgis_layer.dataProvider().changeAttributeValues({feature.id(): {fmapping['stato_invio']: 'ERRORE', fmapping['data_invio']: send_date}})
+                qgis_layer.dataProvider().changeAttributeValues({
+                    feature.id(): {
+                        fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: 'ERRORE', 
+                        fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
+                        #fmapping[settings.ANNCSU_FIELD_DIRTY]: True
+                        }
+                    })
+                
+                
+
                 continue
+
             except Exception as e:
                 logger.error(f"Error sending feature ID {feature.id()}: {e}")
                 self._register_error(feature.id(), str(e))
-                qgis_layer.dataProvider().changeAttributeValues({feature.id(): {fmapping['stato_invio']: 'ERRORE', fmapping['data_invio']: send_date}})
+                qgis_layer.dataProvider().changeAttributeValues({
+                    feature.id(): {
+                        fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: 'ERRORE', 
+                        fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
+                        #fmapping[settings.ANNCSU_FIELD_DIRTY]: True
+                        }
+                    })
                 continue
+
+            finally:
+                
+                # Check if we need to wait after reaching max requests per cycle
+                if (findex + 1) % settings.ANNCSU_MAX_REQUESTS_PER_CICLE == 0:
+                    if settings.ANNCSU_REQUEST_TIME_INTERVAL == 'NEXT_DAY':
+                        # Calculate wait time until 1 PM next day
+                        now = datetime.datetime.now()
+                        next_day_1pm = (now + datetime.timedelta(days=1)).replace(hour=13, minute=0, second=0, microsecond=0)
+                        wait_seconds = (next_day_1pm - now).total_seconds()
+                        
+                        logger.info(f"Reached {settings.ANNCSU_MAX_REQUESTS_PER_CICLE} requests. Waiting {wait_seconds} seconds until {next_day_1pm}")
+                        time.sleep(wait_seconds)
+                    else:
+                        # Wait for specified seconds
+                        logger.info(f"Reached {settings.ANNCSU_MAX_REQUESTS_PER_CICLE} requests. Waiting {settings.ANNCSU_REQUEST_TIME_INTERVAL} seconds")
+                        time.sleep(settings.ANNCSU_REQUEST_TIME_INTERVAL)
+
+
+                findex += 1
 
         return self.results
     
@@ -167,9 +230,9 @@ class ANNCSUPDNDAPI(object):
                 }
             }
         
-        time.sleep(3)  # To avoid overwhelming the API
+        # time.sleep(1)  # To avoid overwhelming the API
         
-        return data
+        # return data
         
         response = requests.post(
             self.api_url,
@@ -202,16 +265,16 @@ class ANNCSUPDND_GestioneCoordinate_API(ANNCSUPDNDAPI):
     def _mapping_feature_to_pdnd(self, feature):
 
         try:
-            z = feature['quota']
+            z = feature[settings.ANNCSU_FIELD_QUOTA]
         except:
             z = '0'
 
         toret = {
                 'codcom': self.anncsu_project.codice_comune.codice_catastale_del_comune,
-                'progr_civico': str(int(feature['indirizzario_id'])),
+                'progr_civico': str(int(feature[settings.ANNCSU_FIELD_PROGR])),
                 'coordinate': {
-                    'x': str(feature['longitudine']),
-                    'y': str(feature['latitudine']),
+                    'x': str(feature[settings.ANNCSU_FIELD_LON]),
+                    'y': str(feature[settings.ANNCSU_FIELD_LAT]),
                     'z': z,
                     'metodo': '3'
                 }

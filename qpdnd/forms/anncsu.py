@@ -11,6 +11,7 @@ __date__ = '2025-10-14 08:54:09'
 __copyright__ = 'Copyright Gis3w'
 
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms import (
     ModelForm, 
@@ -91,3 +92,32 @@ Form for ANNCSUProject model.
                                     css_class='row'
                                 )
                             )
+        
+    def clean_layer(self):
+        """
+        Check for fields required
+        """
+
+        layer = self.cleaned_data['layer']
+
+        # Check required fields
+        required_fields = [
+            settings.ANNCSU_FIELD_STATO_INVIO,
+            settings.ANNCSU_FIELD_DATA_INVIO,
+            settings.ANNCSU_FIELD_DIRTY,
+            settings.ANNCSU_FIELD_PROGR,
+            settings.ANNCSU_FIELD_LAT,
+            settings.ANNCSU_FIELD_LON,
+            #settings.ANNCSU_FIELD_QUOTA # optional
+        ]
+
+        layer_fields = [f.name() for f in layer.qgis_layer.fields()]
+        missing_fields = [field for field in required_fields if field not in layer_fields]
+
+        if missing_fields:
+            raise ValidationError(
+                _("The layer is missing required fields: {}").format(', '.join(missing_fields))
+            )
+
+       
+        return layer

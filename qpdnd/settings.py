@@ -108,3 +108,26 @@ QPDND_TESTING_VOUCHER_EXP = None
 ANNCSU_GOVWAY_API_USER = 'your_govway_user'
 ANNCSU_GOVWAY_API_PASSWORD = 'your_govway_password'
 
+# ANNCSU FIELDS:
+
+# Internal fields mapping
+# -----------------------------
+ANNCSU_FIELD_STATO_INVIO = 'anncsu_stato_invio' # varchar
+ANNCSU_FIELD_DATA_INVIO = 'anncsu_data_invio' # datetime
+ANNCSU_FIELD_DIRTY = 'anncsu_dirty' # boolean
+
+# API - /gestioneaccessi
+# -----------------------------
+
+ANNCSU_FIELD_PROGR = 'progressivo'
+ANNCSU_FIELD_LAT = 'latitudine'
+ANNCSU_FIELD_LON = 'longitudine'
+ANNCSU_FIELD_QUOTA = 'quota'
+
+# Max requests per day
+ANNCSU_MAX_REQUESTS_PER_CICLE = 2000
+
+# Timeout between requests (seconds)
+ANNCSU_REQUEST_TIME_INTERVAL = 60 * 5 # 5 minutes
+#ANNCSU_REQUEST_TIME_INTERVAL = 'NEXT_DAY'  # Special value to indicate reset after midnight'
+
