@@ -52,17 +52,32 @@
 <div class="box box-abstract">
     <div class="box-body">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <h5><strong>Project</strong>: {{ anncsu_project.project.title }} </h5>
             <h5><strong>Layer</strong>: {{ layer }}</h5>
             <h5><strong>Task ID</strong>: <span id="task_id">{{ anncsu_project.task_id }}</span> - <em>Status: <span id="task_status">{{ task_model.state.signal_name|upper }}</span></em></h5>
+            <h5><strong>Start at</strong>: {{ task_model.create_dt }}</h5>
+            <h5><strong>Stop at</strong>: {{ task_model.update_dt }}</h5>
+            <h5><strong>Runtime</strong>: {{ task_duration }}</h5>
+
             <div class="progress progress-md active">
                 <div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                     <span class="sr-only">0% Complete</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <div class="small-box bg-aqua">
+                <div class="inner">
+                    <h3>{{ num_features }}</h3>
+                    <p>{% trans 'Total Features' %}</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-location-pin"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
             <button class="btn btn-lg btn-primary" id="anncsu_sendToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send to PDND API" %}</button>
             <button class="btn btn-lg btn-danger" id="anncsu_stopSendToPdnd"><i class="glyphicon glyphicon-stop"></i> {% trans "STOP send to PDND API" %}</button>
         </div>
@@ -71,50 +86,8 @@
 </div>
 
 <div class="row">
-        <div class="col-md-4 col-xs-12">
-            <div class="small-box bg-aqua">
-            <div class="inner">
-              <h3>{{ num_features }}</h3>
-
-              <p>{% trans 'Features' %}</p>
-            </div>
-            <div class="icon">
-              <i class="ion ion-location-pin"></i>
-            </div>
-          </div>
-        </div>
-        <div id='task_results' class="col-md-8 col-xs-12">
-            {% comment %} <div class="info-box bg-green">
-                <span class="info-box-icon"><i class="ion ion-ios-heart-outline"></i></span>
-
-                <div class="info-box-content">
-                    <span class="info-box-text">Mentions</span>
-                    <span class="info-box-number">92,050</span>
-
-                    <div class="progress">
-                        <div class="progress-bar" style="width: 20%"></div>
-                    </div>
-                    <span class="progress-description">
-                        20% Increase in 30 Days
-                    </span>
-                </div>
-            </div>
-
-            <div class="info-box bg-red">
-                <span class="info-box-icon"><i class="ion ion-ios-cloud-download-outline"></i></span>
-
-                <div class="info-box-content">
-                    <span class="info-box-text">Downloads</span>
-                    <span class="info-box-number">114,381</span>
-
-                    <div class="progress">
-                        <div class="progress-bar" style="width: 70%"></div>
-                    </div>
-                    <span class="progress-description">
-                        70% Increase in 30 Days
-                    </span>
-                </div>
-            </div> {% endcomment %}
+        <div id='task_results' class="col-md-12 col-xs-12">
+            
         </div>
 </div>
     

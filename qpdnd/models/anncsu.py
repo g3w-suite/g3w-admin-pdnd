@@ -103,7 +103,8 @@ class ANNCSUProject(models.Model):
     def clean(self):
 
         # Ensure that the selected layer belongs to the selected project
-        if self.layer.project != self.project:
+
+        if hasattr(self, 'layer') and self.layer.project != self.project:
             raise ValidationError({'layer': 'The selected layer does not belong to the selected project.'})
 
 

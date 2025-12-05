@@ -123,6 +123,12 @@ ga.QPDND.ANNCSU = {
                            that.disable_stop_btn();
                            that.task_status_container.text(that.huey_signals.REVOKED.toUpperCase());
                            clearInterval(that.task_info_interval);
+
+                           // Wait a moment and get final task info
+                           that.show_loading_task_results();
+                           setTimeout(function(){
+                               that.taskInfoOnceTime();
+                           }, 500);
                        } else {
                            throw (res['error_message']);
                        }
@@ -138,6 +144,9 @@ ga.QPDND.ANNCSU = {
     run: function(run_url){
          var that = this;
          this.run_btn.on("click", function(){
+
+            // Clear previous results
+            that.task_results_container.html('');
             
             $.ajax({
                     method: 'get',
@@ -168,6 +177,23 @@ ga.QPDND.ANNCSU = {
 
             });
         });
+    },
+
+    taskInfoOnceTime: function(){
+        var that = this;
+         $.ajax({
+                method: 'get',
+                url: '/qpdnd/' + that.base_url_info_task + that.task_id + '/',
+                success: function (res) {
+
+                    that.task_results = res['task_result'];
+                    that.render_task_results();
+                },
+                error: function (xhr, textStatus, errorMessage) {
+                    ga.widget.showError(ga.utils.buildAjaxErrorMessage(xhr.status, errorMessage));
+                }
+            });
+
     },
 
     taskInfo: function(){
@@ -220,6 +246,10 @@ ga.QPDND.ANNCSU = {
         } catch (e) {
             this.showError(e.message);
         }
+    },
+
+    show_loading_task_results: function(){
+        this.task_results_container.html('<p>Loading task results...</p>');
     },
 
     render_task_results: function(){

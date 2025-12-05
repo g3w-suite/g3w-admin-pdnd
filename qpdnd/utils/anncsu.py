@@ -187,7 +187,11 @@ class ANNCSUPDNDAPI(object):
             finally:
                 
                 # Check if we need to wait after reaching max requests per cycle
-                if (findex + 1) % settings.ANNCSU_MAX_REQUESTS_PER_CICLE == 0:
+                # Examples of how this condition works:
+                # If ANNCSU_MAX_REQUESTS_PER_CICLE = 0: condition is False, never waits
+                # If ANNCSU_MAX_REQUESTS_PER_CICLE = 100 and findex = 99: (99+1) % 100 = 0, waits
+                # If ANNCSU_MAX_REQUESTS_PER_CICLE = 50 and findex = 49: (49+1) % 50 = 0, waits
+                if settings.ANNCSU_MAX_REQUESTS_PER_CICLE > 0 and (findex + 1) % settings.ANNCSU_MAX_REQUESTS_PER_CICLE == 0:
                     if settings.ANNCSU_REQUEST_TIME_INTERVAL == 'NEXT_DAY':
                         # Calculate wait time until 1 PM next day
                         now = datetime.datetime.now()
@@ -232,6 +236,7 @@ class ANNCSUPDNDAPI(object):
         
         # time.sleep(1)  # To avoid overwhelming the API
         
+        print(data)
         # return data
         
         response = requests.post(
