@@ -270,19 +270,27 @@ class ANNCSUPDND_GestioneCoordinate_API(ANNCSUPDNDAPI):
     def _mapping_feature_to_pdnd(self, feature):
 
         try:
-            z = feature[settings.ANNCSU_FIELD_QUOTA]
+            z = str(feature[settings.ANNCSU_FIELD_QUOTA])
         except:
             z = '0'
 
+        # Cut to max 16 length
+
+        # Truncate coordinates to max 12 characters total (including decimal point)
+        # Truncate coordinates ensuring proper decimal precision
+        x_str = f"{float(feature[settings.ANNCSU_FIELD_LON]):.8f}"[:12]
+        y_str = f"{float(feature[settings.ANNCSU_FIELD_LAT]):.8f}"[:12]
+        z_str = z[:12]
+        
         toret = {
-                'codcom': self.anncsu_project.codice_comune.codice_catastale_del_comune,
-                'progr_civico': str(int(feature[settings.ANNCSU_FIELD_PROGR])),
-                'coordinate': {
-                    'x': str(feature[settings.ANNCSU_FIELD_LON]),
-                    'y': str(feature[settings.ANNCSU_FIELD_LAT]),
-                    'z': z,
-                    'metodo': '3'
-                }
+            'codcom': self.anncsu_project.codice_comune.codice_catastale_del_comune,
+            'progr_civico': str(int(feature[settings.ANNCSU_FIELD_PROGR])),
+            'coordinate': {
+                'x': x_str,
+                'y': y_str,
+                'z': z_str,
+                'metodo': '3'
+            }
         }
 
         return toret

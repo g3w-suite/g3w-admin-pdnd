@@ -53,9 +53,26 @@
     <div class="box-body">
     <div class="row">
         <div class="col-md-6">
-            <h5><strong>Project</strong>: {{ anncsu_project.project.title }} </h5>
+            {% if object.env_type == 'test' %}
+            <span class="label label-success" style="font-size: 24px; padding: 5px 10px;">{{ anncsu_project.env_type|upper }}</span>
+            {% else %}
+            <span class="label label-danger" style="font-size: 24px; padding: 5px 10px;">{{ anncsu_project.env_type|upper }}</span>
+            {% endif %}
+            <h5 style="font-size: 24px;"><strong>Project</strong>: {{ anncsu_project.project.title }} </h5>
             <h5><strong>Layer</strong>: {{ layer }}</h5>
-            <h5><strong>Task ID</strong>: <span id="task_id">{{ anncsu_project.task_id }}</span> - <em>Status: <span id="task_status">{{ task_model.state.signal_name|upper }}</span></em></h5>
+            <h5><strong>Task ID</strong>: <span id="task_id">{{ anncsu_project.task_id }}</span> - <em>Status: 
+                {% if task_model.state.signal_name == huey_signals.SIGNAL_EXECUTING %}
+                    <span id="task_status" class="label label-warning blink-animation" style="font-size: 14px; padding: 5px 10px;">{{ task_model.state.signal_name|upper }}</span>
+                {% elif task_model.state.signal_name == huey_signals.SIGNAL_COMPLETE %}
+                    <span id="task_status" class="label label-success" style="font-size: 14px; padding: 5px 10px;">{{ task_model.state.signal_name|upper }}</span>
+                {% elif task_model.state.signal_name == huey_signals.SIGNAL_ERROR or task_model.state.signal_name == huey_signals.SIGNAL_EXPIRED %}
+                    <span id="task_status" class="label label-danger" style="font-size: 14px; padding: 5px 10px;">{{ task_model.state.signal_name|upper }}</span>
+                {% elif task_model.state.signal_name == huey_signals.SIGNAL_CANCELED or task_model.state.signal_name == huey_signals.SIGNAL_REVOKED %}
+                    <span id="task_status" class="label label-default" style="font-size: 14px; padding: 5px 10px;">{{ task_model.state.signal_name|upper }}</span>
+                {% else %}
+                    <span id="task_status" class="label label-info" style="font-size: 14px; padding: 5px 10px;">{{ task_model.state.signal_name|upper }}</span>
+                {% endif %}
+            </em></h5>
             <h5><strong>Start at</strong>: {{ task_model.create_dt }}</h5>
             <h5><strong>Stop at</strong>: {{ task_model.update_dt }}</h5>
             <h5><strong>Runtime</strong>: {{ task_duration }}</h5>

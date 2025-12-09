@@ -65,7 +65,7 @@ class ANNCSUProject(models.Model):
         ('test', _('TESTING'))
     )
 
-    project = models.OneToOneField('qdjango.Project', on_delete=models.CASCADE, related_name="%(app_label)s_anncsu_projects")
+    project = models.ForeignKey('qdjango.Project', on_delete=models.CASCADE, related_name="%(app_label)s_anncsu_projects")
 
     layer = models.ForeignKey('qdjango.Layer', models.CASCADE, related_name="%(app_label)s_anncsu_layers_related")
 

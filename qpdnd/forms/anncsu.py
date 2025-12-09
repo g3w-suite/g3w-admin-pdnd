@@ -60,7 +60,8 @@ Form for ANNCSUProject model.
             project_ids = [c.project.pk for c in ANNCSUProject.objects.all()]
 
 
-        self.fields['project'].queryset = Project.objects.filter(~Q(pk__in=project_ids))
+        # self.fields['project'].queryset = Project.objects.filter(~Q(pk__in=project_ids))
+        self.fields['project'].queryset = Project.objects.filter()
 
 
         self.helper = FormHelper(self)
