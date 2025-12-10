@@ -15,6 +15,10 @@ from huey import signals
 from huey_monitor.models import TaskModel
 from core.utils.qgisapi import get_qgis_features
 from qpdnd.api.models import Accesso
+from qpdnd.settings import (
+    _ANNCSU_SENDED_STATUS,
+    _ANNCSU_ERROR_STATUS
+)
 
 from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
@@ -135,7 +139,7 @@ class ANNCSUPDNDAPI(object):
                 self.results['success'] += 1
                 qgis_layer.dataProvider().changeAttributeValues({
                     feature.id(): {
-                        fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: 'INVIATO', 
+                        fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_SENDED_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
                         #fmapping[settings.ANNCSU_FIELD_DIRTY]: False
                         }
@@ -162,7 +166,7 @@ class ANNCSUPDNDAPI(object):
                 self._register_error(feature.id(), str(http_err))
                 qgis_layer.dataProvider().changeAttributeValues({
                     feature.id(): {
-                        fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: 'ERRORE', 
+                        fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_ERROR_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
                         #fmapping[settings.ANNCSU_FIELD_DIRTY]: True
                         }
@@ -177,7 +181,7 @@ class ANNCSUPDNDAPI(object):
                 self._register_error(feature.id(), str(e))
                 qgis_layer.dataProvider().changeAttributeValues({
                     feature.id(): {
-                        fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: 'ERRORE', 
+                        fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_ERROR_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
                         #fmapping[settings.ANNCSU_FIELD_DIRTY]: True
                         }
@@ -219,7 +223,11 @@ class ANNCSUPDNDAPI(object):
         pdata = self.model(**self._mapping_feature_to_pdnd(feature))
 
         # Prepare authentication
-        auth = HTTPBasicAuth(settings.ANNCSU_GOVWAY_API_USER, settings.ANNCSU_GOVWAY_API_PASSWORD)
+        # If is set govway_username and govway_password in anncsu_project, use them
+        if self.anncsu_project.govway_username and self.anncsu_project.govway_password:
+            auth = HTTPBasicAuth(self.anncsu_project.govway_username, self.anncsu_project.govway_password)
+        else:       
+            auth = HTTPBasicAuth(settings.ANNCSU_GOVWAY_API_USER, settings.ANNCSU_GOVWAY_API_PASSWORD)
 
 
         headers = {

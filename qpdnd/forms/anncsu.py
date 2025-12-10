@@ -15,7 +15,9 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms import (
     ModelForm, 
-    Select
+    Select,
+    CharField, 
+    PasswordInput
 )
 from django.db.models import Q  
 from django.utils.translation import gettext_lazy as _
@@ -40,8 +42,15 @@ from qpdnd.models import (
 
 class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
     """
-Form for ANNCSUProject model.
+    Form for ANNCSUProject model.
     """
+
+    govway_password = CharField(
+        label=_("GovWay API Password"),
+        required=False,
+        strip=False,
+        widget=PasswordInput(), #attrs={'autocomplete': 'new-password'}
+    )
 
     class Meta:
         model = ANNCSUProject
@@ -81,6 +90,8 @@ Form for ANNCSUProject model.
                                                 Field('env_type', css_class='select2'),
                                                 Field('codice_comune', css_class='select2'),
                                                 'govway_api_endpoint',
+                                                'govway_username',
+                                                'govway_password',
                                                 Field('note', rows="3"),
 
                                                 css_class='box-body',
@@ -122,3 +133,21 @@ Form for ANNCSUProject model.
 
        
         return layer
+    
+    def clean_govway_password(self):
+
+        # if password is not changed, keep the old one
+        password = self.cleaned_data.get('govway_password')
+        if not password and self.instance.pk:
+            password = self.instance.govway_password
+        
+        # If  govway_username is set, password must be set too
+        govway_username = self.cleaned_data.get('govway_username')
+        if govway_username and not password:
+            raise ValidationError(_("GovWay API password is required when username is set."))
+        
+        # If govway_username is not set, password reset
+        if not govway_username and password:
+            password = None
+        
+        return password

@@ -38,6 +38,7 @@ class ANNCSUProjectsListView(ListView):
     """
     model = ANNCSUProject
     template_name = 'qpdnd/anncsu/project_list.html'
+    queryset = ANNCSUProject.objects.all().order_by('project__title', 'layer__title')
 
     @method_decorator(permission_required('qpdnd.add_anncsuproject', return_403=True))
     def dispatch(self, request, *args, **kwargs):

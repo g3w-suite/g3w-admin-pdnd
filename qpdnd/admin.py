@@ -22,7 +22,8 @@ class LicenseAdmin(admin.ModelAdmin):
 class ANNCSUProjectAdmin(admin.ModelAdmin):
    list_display = [
        'project',
-       'layer'
+       'layer',
+       'env_type',
    ]
 
 @admin.register(IstatCodiciUi)

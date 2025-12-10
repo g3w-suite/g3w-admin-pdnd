@@ -20,8 +20,12 @@ from core.utils.qgisapi import count_qgis_features
 from qpdnd.models import ANNCSUProject
 from qpdnd.settings import (
     _BASE_URL_INFO_TASK, 
-    _BASE_URL_KILL_TASK
+    _BASE_URL_KILL_TASK,
+    _ANNCSU_SENDED_STATUS,
+    _ANNCSU_ERROR_STATUS
 )
+
+from qgis.core import QgsFeatureRequest
 
 
 
@@ -40,7 +44,29 @@ class ANNCSURunView(TemplateView):
         ctx['qgs_layer'] = ctx['layer'].qgis_layer
 
         # Feacture count
+
+        original_subset_string = ctx['qgs_layer'].subsetString()
+
         ctx['num_features'] = count_qgis_features(ctx['qgs_layer'])
+
+
+        # Count feature by anncsu_sta field
+        ctx['num_features_by_status'] = {}
+        request = QgsFeatureRequest().setFilterExpression(
+            f"\"anncsu_sta\" = '{_ANNCSU_SENDED_STATUS}'"
+        )
+
+        ctx['num_features_by_status'][_ANNCSU_SENDED_STATUS] = count_qgis_features(ctx['qgs_layer'], request)
+
+        request = QgsFeatureRequest().setFilterExpression(
+            f"\"anncsu_sta\" = '{_ANNCSU_ERROR_STATUS}'"
+        )
+
+        ctx['num_features_by_status'][_ANNCSU_ERROR_STATUS] = count_qgis_features(ctx['qgs_layer'], request)
+
+        # Restore the original subset string and select no features
+        ctx['qgs_layer'].selectByIds([])
+        ctx['qgs_layer'].setSubsetString(original_subset_string)
 
         # Task id
         ctx['BASE_URL_INFO_TASK'] = _BASE_URL_INFO_TASK

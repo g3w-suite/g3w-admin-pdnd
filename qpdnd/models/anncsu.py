@@ -79,6 +79,11 @@ class ANNCSUProject(models.Model):
 
     task_id = models.CharField(max_length=255, blank=True, null=True, help_text=_('Asynchronous task ID.'))
 
+    ## Add user/password for GOVWAY authentication if needed
+    govway_username = models.CharField(max_length=255, blank=True, null=True, help_text=_('GovWay API username'))
+
+    govway_password = models.CharField(max_length=255, blank=True, null=True, help_text=_('GovWay API password'))
+
     def get_features(self):
         """
         Get QGIS features from the configured layer.

@@ -104,6 +104,10 @@ QPDND_TESTING_VOUCHER_EXP = None
 # For ANNCSU 
 #############################################################'
 
+# Private settings for GovWay API access
+_ANNCSU_SENDED_STATUS = 'INVIATO'
+_ANNCSU_ERROR_STATUS = 'ERRORE'
+
 # GovWay API auth user
 ANNCSU_GOVWAY_API_USER = 'your_govway_user'
 ANNCSU_GOVWAY_API_PASSWORD = 'your_govway_password'

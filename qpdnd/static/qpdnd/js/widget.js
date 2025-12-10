@@ -275,13 +275,6 @@ ga.QPDND.ANNCSU = {
             <div class="info-box-content">
                 <span class="info-box-text">Feature sent</span>
                 <span class="info-box-number"> <%= success %></span>
-
-                <div class="progress">
-                    <div class="progress-bar" style="width: <%= perc_success %>%"></div>
-                </div>
-                <span class="progress-description">
-                    <%= perc_success %>%                 
-                </span>
             </div>
         </div>
 
@@ -291,13 +284,6 @@ ga.QPDND.ANNCSU = {
             <div class="info-box-content">
                 <span class="info-box-text">Errors</span>
                 <span class="info-box-number"><%= failed %></span>
-
-                <div class="progress">
-                    <div class="progress-bar" style="width: <%= perc_failed %>%"></div>
-                </div>
-                <span class="progress-description">
-                    <%= perc_failed %>%
-                </span>
             </div>
         </div>
     `),
