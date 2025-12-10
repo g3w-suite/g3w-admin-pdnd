@@ -242,11 +242,6 @@ class ANNCSUPDNDAPI(object):
                 }
             }
         
-        # time.sleep(1)  # To avoid overwhelming the API
-        
-        print(data)
-        # return data
-        
         response = requests.post(
             self.api_url,
             headers=headers,
