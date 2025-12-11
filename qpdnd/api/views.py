@@ -172,8 +172,11 @@ class ANNCSUGestioneCoordinateAPIView(G3WAPIView):
 
         anncsu_project = ANNCSUProject.objects.get(pk=kwargs['anncsu_project_id'])
 
+        # Check for additional GET parameters if needed
+        send_type = request.GET.get('send_type', None)
+
         # Send on Huey
-        task = send_anncsu_pdnd_task(anncsu_project)
+        task = send_anncsu_pdnd_task(anncsu_project, send_type)
 
         # Send on Celery
         # task = object()

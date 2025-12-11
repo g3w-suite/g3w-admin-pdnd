@@ -80,6 +80,8 @@ ga.QPDND.ANNCSU = {
 
     init: function(){
         this.run_btn = $("#anncsu_sendToPdnd");
+        this.run_not_sent_btn = $("#anncsu_sendOnlyNotSentToPdnd");
+        this.run_only_error_btn = $("#anncsu_sendOnlyErrorToPdnd");
         this.stop_btn = $("#anncsu_stopSendToPdnd");
         this.progress_bar = $(".progress-bar");
         this.task_id_container = $("#task_id");
@@ -97,9 +99,25 @@ ga.QPDND.ANNCSU = {
         this.run_btn.prop('disabled', true);
     },
 
+    disable_run_not_sent_btn: function(){
+        this.run_not_sent_btn.prop('disabled', true);
+    },
+
+    disable_run_only_error_btn: function(){
+        this.run_only_error_btn.prop('disabled', true);
+    },
+
     enable_run_btn: function(){
         this.run_btn.prop('disabled', false);
     },
+
+    enable_run_not_sent_btn: function(){
+        this.run_not_sent_btn.prop('disabled', false);
+    },
+
+    enable_run_only_error_btn: function(){
+        this.run_only_error_btn.prop('disabled', false);
+    },  
 
     disable_stop_btn: function(){
         this.stop_btn.prop('disabled', true);
@@ -120,6 +138,8 @@ ga.QPDND.ANNCSU = {
                        console.log(res);
                        if (res['status'] == that.huey_signals.REVOKED) {
                            that.enable_run_btn();
+                           that.enable_run_not_sent_btn();
+                           that.enable_run_only_error_btn();
                            that.disable_stop_btn();
                            that.task_status_container.text(that.huey_signals.REVOKED.toUpperCase());
                            clearInterval(that.task_info_interval);
@@ -143,10 +163,16 @@ ga.QPDND.ANNCSU = {
 
     run: function(run_url){
          var that = this;
-         this.run_btn.on("click", function(){
+         var run_function = function(){
 
             // Clear previous results
             that.task_results_container.html('');
+            var btn_id = $(this).attr('id');
+            if (btn_id == 'anncsu_sendOnlyNotSentToPdnd'){
+                run_url += '?send_type=not-sent';
+            } else if (btn_id == 'anncsu_sendOnlyErrorToPdnd'){
+                run_url += '?send_type=error';
+            }
             
             $.ajax({
                     method: 'get',
@@ -157,6 +183,8 @@ ga.QPDND.ANNCSU = {
                             that.task_id = res['task_id'];
 
                             that.disable_run_btn();
+                            that.disable_run_not_sent_btn();
+                            that.disable_run_only_error_btn();
                             that.stop("/qpdnd/" + that.base_url_kill_task + that.task_id);
                             that.enable_stop_btn();
 
@@ -176,7 +204,11 @@ ga.QPDND.ANNCSU = {
                     }
 
             });
-        });
+        }; 
+
+        this.run_btn.on("click", run_function);
+        this.run_not_sent_btn.on("click", run_function);
+        this.run_only_error_btn.on("click", run_function);
     },
 
     taskInfoOnceTime: function(){
@@ -220,6 +252,8 @@ ga.QPDND.ANNCSU = {
                                 .text("100% Complete");
 
                             that.enable_run_btn();  
+                            that.enable_run_not_sent_btn();
+                            that.enable_run_only_error_btn();
                             that.task_status_container.text(res['status'].toUpperCase());
                             that.task_results = res['task_result'];
                             that.render_task_results();

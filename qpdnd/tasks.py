@@ -98,7 +98,7 @@ def db_task(*args, **kwargs):
 
 
 @db_task(context=True)
-def send_anncsu_pdnd_task(anncsu_project, task):
+def send_anncsu_pdnd_task(anncsu_project, send_type, task):
     """
     Task to send ANNCSU PDND data to API.
     """
@@ -114,7 +114,7 @@ def send_anncsu_pdnd_task(anncsu_project, task):
     )
 
 
-    gc = ANNCSUPDND_GestioneCoordinate_API(anncsu_project, process_info)
+    gc = ANNCSUPDND_GestioneCoordinate_API(anncsu_project, send_type, process_info)
     
     return gc.send_features()
 

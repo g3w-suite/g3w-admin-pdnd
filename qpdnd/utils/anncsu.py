@@ -42,7 +42,7 @@ class ANNCSUPDNDAPI(object):
     api_url = None
 
 
-    def __init__(self, anncsu_project, process_info=None):
+    def __init__(self, anncsu_project, send_type, process_info=None):
         """ 
         Constructor 
         :param anncsu_project: ANNCSUProject instance
@@ -50,6 +50,7 @@ class ANNCSUPDNDAPI(object):
         """
 
         self.anncsu_project = anncsu_project
+        self.send_type = send_type
         self.process_info = process_info
 
         # Set TaskModel if exists
@@ -109,8 +110,8 @@ class ANNCSUPDNDAPI(object):
         qgis_layer = self.anncsu_project.layer.qgis_layer
         fmapping = self._layer_fields_mapping(qgis_layer)
         send_date = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-        
-        features = self.anncsu_project.get_features()
+        print(self.send_type)
+        features = self.anncsu_project.get_features(self.send_type)
 
         findex = 0
         while findex < len(features):
@@ -199,8 +200,8 @@ class ANNCSUPDNDAPI(object):
                     if settings.ANNCSU_REQUEST_TIME_INTERVAL == 'NEXT_DAY':
                         # Calculate wait time until 1 PM next day
                         now = datetime.datetime.now()
-                        next_day_1pm = (now + datetime.timedelta(days=1)).replace(hour=13, minute=0, second=0, microsecond=0)
-                        wait_seconds = (next_day_1pm - now).total_seconds()
+                        next_day_1am = (now + datetime.timedelta(days=1)).replace(hour=1, minute=0, second=0, microsecond=0)
+                        wait_seconds = (next_day_1am - now).total_seconds()
                         
                         logger.info(f"Reached {settings.ANNCSU_MAX_REQUESTS_PER_CICLE} requests. Waiting {wait_seconds} seconds until {next_day_1pm}")
                         time.sleep(wait_seconds)
@@ -263,9 +264,9 @@ class ANNCSUPDND_GestioneCoordinate_API(ANNCSUPDNDAPI):
 
     model = Accesso
 
-    def __init__(self, anncsu_project, process_info=None):
+    def __init__(self, anncsu_project, send_type, process_info=None, **kwargs):
         
-        super().__init__(anncsu_project, process_info)
+        super().__init__(anncsu_project, send_type, process_info, **kwargs)
 
         # Set specific API URL
         self.api_url = self.anncsu_project.govway_api_endpoint

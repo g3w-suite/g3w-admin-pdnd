@@ -11,6 +11,7 @@ __date__ = '2025-10-10 15:53:19'
 __copyright__ = 'Copyright Gis3w'
 
 
+from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -18,8 +19,15 @@ from huey.contrib.djhuey import HUEY
 from huey.exceptions import TaskException
 from huey_monitor.models import TaskModel
 from core.utils.qgisapi import get_qgis_features
+from qpdnd.settings import (
+    _ANNCSU_SENDED_STATUS, 
+    _ANNCSU_ERROR_STATUS
+)
 from model_utils import Choices
-from qgis.core import QgsSettings
+from qgis.core import (
+    QgsSettings, 
+    QgsFeatureRequest
+)
 
 
 
@@ -84,11 +92,43 @@ class ANNCSUProject(models.Model):
 
     govway_password = models.CharField(max_length=255, blank=True, null=True, help_text=_('GovWay API password'))
 
-    def get_features(self):
+    def get_features(self, send_type=None):
         """
         Get QGIS features from the configured layer.
+        :param send_type: optional send type to filter features, can be 'dirty', 'error', 'dirty-error', 'not-sent', 'sent'
         :return: list of QGIS features"""
-        return get_qgis_features(self.layer.qgis_layer)
+
+        qlayer  = self.layer.qgis_layer
+        
+        if send_type == 'error':
+            expression = f"\"{settings.ANNCSU_FIELD_STATO_INVIO}\" = '{_ANNCSU_ERROR_STATUS}'"
+        elif send_type == 'sent':
+            expression = f"\"{settings.ANNCSU_FIELD_STATO_INVIO}\" = '{_ANNCSU_SENDED_STATUS}'"
+        elif send_type == 'dirty':
+            expression = f"\"{settings.ANNCSU_FIELD_DIRTY}\" IS True"
+        elif send_type == 'dirty-error':
+            expression = f"\"{settings.ANNCSU_FIELD_DIRTY}\" IS True OR \"{settings.ANNCSU_FIELD_STATO_INVIO}\" = '{_ANNCSU_ERROR_STATUS}'"
+        elif send_type == 'not-sent':
+            expression = f"\"{settings.ANNCSU_FIELD_STATO_INVIO}\" IS NULL OR \"{settings.ANNCSU_FIELD_STATO_INVIO}\" <> '{_ANNCSU_SENDED_STATUS}'"
+        else:
+            expression = 'ALL'
+
+        if expression == 'ALL':
+            features = get_qgis_features(qlayer)
+        else:
+            
+            original_subset_string = qlayer.subsetString()
+
+            qfr = QgsFeatureRequest()
+            qfr.setFilterExpression(expression)
+            features = get_qgis_features(self.layer.qgis_layer, qgis_feature_request=qfr)
+
+            # Restore the original subset string and select no features
+            qlayer.selectByIds([])
+            qlayer.setSubsetString(original_subset_string)
+        
+        
+        return features
     
     def get_task(self):
         """
