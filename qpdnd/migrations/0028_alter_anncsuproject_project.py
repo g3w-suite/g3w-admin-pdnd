@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('qdjango', '0135_message_body_pt_message_title_pt_and_more'),
         ('qpdnd', '0027_anncsuproject_task_id'),
     ]
 
