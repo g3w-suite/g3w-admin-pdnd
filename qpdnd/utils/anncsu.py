@@ -203,7 +203,7 @@ class ANNCSUPDNDAPI(object):
                         next_day_1am = (now + datetime.timedelta(days=1)).replace(hour=1, minute=0, second=0, microsecond=0)
                         wait_seconds = (next_day_1am - now).total_seconds()
                         
-                        logger.info(f"Reached {settings.ANNCSU_MAX_REQUESTS_PER_CICLE} requests. Waiting {wait_seconds} seconds until {next_day_1pm}")
+                        logger.info(f"Reached {settings.ANNCSU_MAX_REQUESTS_PER_CICLE} requests. Waiting {wait_seconds} seconds until {next_day_1am}")
                         time.sleep(wait_seconds)
                     else:
                         # Wait for specified seconds
