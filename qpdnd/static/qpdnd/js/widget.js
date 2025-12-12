@@ -298,6 +298,7 @@ ga.QPDND.ANNCSU = {
                 failed: this.task_results['failed'],
                 perc_success: perc_success,
                 perc_failed: perc_failed,
+                url_down_task_results: "/qpdnd/" + this.base_url_down_task_results + this.task_id,
             }));
         }
     },
@@ -320,5 +321,7 @@ ga.QPDND.ANNCSU = {
                 <span class="info-box-number"><%= failed %></span>
             </div>
         </div>
+
+        <a href= "<%= url_down_task_results %>" class="btn btn-lg btn-success" id="anncsu_downloadResults"><i class="glyphicon glyphicon-download"></i> Download Results</a>
     `),
 };

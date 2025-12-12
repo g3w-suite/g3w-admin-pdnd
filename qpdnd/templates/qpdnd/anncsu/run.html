@@ -8,6 +8,7 @@
     ga.QPDND.ANNCSU.run("{% url 'anncsu-api-gestionecoordinate' anncsu_project.id %}");
     ga.QPDND.ANNCSU.base_url_info_task = '{{ BASE_URL_INFO_TASK }}';
     ga.QPDND.ANNCSU.base_url_kill_task = '{{ BASE_URL_KILL_TASK }}';
+    ga.QPDND.ANNCSU.base_url_down_task_results = '{{ BASE_URL_DOWN_TASK_RESULTS }}';
     ga.QPDND.ANNCSU.disable_stop_btn();
     {% if anncsu_project.task_id %}
     ga.QPDND.ANNCSU.task_id = "{{ anncsu_project.task_id }}";

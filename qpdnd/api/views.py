@@ -38,6 +38,7 @@ from qgis.server import QgsServerProjectUtils
 
 from django.test import Client
 import json
+from django.http import HttpResponse
 
 class QDPNDOWSRequestHandler(OWSRequestHandler):
 
@@ -309,3 +310,43 @@ class ANNCSURunKillTaskView(G3WAPIView):
                 'status': 'error',
                 'error': str(e)
             }, status=500)
+
+
+class ANNCSUDownTaskResultsView(G3WAPIView):
+    """
+    Donwload ANNCSU task results view
+    """
+
+    def get(self, request, task_id):
+        """
+        Download the results of a Huey task given the task_id
+        """
+        try:
+            # Try to retrieve the task result, may throw an exception
+            try:
+                result = HUEY.result(task_id)
+            except TaskException:
+                return JsonResponse({
+                    'status': 'error',
+                    'error': 'Error retrieving task results'
+                }, status=500)
+
+            if result is None:
+                return JsonResponse({
+                    'status': 'error',
+                    'error': 'No results available for this task'
+                }, status=404)
+
+            # Return the results as a JSON response
+            response = HttpResponse(
+                json.dumps({'status': 'success', 'task_result': result}, indent=2),
+                content_type='application/json'
+            )
+            response['Content-Disposition'] = f'attachment; filename="task_{task_id}_results.json"'
+            return response
+
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'error': str(e)
+            }, status=500)  

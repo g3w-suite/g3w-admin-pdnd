@@ -21,6 +21,7 @@ from qpdnd.models import ANNCSUProject
 from qpdnd.settings import (
     _BASE_URL_INFO_TASK, 
     _BASE_URL_KILL_TASK,
+    _BASE_URL_DOWN_TASK_RESULTS,
     _ANNCSU_SENDED_STATUS,
     _ANNCSU_ERROR_STATUS
 )
@@ -71,34 +72,39 @@ class ANNCSURunView(TemplateView):
         # Task id
         ctx['BASE_URL_INFO_TASK'] = _BASE_URL_INFO_TASK
         ctx['BASE_URL_KILL_TASK'] = _BASE_URL_KILL_TASK
+        ctx['BASE_URL_DOWN_TASK_RESULTS'] = _BASE_URL_DOWN_TASK_RESULTS
         if ctx['anncsu_project'].task_id:
-            ctx['task_model'] = ctx['anncsu_project'].get_task()
-
-            # Calculate duration
-            if ctx['task_model'].update_dt and ctx['task_model'].create_dt:
-                delta = ctx['task_model'].update_dt - ctx['task_model'].create_dt
-                total_seconds = delta.total_seconds()
-                days = int(total_seconds // 86400)
-                hours = int((total_seconds % 86400) // 3600)
-                minutes = int((total_seconds % 3600) // 60)
-                seconds = int(total_seconds % 60)
-                
-                duration_parts = []
-                if days > 0:
-                    duration_parts.append(f"{days}g")
-                if hours > 0:
-                    duration_parts.append(f"{hours}h")
-                if minutes > 0:
-                    duration_parts.append(f"{minutes}m")
-                if seconds > 0 or not duration_parts:
-                    duration_parts.append(f"{seconds}s")
-                
-                ctx['task_duration'] = " ".join(duration_parts)
-
-            # Get tasks results
             try:
-                ctx['task_results'] = HUEY.result(ctx['anncsu_project'].task_id)
-            except TaskException:
+                ctx['task_model'] = ctx['anncsu_project'].get_task()
+
+                # Calculate duration
+                if ctx['task_model'].update_dt and ctx['task_model'].create_dt:
+                    delta = ctx['task_model'].update_dt - ctx['task_model'].create_dt
+                    total_seconds = delta.total_seconds()
+                    days = int(total_seconds // 86400)
+                    hours = int((total_seconds % 86400) // 3600)
+                    minutes = int((total_seconds % 3600) // 60)
+                    seconds = int(total_seconds % 60)
+                    
+                    duration_parts = []
+                    if days > 0:
+                        duration_parts.append(f"{days}g")
+                    if hours > 0:
+                        duration_parts.append(f"{hours}h")
+                    if minutes > 0:
+                        duration_parts.append(f"{minutes}m")
+                    if seconds > 0 or not duration_parts:
+                        duration_parts.append(f"{seconds}s")
+                    
+                    ctx['task_duration'] = " ".join(duration_parts)
+
+                # Get tasks results
+                try:
+                    ctx['task_results'] = HUEY.result(ctx['anncsu_project'].task_id)
+                except TaskException:
+                    ctx['task_results'] = None
+            except Exception:
+                ctx['task_model'] = None
                 ctx['task_results'] = None
         
         # Task huey signals

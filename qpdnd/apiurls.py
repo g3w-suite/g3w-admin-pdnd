@@ -14,14 +14,16 @@ __license__ = 'MPL 2.0'
 from django.urls import path, re_path
 from .settings import (
     _BASE_URL_INFO_TASK, 
-    _BASE_URL_KILL_TASK
+    _BASE_URL_KILL_TASK,
+    _BASE_URL_DOWN_TASK_RESULTS
 )
 from .api.views import (
     QPDNDAPIOgcView,
     QPDNDInfoProjectAPIView, 
     ANNCSUGestioneCoordinateAPIView, 
     ANNCSURunInfoTaskView,
-    ANNCSURunKillTaskView
+    ANNCSURunKillTaskView, 
+    ANNCSUDownTaskResultsView
 )
 
 BASE_URLS = 'qpdnd'
@@ -53,5 +55,10 @@ urlpatterns = [
     path(f'{_BASE_URL_KILL_TASK}<str:task_id>/',
          ANNCSURunKillTaskView.as_view(),
          name='anncsu-api-killtask'),
+
+    # Download results
+    path(f'{_BASE_URL_DOWN_TASK_RESULTS}<str:task_id>/',
+         ANNCSUDownTaskResultsView.as_view(),
+         name='anncsu-api-downtaskresults'),
 
 ]
