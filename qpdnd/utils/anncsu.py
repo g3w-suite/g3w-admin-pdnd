@@ -29,7 +29,7 @@ import time
 
 import logging
 
-logger = logging.getLogger('qdpnd.anncsu')
+logger = logging.getLogger('qpdnd.anncsu')
 
 
 class ANNCSUPDNDAPI(object):
