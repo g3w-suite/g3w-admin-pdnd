@@ -222,6 +222,21 @@ class ANNCSURunInfoTaskView(G3WAPIView):
                 progress_percentage = 0
 
             try:
+
+                # Add current feature being processed
+
+                try:
+                    ap = ANNCSUProject.objects.get(task_id=task_id)
+                    if not result:
+                        result = {}
+                    result.update({
+                        'current_sent': len([f for f in ap.get_features(send_type='sent')]),
+                        'current_error': len([f for f in ap.get_features(send_type='error')])
+                    })
+                except:
+                    pass
+
+
                 return JsonResponse({
                     'status': task_model.state.signal_name,
                     'exception': task_model.state.exception_line,
