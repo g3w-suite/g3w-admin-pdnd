@@ -18,8 +18,6 @@
         ga.QPDND.ANNCSU.disable_run_btn();
         ga.QPDND.ANNCSU.stop("{% url 'anncsu-api-killtask' anncsu_project.task_id %}");
         ga.QPDND.ANNCSU.enable_stop_btn();
-    }
-    if ('{{ task_model.state.signal_name }}' != '{{ huey_signals.SIGNAL_EXECUTING }}') {
         ga.QPDND.ANNCSU.render_task_results();
     }
 

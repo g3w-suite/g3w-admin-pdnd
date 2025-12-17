@@ -164,7 +164,7 @@ class ANNCSUPDNDAPI(object):
                 #     # Retry the same feature (don't increment findex)
                 #     continue
                 
-                self._register_error(feature.id(), str(http_err))
+                self._register_error(feature.id(), f"Status code: {http_err.response.status_code}: {http_err.response.text}")
                 qgis_layer.dataProvider().changeAttributeValues({
                     feature.id(): {
                         fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_ERROR_STATUS, 
