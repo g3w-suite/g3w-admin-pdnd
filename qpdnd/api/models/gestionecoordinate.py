@@ -15,21 +15,10 @@ from pydantic import (
     BaseModel, 
     field_validator
 )
+
+from .coordinate import Coordinate
+
 import re
-
-class Coordinate(BaseModel):
-    x: str
-    y: str
-    z: str
-    metodo: str
-
-    @field_validator("x", "y", "z")
-    def validate_float_string(cls, value):
-        try:
-            float(value)
-        except ValueError:
-            raise ValueError(f"Il valore '{value}' deve essere una stringa rappresentante un float")
-        return value
 
 class Accesso(BaseModel):
     codcom: str
