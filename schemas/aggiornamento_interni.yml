@@ -1,0 +1,245 @@
+openapi: "3.0.3"
+info:
+  title: ANNCSU REST API - INTERNI
+  description: |-
+    API dei servizi REST di ANNCSU su PDND per aggiornamento degli interni
+    Pattern Model applicati:
+    - [AUDIT_REST_02 ] Inoltro dati tracciati nel dominio del Fruitore REST con correlazione
+    - [BLOCK_REST] Blocking REST
+    - [INTEGRITY_REST_02] Integrità del payload messaggio REST in PDND
+  termsOfService: "https://govway.org/documentazione/api/index.html"
+  contact:
+    email: "infopdnd_anncsu@sogei.it"
+  version: "1.0.0 draft"
+  x-api-id: "https://govway.org/apiConfig"
+  x-summary: "Servizi per la configurazione di GovWay"
+servers:
+  - url: https://modipa.agenziaentrate.gov.it/govway/rest/in/AgenziaEntrate/anncsuinterni/v1
+    description: "l'accesso all'API e' protetta dai controlli di accesso su GovWay"
+  - url: https://modipa-val.agenziaentrate.it/govway/rest/in/AgenziaEntrate/anncsuinterni/v1
+    description: "l'accesso alle API di validazione e' protetta dai controlli di accesso su GovWay"
+tags:
+  - name: anncsu
+    description: Servizi ANNCSU su PDND
+  - name: status
+security:
+  - bearerAuth: []
+    Agid-JWT-Signature: []
+    Agid-JWT-TrackingEvidence: []
+paths:
+  /gestioneinterno:
+    post:
+      description: Questo endpoint consente di eseguire una modifica o inserimento di interni.
+      operationId: gestioneinterno
+      summary: Esegui un'operazione sugli interni
+      tags:
+        - "anncsu"
+      requestBody:
+        description: Dati necessari per l'operazione sugli interni.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RichiestaOperazione'
+      responses:
+        '200':
+          description: Operazione eseguita con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaOperazione'
+        '400':
+          description: Richiesta non valida
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RispostaErrore'
+        '401':
+          description: Operazione non consentita
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RispostaErrore'
+        '404':
+          description: Accesso non trovato
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RispostaErrore'
+        '500':
+          description: Errore interno del server
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RispostaErrore'
+
+  /status:
+    get:
+      summary: Ritorna lo stato dell'applicazione.
+      description: |
+        Ritorna lo stato dell'applicazione. A scopo
+        di test, su base randomica puo' ritornare
+        un errore.
+      operationId: show_status
+      tags:
+        - "status"
+      responses:
+        '200':
+          description: |
+            Il server ha ritornato lo status. 
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        '503':
+          description: |
+            Il server non è disponibile. 
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+components:
+  schemas:
+    RichiestaOperazione:
+      type: object
+      properties:
+        codcom:
+          type: string
+          description: "Codice del comune"
+        progr_civico:
+          type: string
+          description: "Progressivo accesso"
+        progr_interno:
+          type: string
+          description: "Progressivo interno"
+        interno:
+          type: string
+          description: "Interno"
+        tipo_operazione:
+          type: string
+          description: "Tipo di operazione"
+        codice_interno_comunale:
+          type: string
+          description: "Codice interno comunale"
+        cortile:
+          type: string
+          description: "Cortile"
+        edificio:
+          type: string
+          description: "Edificio"
+        scala:
+          type: string
+          description: "Scala"
+        piano:
+          type: string
+          description: "Piano"
+        esponente_interno:
+          type: string
+          description: "Esponente interno"
+    RispostaOperazione:
+      type: object
+      properties:
+        idRichiesta:
+          type: string
+          maxLength: 15
+          description: Identificativo assegnato alla richiesta
+          example: '5144'
+        esito:
+          type: string
+          description: Esito dell'operazione
+          example: "0"
+        messaggio:
+          type: string
+          description: Messaggio associato all'esito
+          example: "OK"
+        dati:
+          type: array
+          items:
+            type: object
+            properties:
+              progr_nazionale_ni:
+                type: string
+                description: Progressivo nazionale NI
+              progr_nazionale_nc:
+                type: string
+                description: Progressivo nazionale NC
+              codice_comunale_ni:
+                type: string
+                description: Codice comunale NI
+              interno:
+                type: string
+                description: Interno
+              cortile:
+                type: string
+                description: Cortile
+              edificio:
+                type: string
+                description: Edificio
+              scala:
+                type: string
+                description: Scala
+              piano:
+                type: string
+                description: Piano
+              data_inizio_ni:
+                type: string
+                description: Data di inizio NI
+              data_fine_ni:
+                type: string
+                description: Data di fine NI
+              data_aggiornamento_ni:
+                type: string
+                description: Data di aggiornamento NI
+              esponente_interno:
+                type: string
+                description: Esponente interno
+    RispostaErrore:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identificativo dell'operazione.
+          example: '5144'
+        codice:
+          type: string
+          description: Codice di errore
+          example: '23'
+        messaggio:
+          type: string
+          description: Messaggio di errore.
+          example: "Errore di validazione: [specifica qui il messaggio di errore]"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: 'A bearer token in the format of a JWS and conformed to the specifications included in [RFC8725](https://tools.ietf.org/html/RFC8725).'
+      scheme: bearer
+      bearerFormat: JWT
+    Agid-JWT-Signature:
+      type: apiKey
+      in: header
+      name: Agid-JWT-Signature
+      description: |-
+        Header della firma di JWS.
+        Il valore di questo header è una firma JWS.
+        Vedere Modi  [integrity_rest_02] Integrità del payload del messaggio REST in PDND
+    Agid-JWT-TrackingEvidence:
+      type: apiKey
+      in: header
+      name: Agid-JWT-TrackingEvidence
+      description: |-
+        Header della firma di JWS.
+        Il valore di questo header è una firma JWS.
+        Vedere Modi  [audit_rest_02] Inoltro dati tracciati nel dominio del Fruitore REST con correlazione
+        Claim da includere:
+            userID, un identificativo univoco dell'utente interno al dominio del fruitore che ha determinato l'esigenza della request di accesso all'e-service dell'erogatore;
+            userLocation, un identificativo univoco della postazione interna al dominio del fruitore da cui è avviata l'esigenza della request di accesso all'e-service dell'erogatore;
+            LoA, livello di sicurezza o di garanzia adottato nel processo di autenticazione informatica nel dominio del fruitore.
+

@@ -44,3 +44,4 @@ class QPDNDLayerAccessControlFilter(QgsAccessControlFilter):
 layer_filter = QPDNDLayerAccessControlFilter(QGS_SERVER.serverInterface())
 # Note: this should be the last filter, set the priority to 10000
 QGS_SERVER.serverInterface().registerAccessControl(layer_filter, 10100)
+

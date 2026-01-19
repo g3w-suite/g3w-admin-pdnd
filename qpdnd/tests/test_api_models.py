@@ -11,7 +11,7 @@ __date__ = '2025-12-23'
 __copyright__ = 'Copyright Gis3w'
 
 
-import unittest
+from django.test import TestCase
 from pydantic import ValidationError
 from qpdnd.api.models.gestionecoordinate import Accesso
 from qpdnd.api.models.coordinate import Coordinate
@@ -20,9 +20,12 @@ from qpdnd.api.models.aggiornamentoaccessi import (
     Richiesta,
     RichiestaOperazione
 )
+from qpdnd.api.models.aggiornamentointerni import (
+    RichiestaOperazione as RichiestaOperazioneInterni
+)
 
 
-class TestAccesso(unittest.TestCase):
+class TestAccesso(TestCase):
     """Test suite for Accesso model from gestionecoordinate"""
 
     def test_accesso_valid_data(self):
@@ -265,7 +268,7 @@ class TestAccesso(unittest.TestCase):
         self.assertEqual(accesso.coordinate.y, "44.0")
 
 
-class TestAccessoAggiornamento(unittest.TestCase):
+class TestAccessoAggiornamento(TestCase):
     """Test suite for Accesso model from aggiornamentoaccessi"""
 
     def test_accesso_valid_data_complete(self):
@@ -525,7 +528,7 @@ class TestAccessoAggiornamento(unittest.TestCase):
         self.assertIsNone(accesso.metrico)
 
 
-class TestRichiesta(unittest.TestCase):
+class TestRichiesta(TestCase):
     """Test suite for Richiesta model"""
 
     def test_richiesta_valid_complete(self):
@@ -615,7 +618,7 @@ class TestRichiesta(unittest.TestCase):
         self.assertEqual(json_data["accesso"]["numero"], "30")
 
 
-class TestRichiestaOperazione(unittest.TestCase):
+class TestRichiestaOperazione(TestCase):
     """Test suite for RichiestaOperazione model"""
 
     def test_richiesta_operazione_complete(self):
@@ -713,5 +716,164 @@ class TestRichiestaOperazione(unittest.TestCase):
         self.assertEqual(richiesta_op.richiesta.progr_nazionale, "9000444")
 
 
-if __name__ == '__main__':
-    unittest.main()
+class TestRichiestaOperazioneInterni(TestCase):
+    """Test suite for RichiestaOperazione model from aggiornamentointerni"""
+
+    def test_richiesta_operazione_interni_valid_complete(self):
+        """Test RichiestaOperazioneInterni with all fields"""
+        data = {
+            "codcom": "A062",
+            "progr_civico": "1370588",
+            "progr_interno": "12345",
+            "interno": "A1",
+            "tipo_operazione": "I",
+            "codice_interno_comunale": "INT001",
+            "cortile": "C1",
+            "edificio": "ED1",
+            "scala": "S1",
+            "piano": "2",
+            "esponente_interno": "B"
+        }
+        richiesta_op = RichiestaOperazioneInterni(**data)
+        
+        self.assertEqual(richiesta_op.codcom, "A062")
+        self.assertEqual(richiesta_op.progr_civico, "1370588")
+        self.assertEqual(richiesta_op.progr_interno, "12345")
+        self.assertEqual(richiesta_op.interno, "A1")
+        self.assertEqual(richiesta_op.tipo_operazione, "I")
+        self.assertEqual(richiesta_op.codice_interno_comunale, "INT001")
+        self.assertEqual(richiesta_op.cortile, "C1")
+        self.assertEqual(richiesta_op.edificio, "ED1")
+        self.assertEqual(richiesta_op.scala, "S1")
+        self.assertEqual(richiesta_op.piano, "2")
+        self.assertEqual(richiesta_op.esponente_interno, "B")
+
+    def test_richiesta_operazione_interni_minimal(self):
+        """Test RichiestaOperazioneInterni with no data (all fields optional)"""
+        data = {}
+        richiesta_op = RichiestaOperazioneInterni(**data)
+        
+        self.assertIsNone(richiesta_op.codcom)
+        self.assertIsNone(richiesta_op.progr_civico)
+        self.assertIsNone(richiesta_op.progr_interno)
+        self.assertIsNone(richiesta_op.interno)
+        self.assertIsNone(richiesta_op.tipo_operazione)
+        self.assertIsNone(richiesta_op.codice_interno_comunale)
+        self.assertIsNone(richiesta_op.cortile)
+        self.assertIsNone(richiesta_op.edificio)
+        self.assertIsNone(richiesta_op.scala)
+        self.assertIsNone(richiesta_op.piano)
+        self.assertIsNone(richiesta_op.esponente_interno)
+
+    def test_richiesta_operazione_interni_partial(self):
+        """Test RichiestaOperazioneInterni with partial data"""
+        data = {
+            "codcom": "B123",
+            "progr_civico": "2000111",
+            "interno": "5",
+            "tipo_operazione": "U"
+        }
+        richiesta_op = RichiestaOperazioneInterni(**data)
+        
+        self.assertEqual(richiesta_op.codcom, "B123")
+        self.assertEqual(richiesta_op.progr_civico, "2000111")
+        self.assertEqual(richiesta_op.interno, "5")
+        self.assertEqual(richiesta_op.tipo_operazione, "U")
+        self.assertIsNone(richiesta_op.progr_interno)
+        self.assertIsNone(richiesta_op.cortile)
+
+    def test_richiesta_operazione_interni_insert_operation(self):
+        """Test RichiestaOperazioneInterni for insert operation"""
+        data = {
+            "codcom": "C456",
+            "progr_civico": "3000222",
+            "interno": "10A",
+            "tipo_operazione": "I",
+            "edificio": "B",
+            "scala": "1",
+            "piano": "3"
+        }
+        richiesta_op = RichiestaOperazioneInterni(**data)
+        
+        self.assertEqual(richiesta_op.tipo_operazione, "I")
+        self.assertEqual(richiesta_op.interno, "10A")
+        self.assertEqual(richiesta_op.edificio, "B")
+        self.assertEqual(richiesta_op.scala, "1")
+        self.assertEqual(richiesta_op.piano, "3")
+
+    def test_richiesta_operazione_interni_delete_operation(self):
+        """Test RichiestaOperazioneInterni for delete operation"""
+        data = {
+            "codcom": "D789",
+            "progr_civico": "4000333",
+            "progr_interno": "99999",
+            "tipo_operazione": "D"
+        }
+        richiesta_op = RichiestaOperazioneInterni(**data)
+        
+        self.assertEqual(richiesta_op.tipo_operazione, "D")
+        self.assertEqual(richiesta_op.progr_interno, "99999")
+
+    def test_richiesta_operazione_interni_json_serialization(self):
+        """Test RichiestaOperazioneInterni JSON serialization"""
+        data = {
+            "codcom": "E012",
+            "progr_civico": "5000444",
+            "interno": "15",
+            "tipo_operazione": "I",
+            "piano": "1",
+            "scala": "A"
+        }
+        richiesta_op = RichiestaOperazioneInterni(**data)
+        json_data = richiesta_op.model_dump()
+        
+        self.assertEqual(json_data["codcom"], "E012")
+        self.assertEqual(json_data["progr_civico"], "5000444")
+        self.assertEqual(json_data["interno"], "15")
+        self.assertEqual(json_data["tipo_operazione"], "I")
+        self.assertEqual(json_data["piano"], "1")
+        self.assertEqual(json_data["scala"], "A")
+
+    def test_richiesta_operazione_interni_json_deserialization(self):
+        """Test RichiestaOperazioneInterni JSON deserialization"""
+        json_str = '{"codcom": "F345", "progr_civico": "6000555", "interno": "20", "tipo_operazione": "U"}'
+        richiesta_op = RichiestaOperazioneInterni.model_validate_json(json_str)
+        
+        self.assertEqual(richiesta_op.codcom, "F345")
+        self.assertEqual(richiesta_op.progr_civico, "6000555")
+        self.assertEqual(richiesta_op.interno, "20")
+        self.assertEqual(richiesta_op.tipo_operazione, "U")
+
+    def test_richiesta_operazione_interni_with_esponente(self):
+        """Test RichiestaOperazioneInterni with esponente_interno"""
+        data = {
+            "codcom": "G678",
+            "progr_civico": "7000666",
+            "interno": "25",
+            "esponente_interno": "bis",
+            "tipo_operazione": "I"
+        }
+        richiesta_op = RichiestaOperazioneInterni(**data)
+        
+        self.assertEqual(richiesta_op.interno, "25")
+        self.assertEqual(richiesta_op.esponente_interno, "bis")
+
+    def test_richiesta_operazione_interni_full_address(self):
+        """Test RichiestaOperazioneInterni with full address details"""
+        data = {
+            "codcom": "H901",
+            "progr_civico": "8000777",
+            "interno": "30",
+            "cortile": "Principale",
+            "edificio": "A",
+            "scala": "2",
+            "piano": "4",
+            "tipo_operazione": "I"
+        }
+        richiesta_op = RichiestaOperazioneInterni(**data)
+        
+        self.assertEqual(richiesta_op.cortile, "Principale")
+        self.assertEqual(richiesta_op.edificio, "A")
+        self.assertEqual(richiesta_op.scala, "2")
+        self.assertEqual(richiesta_op.piano, "4")
+
