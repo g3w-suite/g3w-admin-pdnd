@@ -10,7 +10,7 @@ class QpdndConfig(AppConfig):
         # Load all QGIS server "filter" and "services" plugins,
         # apps can load additional filters and services by
         # registering them directly to QGS_SERVER
-        from . import server_filters
+        #from . import server_filters
         from . import receivers
 
         # Add default settings for module

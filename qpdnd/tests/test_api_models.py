@@ -23,6 +23,13 @@ from qpdnd.api.models.aggiornamentoaccessi import (
 from qpdnd.api.models.aggiornamentointerni import (
     RichiestaOperazione as RichiestaOperazioneInterni
 )
+from qpdnd.api.models.aggiornamentoodonimi import (
+    TipoOperazione,
+    Provvedimento,
+    AutPrefettura,
+    Richiesta as RichiestaOdonimi,
+    RichiestaOperazione as RichiestaOperazioneOdonimi
+)
 
 
 class TestAccesso(TestCase):
@@ -876,4 +883,519 @@ class TestRichiestaOperazioneInterni(TestCase):
         self.assertEqual(richiesta_op.edificio, "A")
         self.assertEqual(richiesta_op.scala, "2")
         self.assertEqual(richiesta_op.piano, "4")
+
+
+class TestTipoOperazione(TestCase):
+    """Test suite for TipoOperazione enum"""
+
+    def test_tipo_operazione_values(self):
+        """Test that TipoOperazione enum has the expected values"""
+        self.assertEqual(TipoOperazione.I.value, 'I')
+        self.assertEqual(TipoOperazione.R.value, 'R')
+        self.assertEqual(TipoOperazione.S.value, 'S')
+
+    def test_tipo_operazione_members(self):
+        """Test that TipoOperazione enum has exactly three members"""
+        self.assertEqual(len(TipoOperazione), 3)
+        self.assertIn(TipoOperazione.I, TipoOperazione)
+        self.assertIn(TipoOperazione.R, TipoOperazione)
+        self.assertIn(TipoOperazione.S, TipoOperazione)
+
+
+class TestProvvedimento(TestCase):
+    """Test suite for Provvedimento model"""
+
+    def test_provvedimento_valid_data(self):
+        """Test Provvedimento creation with valid data"""
+        data = {
+            "data": "10/10/2023",
+            "protocollo": "1234567/abc",
+            "flag_delibera": 2
+        }
+        provvedimento = Provvedimento(**data)
+        
+        self.assertEqual(provvedimento.data, "10/10/2023")
+        self.assertEqual(provvedimento.protocollo, "1234567/abc")
+        self.assertEqual(provvedimento.flag_delibera, 2)
+
+    def test_provvedimento_all_none(self):
+        """Test Provvedimento with all fields as None"""
+        provvedimento = Provvedimento()
+        
+        self.assertIsNone(provvedimento.data)
+        self.assertIsNone(provvedimento.protocollo)
+        self.assertIsNone(provvedimento.flag_delibera)
+
+    def test_provvedimento_flag_delibera_0_requires_data_and_protocollo(self):
+        """Test that flag_delibera=0 requires data and protocollo"""
+        data = {
+            "flag_delibera": 0
+        }
+        with self.assertRaises(ValidationError) as context:
+            Provvedimento(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('data e protocollo sono obbligatori' in str(e) for e in errors))
+
+    def test_provvedimento_flag_delibera_1_requires_data_and_protocollo(self):
+        """Test that flag_delibera=1 requires data and protocollo"""
+        data = {
+            "flag_delibera": 1,
+            "data": "10/10/2023"
+        }
+        with self.assertRaises(ValidationError) as context:
+            Provvedimento(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('data e protocollo sono obbligatori' in str(e) for e in errors))
+
+    def test_provvedimento_flag_delibera_0_with_data_and_protocollo(self):
+        """Test that flag_delibera=0 is valid with data and protocollo"""
+        data = {
+            "data": "10/10/2023",
+            "protocollo": "1234/abc",
+            "flag_delibera": 0
+        }
+        provvedimento = Provvedimento(**data)
+        self.assertEqual(provvedimento.flag_delibera, 0)
+
+    def test_provvedimento_flag_delibera_1_with_data_and_protocollo(self):
+        """Test that flag_delibera=1 is valid with data and protocollo"""
+        data = {
+            "data": "10/10/2023",
+            "protocollo": "1234/abc",
+            "flag_delibera": 1
+        }
+        provvedimento = Provvedimento(**data)
+        self.assertEqual(provvedimento.flag_delibera, 1)
+
+    def test_provvedimento_flag_delibera_out_of_range(self):
+        """Test that flag_delibera must be between 0 and 4"""
+        data = {
+            "data": "10/10/2023",
+            "protocollo": "1234/abc",
+            "flag_delibera": 5
+        }
+        with self.assertRaises(ValidationError) as context:
+            Provvedimento(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('flag_delibera' in str(e) for e in errors))
+
+    def test_provvedimento_flag_delibera_negative(self):
+        """Test that flag_delibera cannot be negative"""
+        data = {
+            "data": "10/10/2023",
+            "protocollo": "1234/abc",
+            "flag_delibera": -1
+        }
+        with self.assertRaises(ValidationError) as context:
+            Provvedimento(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('flag_delibera' in str(e) for e in errors))
+
+    def test_provvedimento_protocollo_max_length(self):
+        """Test Provvedimento protocollo max length constraint"""
+        data = {
+            "protocollo": "a" * 71,  # Exceeds max_length=70
+            "flag_delibera": 2
+        }
+        with self.assertRaises(ValidationError) as context:
+            Provvedimento(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('protocollo' in str(e) for e in errors))
+
+    def test_provvedimento_protocollo_max_length_valid(self):
+        """Test Provvedimento protocollo at max length"""
+        data = {
+            "protocollo": "a" * 70,
+            "flag_delibera": 2
+        }
+        provvedimento = Provvedimento(**data)
+        self.assertEqual(len(provvedimento.protocollo), 70)
+
+
+class TestAutPrefettura(TestCase):
+    """Test suite for AutPrefettura model"""
+
+    def test_aut_prefettura_valid_data(self):
+        """Test AutPrefettura creation with valid data"""
+        data = {
+            "data_pref": "10/10/2023",
+            "protocollo_pref": "Prot.Gen.1234567"
+        }
+        aut_pref = AutPrefettura(**data)
+        
+        self.assertEqual(aut_pref.data_pref, "10/10/2023")
+        self.assertEqual(aut_pref.protocollo_pref, "Prot.Gen.1234567")
+
+    def test_aut_prefettura_all_none(self):
+        """Test AutPrefettura with all fields as None"""
+        aut_pref = AutPrefettura()
+        
+        self.assertIsNone(aut_pref.data_pref)
+        self.assertIsNone(aut_pref.protocollo_pref)
+
+    def test_aut_prefettura_protocollo_max_length(self):
+        """Test AutPrefettura protocollo_pref max length constraint"""
+        data = {
+            "data_pref": "10/10/2023",
+            "protocollo_pref": "a" * 71  # Exceeds max_length=70
+        }
+        with self.assertRaises(ValidationError) as context:
+            AutPrefettura(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('protocollo_pref' in str(e) for e in errors))
+
+    def test_aut_prefettura_protocollo_max_length_valid(self):
+        """Test AutPrefettura protocollo_pref at max length"""
+        data = {
+            "data_pref": "10/10/2023",
+            "protocollo_pref": "a" * 70
+        }
+        aut_pref = AutPrefettura(**data)
+        self.assertEqual(len(aut_pref.protocollo_pref), 70)
+
+
+class TestRichiestaOdonimi(TestCase):
+    """Test suite for Richiesta model from aggiornamentoodonimi"""
+
+    def test_richiesta_odonimi_minimal_data(self):
+        """Test Richiesta creation with minimal required data"""
+        data = {
+            "codcom": "A062"
+        }
+        richiesta = RichiestaOdonimi(**data)
+        
+        self.assertEqual(richiesta.codcom, "A062")
+        self.assertIsNone(richiesta.tipo_operazione)
+
+    def test_richiesta_odonimi_insert_operation(self):
+        """Test Richiesta with insert operation requires dug"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.I,
+            "dug": "VIA",
+            "denom_delibera": "DELLE ORCHIDEE"
+        }
+        richiesta = RichiestaOdonimi(**data)
+        
+        self.assertEqual(richiesta.tipo_operazione, TipoOperazione.I)
+        self.assertEqual(richiesta.dug, "VIA")
+        self.assertEqual(richiesta.denom_delibera, "DELLE ORCHIDEE")
+
+    def test_richiesta_odonimi_insert_without_dug_fails(self):
+        """Test that insert operation requires dug"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.I
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('dug è obbligatorio' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_update_operation(self):
+        """Test Richiesta with update operation requires progr_nazionale and dug"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.R,
+            "progr_nazionale": "2000449",
+            "dug": "PIAZZA"
+        }
+        richiesta = RichiestaOdonimi(**data)
+        
+        self.assertEqual(richiesta.tipo_operazione, TipoOperazione.R)
+        self.assertEqual(richiesta.progr_nazionale, "2000449")
+        self.assertEqual(richiesta.dug, "PIAZZA")
+
+    def test_richiesta_odonimi_update_without_progr_nazionale_fails(self):
+        """Test that update operation requires progr_nazionale"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.R,
+            "dug": "VIA"
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('progr_nazionale è obbligatorio' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_update_without_dug_fails(self):
+        """Test that update operation requires dug"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.R,
+            "progr_nazionale": "2000449"
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('dug è obbligatorio' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_suppression_operation(self):
+        """Test Richiesta with suppression operation requires progr_nazionale"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.S,
+            "progr_nazionale": "2000449"
+        }
+        richiesta = RichiestaOdonimi(**data)
+        
+        self.assertEqual(richiesta.tipo_operazione, TipoOperazione.S)
+        self.assertEqual(richiesta.progr_nazionale, "2000449")
+        self.assertIsNone(richiesta.dug)
+
+    def test_richiesta_odonimi_suppression_without_progr_nazionale_fails(self):
+        """Test that suppression operation requires progr_nazionale"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.S
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('progr_nazionale è obbligatorio' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_suppression_with_dug_fails(self):
+        """Test that suppression operation does not allow dug"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.S,
+            "progr_nazionale": "2000449",
+            "dug": "VIA"
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('dug non è ammesso' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_missing_codcom_fails(self):
+        """Test that codcom is required"""
+        data = {
+            "tipo_operazione": TipoOperazione.I,
+            "dug": "VIA"
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('codcom' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_with_provvedimento(self):
+        """Test Richiesta with nested Provvedimento"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.I,
+            "dug": "VIA",
+            "provvedimento": {
+                "data": "10/10/2023",
+                "protocollo": "1234/abc",
+                "flag_delibera": 2
+            }
+        }
+        richiesta = RichiestaOdonimi(**data)
+        
+        self.assertIsNotNone(richiesta.provvedimento)
+        self.assertEqual(richiesta.provvedimento.data, "10/10/2023")
+        self.assertEqual(richiesta.provvedimento.protocollo, "1234/abc")
+        self.assertEqual(richiesta.provvedimento.flag_delibera, 2)
+
+    def test_richiesta_odonimi_with_aut_prefettura(self):
+        """Test Richiesta with nested AutPrefettura"""
+        data = {
+            "codcom": "A062",
+            "aut_prefettura": {
+                "data_pref": "10/10/2023",
+                "protocollo_pref": "Prot.Gen.123"
+            }
+        }
+        richiesta = RichiestaOdonimi(**data)
+        
+        self.assertIsNotNone(richiesta.aut_prefettura)
+        self.assertEqual(richiesta.aut_prefettura.data_pref, "10/10/2023")
+        self.assertEqual(richiesta.aut_prefettura.protocollo_pref, "Prot.Gen.123")
+
+    def test_richiesta_odonimi_full_data(self):
+        """Test Richiesta with all fields populated"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.I,
+            "codice_comunale": "75439 d",
+            "dug": "VIA",
+            "denom_delibera": "DELLE ORCHIDEE",
+            "denom_in_lingua_1": "ODONIMO LINGUA 1",
+            "denom_in_lingua_2": "ODONIMO LINGUA 2",
+            "denom_localita": "CASAL PALOCCO",
+            "provvedimento": {
+                "data": "10/10/2023",
+                "protocollo": "1234/abc",
+                "flag_delibera": 2
+            },
+            "aut_prefettura": {
+                "data_pref": "15/10/2023",
+                "protocollo_pref": "Prot.Gen.567"
+            },
+            "data_valid_amm": "08/10/2024"
+        }
+        richiesta = RichiestaOdonimi(**data)
+        
+        self.assertEqual(richiesta.codcom, "A062")
+        self.assertEqual(richiesta.tipo_operazione, TipoOperazione.I)
+        self.assertEqual(richiesta.codice_comunale, "75439 d")
+        self.assertEqual(richiesta.dug, "VIA")
+        self.assertEqual(richiesta.denom_delibera, "DELLE ORCHIDEE")
+        self.assertEqual(richiesta.denom_in_lingua_1, "ODONIMO LINGUA 1")
+        self.assertEqual(richiesta.denom_in_lingua_2, "ODONIMO LINGUA 2")
+        self.assertEqual(richiesta.denom_localita, "CASAL PALOCCO")
+        self.assertEqual(richiesta.data_valid_amm, "08/10/2024")
+        self.assertIsNotNone(richiesta.provvedimento)
+        self.assertIsNotNone(richiesta.aut_prefettura)
+
+    def test_richiesta_odonimi_progr_nazionale_max_length(self):
+        """Test Richiesta progr_nazionale max length constraint"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.R,
+            "progr_nazionale": "a" * 11,  # Exceeds max_length=10
+            "dug": "VIA"
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('progr_nazionale' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_codice_comunale_max_length(self):
+        """Test Richiesta codice_comunale max length constraint"""
+        data = {
+            "codcom": "A062",
+            "codice_comunale": "a" * 31  # Exceeds max_length=30
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('codice_comunale' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_dug_max_length(self):
+        """Test Richiesta dug max length constraint"""
+        data = {
+            "codcom": "A062",
+            "tipo_operazione": TipoOperazione.I,
+            "dug": "a" * 31  # Exceeds max_length=30
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('dug' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_denom_delibera_max_length(self):
+        """Test Richiesta denom_delibera max length constraint"""
+        data = {
+            "codcom": "A062",
+            "denom_delibera": "a" * 121  # Exceeds max_length=120
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('denom_delibera' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_denom_in_lingua_1_max_length(self):
+        """Test Richiesta denom_in_lingua_1 max length constraint"""
+        data = {
+            "codcom": "A062",
+            "denom_in_lingua_1": "a" * 151  # Exceeds max_length=150
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('denom_in_lingua_1' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_denom_in_lingua_2_max_length(self):
+        """Test Richiesta denom_in_lingua_2 max length constraint"""
+        data = {
+            "codcom": "A062",
+            "denom_in_lingua_2": "a" * 151  # Exceeds max_length=150
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('denom_in_lingua_2' in str(e) for e in errors))
+
+    def test_richiesta_odonimi_denom_localita_max_length(self):
+        """Test Richiesta denom_localita max length constraint"""
+        data = {
+            "codcom": "A062",
+            "denom_localita": "a" * 152  # Exceeds max_length=151
+        }
+        with self.assertRaises(ValidationError) as context:
+            RichiestaOdonimi(**data)
+        
+        errors = context.exception.errors()
+        self.assertTrue(any('denom_localita' in str(e) for e in errors))
+
+
+class TestRichiestaOperazioneOdonimi(TestCase):
+    """Test suite for RichiestaOperazione model from aggiornamentoodonimi"""
+
+    def test_richiesta_operazione_odonimi_valid_data(self):
+        """Test RichiestaOperazione creation with valid data"""
+        data = {
+            "richiesta": {
+                "codcom": "A062",
+                "tipo_operazione": TipoOperazione.I,
+                "dug": "VIA",
+                "denom_delibera": "DELLE ORCHIDEE"
+            }
+        }
+        richiesta_op = RichiestaOperazioneOdonimi(**data)
+        
+        self.assertIsNotNone(richiesta_op.richiesta)
+        self.assertEqual(richiesta_op.richiesta.codcom, "A062")
+        self.assertEqual(richiesta_op.richiesta.tipo_operazione, TipoOperazione.I)
+
+    def test_richiesta_operazione_odonimi_none_richiesta(self):
+        """Test RichiestaOperazione with None richiesta"""
+        richiesta_op = RichiestaOperazioneOdonimi()
+        
+        self.assertIsNone(richiesta_op.richiesta)
+
+    def test_richiesta_operazione_odonimi_with_full_richiesta(self):
+        """Test RichiestaOperazione with fully populated nested Richiesta"""
+        data = {
+            "richiesta": {
+                "codcom": "A062",
+                "tipo_operazione": TipoOperazione.R,
+                "progr_nazionale": "2000449",
+                "codice_comunale": "75439 d",
+                "dug": "PIAZZA",
+                "denom_delibera": "GARIBALDI",
+                "provvedimento": {
+                    "data": "10/10/2023",
+                    "protocollo": "1234/abc",
+                    "flag_delibera": 1
+                },
+                "data_valid_amm": "08/10/2024"
+            }
+        }
+        richiesta_op = RichiestaOperazioneOdonimi(**data)
+        
+        self.assertIsNotNone(richiesta_op.richiesta)
+        self.assertEqual(richiesta_op.richiesta.tipo_operazione, TipoOperazione.R)
+        self.assertEqual(richiesta_op.richiesta.progr_nazionale, "2000449")
+        self.assertEqual(richiesta_op.richiesta.dug, "PIAZZA")
+        self.assertIsNotNone(richiesta_op.richiesta.provvedimento)
 
