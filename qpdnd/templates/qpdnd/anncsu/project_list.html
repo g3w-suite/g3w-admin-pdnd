@@ -37,6 +37,7 @@
             <thead>
                 <tr>
                     <th style="width:120px">Actions</th>
+                    <th>{% trans 'API Type' %}</th>
                     <th>{% trans 'PDND environment' %}</th>
                     <th>{% trans 'Projects' %}</th>
                     <th>{% trans 'Layers' %}</th>
@@ -66,6 +67,7 @@
                         </span>
 
                     </td>
+                    <td>{{ object.api_type }}</td>
                     <td>
                         {% if object.env_type == 'test' %}
                         <span class="label label-success">{{ object.env_type|upper }}</span>

@@ -65,6 +65,8 @@ class IstatCodiciUi(models.Model):
         verbose_name_plural = 'ISTAT Codici UI'
         verbose_name = 'ISTAT Codici UI'
 
+
+
 class ANNCSUProject(models.Model):
     """ Projects to expose with ANNCSU PDND extension """
 
@@ -72,6 +74,13 @@ class ANNCSUProject(models.Model):
         ('prod', _('PRODUCTION')),
         ('test', _('TESTING'))
     )
+
+    API_TYPE = Choices(
+        ('aggcoord', 'AGGIORNAMENTO COORDINATE'),
+        ('aggacc', 'AGGIORNAMENTO ACCESSI')
+    )
+
+    api_type = models.CharField(max_length=10, choices=API_TYPE, default=API_TYPE.aggcoord)
 
     project = models.ForeignKey('qdjango.Project', on_delete=models.CASCADE, related_name="%(app_label)s_anncsu_projects")
 

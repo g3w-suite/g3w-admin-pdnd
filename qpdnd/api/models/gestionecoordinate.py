@@ -20,7 +20,7 @@ from .coordinate import Coordinate
 
 import re
 
-class Accesso(BaseModel):
+class AccessoGestioneCoordinate(BaseModel):
     codcom: str
     progr_civico: str
     coordinate: Coordinate
@@ -39,3 +39,6 @@ class Accesso(BaseModel):
         except ValueError:
             raise ValueError("prog_civico deve essere un valore numerico rappresentato come stringa")
         return value
+    
+class RichiestaGestioneCoordinate(BaseModel):
+    accesso: AccessoGestioneCoordinate | None = None

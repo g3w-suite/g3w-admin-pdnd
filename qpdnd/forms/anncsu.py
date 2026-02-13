@@ -85,6 +85,7 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                                                 css_class='box-header with-border'
                                             ),
                                             Div(
+                                                Field('api_type', css_class='select2'),
                                                 Field('project', css_class='select2'),
                                                 Field('layer', css_class='select2'),
                                                 Field('env_type', css_class='select2'),
@@ -113,6 +114,7 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
         layer = self.cleaned_data['layer']
 
         # Check required fields
+        # Valid for every apit type
         required_fields = [
             settings.ANNCSU_FIELD_STATO_INVIO,
             settings.ANNCSU_FIELD_DATA_INVIO,

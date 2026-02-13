@@ -14,7 +14,12 @@ from django.conf import settings
 from huey import signals
 from huey_monitor.models import TaskModel
 from core.utils.qgisapi import get_qgis_features
-from qpdnd.api.models import Accesso
+from qpdnd.api.models import (
+    AccessoGestioneCoordinate, 
+    AccessoAggiornamentiAccessi,
+    RichiestaGestioneCoordinate,
+    RichiestaAggiornamentoAccessi
+)
 from qpdnd.settings import (
     _ANNCSU_SENDED_STATUS,
     _ANNCSU_ERROR_STATUS
@@ -235,18 +240,18 @@ class ANNCSUPDNDAPI(object):
             "Accept": "application/json",
             "Content-Type": "application/json"
         }
-        
-        # Send POST request with basic authentication
-        data = {
-                'richiesta': {
-                    'accesso': pdata.dict()
-                }
-            }
+
+        tosend = {
+            'rihiesta': pdata.model_dump()
+        }
+
+        print(tosend)
+        return {}
         
         response = requests.post(
             self.api_url,
             headers=headers,
-            json=data,
+            json=tosend,
             auth=auth
         )
         logger.debug(f"[ANNCSU gestioneaccessi] - {response.json()}")
@@ -262,7 +267,7 @@ class ANNCSUPDND_GestioneCoordinate_API(ANNCSUPDNDAPI):
     ANNCSU PDND Gestione Coordinate API utils class.
     """
 
-    model = Accesso
+    model = RichiestaGestioneCoordinate
 
     def __init__(self, anncsu_project, send_type, process_info=None, **kwargs):
         
@@ -286,7 +291,7 @@ class ANNCSUPDND_GestioneCoordinate_API(ANNCSUPDNDAPI):
         y_str = f"{float(feature[settings.ANNCSU_FIELD_LAT]):.8f}"[:12]
         z_str = z[:12]
         
-        toret = {
+        accesso_data = {
             'codcom': self.anncsu_project.codice_comune.codice_catastale_del_comune,
             'progr_civico': str(int(feature[settings.ANNCSU_FIELD_PROGR])),
             'coordinate': {
@@ -297,4 +302,28 @@ class ANNCSUPDND_GestioneCoordinate_API(ANNCSUPDNDAPI):
             }
         }
 
-        return toret
+        toret = AccessoGestioneCoordinate(**accesso_data)
+
+        return {
+            "accesso": toret.model_dump()
+        }
+
+
+class ANNCSUPDND_AggiornamentoAccessi_API(ANNCSUPDNDAPI):
+    """
+    ANNCSU PDND Aggiornamento Accessi API utils class.
+    """
+
+    model = RichiestaAggiornamentoAccessi
+
+    def __init__(self, anncsu_project, send_type, process_info=None, **kwargs):
+        
+        super().__init__(anncsu_project, send_type, process_info, **kwargs)
+
+        # Set specific API URL
+        self.api_url = self.anncsu_project.govway_api_endpoint
+
+    def _mapping_feature_to_pdnd(self, feature):
+
+        # TODO: implement mapping logic for aggiornamento accessi
+        return {}

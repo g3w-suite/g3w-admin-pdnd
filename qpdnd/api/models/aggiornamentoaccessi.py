@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, StringConstraints, model_validator
 from .coordinate import Coordinate
 
 
-class Accesso(BaseModel):
+class AccessoAggiornamentiAccessi(BaseModel):
     progr_civico: Annotated[str, StringConstraints(max_length=15)] | None = Field(
         None,
         description="Progressivo accesso (obbligatorio solo per operazione_civico='R','S')",
@@ -102,17 +102,14 @@ class Accesso(BaseModel):
         return self
 
 
-class Richiesta(BaseModel):
+class RichiestaAggiornamentoAccessi(BaseModel):
     codcom: str | None = Field(
         None, description='Codice del comune (obbligatorio)', example='A062'
     )
     progr_nazionale: Annotated[str, StringConstraints(max_length=10)] | None = Field(
         None, description='Progressivo nazionale (obbligatorio)', example='2000449'
     )
-    accesso: Accesso | None = None
+    accesso: AccessoAggiornamentiAccessi | None = None
 
-
-class RichiestaOperazione(BaseModel):
-    richiesta: Richiesta | None = None
 
 
