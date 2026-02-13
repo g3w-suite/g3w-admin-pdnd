@@ -244,9 +244,6 @@ class ANNCSUPDNDAPI(object):
         tosend = {
             'rihiesta': pdata.model_dump()
         }
-
-        print(tosend)
-        return {}
         
         response = requests.post(
             self.api_url,
