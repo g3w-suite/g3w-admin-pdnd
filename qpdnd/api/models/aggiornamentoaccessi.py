@@ -3,9 +3,15 @@
 #   timestamp: 2025-12-22T15:33:39+00:00
 
 from typing import Annotated
-from pydantic import BaseModel, Field, StringConstraints, model_validator
+from pydantic import ( 
+    BaseModel,
+    Field, 
+    StringConstraints, 
+    model_validator
+)
 
 from .coordinate import Coordinate
+from .mtype import TipoOperazione
 
 
 class AccessoAggiornamentiAccessi(BaseModel):
@@ -17,7 +23,7 @@ class AccessoAggiornamentiAccessi(BaseModel):
     
     @model_validator(mode='after')
     def check_progr_civico_required(self):
-        if self.operazione_civico in ['R', 'S'] and not self.progr_civico:
+        if self.operazione_civico in [TipoOperazione.R, TipoOperazione.S] and not self.progr_civico:
             raise ValueError("progr_civico è obbligatorio quando operazione_civico è 'R' o 'S'")
         return self
     
@@ -33,7 +39,7 @@ class AccessoAggiornamentiAccessi(BaseModel):
     
     @model_validator(mode='after')
     def check_numero_constraints(self):
-        if self.operazione_civico == 'S' and self.numero:
+        if self.operazione_civico == TipoOperazione.S and self.numero:
             raise ValueError("numero non deve essere valorizzato quando operazione_civico è 'S'")
         if self.metrico and self.numero:
             raise ValueError("numero non deve essere valorizzato quando l'accesso è identificato con il sistema metrico")
@@ -58,7 +64,7 @@ class AccessoAggiornamentiAccessi(BaseModel):
     
     @model_validator(mode='after')
     def check_metrico_constraints(self):
-        if self.operazione_civico == 'S' and self.metrico:
+        if self.operazione_civico == TipoOperazione.S and self.metrico:
             raise ValueError("metrico non deve essere valorizzato quando operazione_civico è 'S'")
         if self.numero and self.metrico:
             raise ValueError("metrico non deve essere valorizzato quando l'accesso è identificato con il numero civico")
@@ -72,11 +78,11 @@ class AccessoAggiornamentiAccessi(BaseModel):
     
     @model_validator(mode='after')
     def check_sezione_censimento_operation(self):
-        if self.sezione_censimento and self.operazione_civico not in ['I', 'R']:
+        if self.sezione_censimento and self.operazione_civico not in [TipoOperazione.I, TipoOperazione.R]:
             raise ValueError("sezione_censimento può essere valorizzato solo quando operazione_civico è 'I' o 'R'")
         return self
     
-    operazione_civico: Annotated[str, StringConstraints(max_length=1)] | None = Field(
+    operazione_civico: TipoOperazione | None = Field(
         None,
         description="Tipo di operazione sull'accesso. 'I'=inserimento, 'R'=aggiornamento, 'S'=soppressione",
         example='R',
@@ -97,7 +103,7 @@ class AccessoAggiornamentiAccessi(BaseModel):
     
     @model_validator(mode='after')
     def check_isolato_operation(self):
-        if self.isolato and self.operazione_civico not in ['I', 'R']:
+        if self.isolato and self.operazione_civico not in [TipoOperazione.I, TipoOperazione.R]:
             raise ValueError("isolato può essere valorizzato solo quando operazione_civico è 'I' o 'R'")
         return self
 

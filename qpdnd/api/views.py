@@ -340,17 +340,27 @@ class ANNCSUDownTaskResultsView(G3WAPIView):
             # Try to retrieve the task result, may throw an exception
             try:
                 result = HUEY.result(task_id)
+
+                # If result is None, try to get from ANNCSUPProject model
+                if result is None:
+                    raise TaskException("No result available for this task")
             except TaskException:
-                return JsonResponse({
+                # Try to get from ANNCSUPProject model
+                try:
+                    ap = ANNCSUProject.objects.get(task_id=task_id)
+                    if ap.results:
+                        result = ap.results
+                    else:
+                       return JsonResponse({
+                        'status': 'error',
+                        'error': 'No results available for this task'
+                    }, status=404)
+                
+                except ANNCSUProject.DoesNotExist:
+                    return JsonResponse({
                     'status': 'error',
                     'error': 'Error retrieving task results'
                 }, status=500)
-
-            if result is None:
-                return JsonResponse({
-                    'status': 'error',
-                    'error': 'No results available for this task'
-                }, status=404)
 
             # Return the results as a JSON response
             response = HttpResponse(

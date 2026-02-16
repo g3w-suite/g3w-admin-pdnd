@@ -11,19 +11,23 @@ __date__ = '2025-11-19 12:44:23'
 __copyright__ = 'Copyright Gis3w'
 
 from django.conf import settings
-from huey import signals
+#from pydantic import ValidationError
 from huey_monitor.models import TaskModel
 from core.utils.qgisapi import get_qgis_features
 from qpdnd.api.models import (
     AccessoGestioneCoordinate, 
     AccessoAggiornamentiAccessi,
     RichiestaGestioneCoordinate,
-    RichiestaAggiornamentoAccessi
+    RichiestaAggiornamentoAccessi, 
+    Coordinate,
+    TipoOperazione
 )
+
 from qpdnd.settings import (
     _ANNCSU_SENDED_STATUS,
     _ANNCSU_ERROR_STATUS
 )
+
 
 from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
@@ -70,6 +74,28 @@ class ANNCSUPDNDAPI(object):
             'errors': {}
         }
 
+    def _get_coordinates(self, feature):
+
+        try:
+            z = str(feature[settings.ANNCSU_FIELD_QUOTA])
+        except:
+            z = '0'
+
+        # Cut to max 16 length
+
+        # Truncate coordinates to max 12 characters total (including decimal point)
+        # Truncate coordinates ensuring proper decimal precision
+        x_str = f"{float(feature[settings.ANNCSU_FIELD_LON]):.8f}"[:12]
+        y_str = f"{float(feature[settings.ANNCSU_FIELD_LAT]):.8f}"[:12]
+        z_str = z[:12]
+
+        return Coordinate(**{
+                'x': x_str,
+                'y': y_str,
+                'z': z_str,
+                'metodo': '3'
+            })
+
 
     def _mapping_feature_to_pdnd(self, feature):
         """
@@ -115,7 +141,7 @@ class ANNCSUPDNDAPI(object):
         qgis_layer = self.anncsu_project.layer.qgis_layer
         fmapping = self._layer_fields_mapping(qgis_layer)
         send_date = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-        print(self.send_type)
+
         features = self.anncsu_project.get_features(self.send_type)
 
         findex = 0
@@ -147,7 +173,7 @@ class ANNCSUPDNDAPI(object):
                     feature.id(): {
                         fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_SENDED_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
-                        #fmapping[settings.ANNCSU_FIELD_DIRTY]: False
+                        fmapping[settings.ANNCSU_FIELD_DIRTY]: False
                         }
                     })
                 
@@ -174,7 +200,7 @@ class ANNCSUPDNDAPI(object):
                     feature.id(): {
                         fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_ERROR_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
-                        #fmapping[settings.ANNCSU_FIELD_DIRTY]: True
+                        fmapping[settings.ANNCSU_FIELD_DIRTY]: True
                         }
                     })
                 
@@ -183,6 +209,8 @@ class ANNCSUPDNDAPI(object):
                 continue
 
             except Exception as e:
+                # if isinstance(e, ValidationError):
+                #     print(e)
                 logger.error(f"Error sending feature ID {feature.id()}: {e}")
                 self._register_error(feature.id(), str(e))
                 qgis_layer.dataProvider().changeAttributeValues({
@@ -244,6 +272,9 @@ class ANNCSUPDNDAPI(object):
         tosend = {
             'rihiesta': pdata.model_dump()
         }
+
+        print(tosend)
+        return {}
         
         response = requests.post(
             self.api_url,
@@ -274,35 +305,17 @@ class ANNCSUPDND_GestioneCoordinate_API(ANNCSUPDNDAPI):
         self.api_url = self.anncsu_project.govway_api_endpoint
 
     def _mapping_feature_to_pdnd(self, feature):
-
-        try:
-            z = str(feature[settings.ANNCSU_FIELD_QUOTA])
-        except:
-            z = '0'
-
-        # Cut to max 16 length
-
-        # Truncate coordinates to max 12 characters total (including decimal point)
-        # Truncate coordinates ensuring proper decimal precision
-        x_str = f"{float(feature[settings.ANNCSU_FIELD_LON]):.8f}"[:12]
-        y_str = f"{float(feature[settings.ANNCSU_FIELD_LAT]):.8f}"[:12]
-        z_str = z[:12]
         
         accesso_data = {
             'codcom': self.anncsu_project.codice_comune.codice_catastale_del_comune,
             'progr_civico': str(int(feature[settings.ANNCSU_FIELD_PROGR])),
-            'coordinate': {
-                'x': x_str,
-                'y': y_str,
-                'z': z_str,
-                'metodo': '3'
-            }
+            'coordinate': self._get_coordinates(feature)
         }
 
-        toret = AccessoGestioneCoordinate(**accesso_data)
+        accesso = AccessoGestioneCoordinate(**accesso_data)
 
         return {
-            "accesso": toret.model_dump()
+            "accesso": accesso.model_dump()
         }
 
 
@@ -320,12 +333,68 @@ class ANNCSUPDND_AggiornamentoAccessi_API(ANNCSUPDNDAPI):
         # Set specific API URL
         self.api_url = self.anncsu_project.govway_api_endpoint
 
+    def _get_operazione_civico(self, feature):
+        """
+        Get the operation for civico based on specific fields in feature.
+        If not present, default to 'R'.
+        """
+        # Example logic to determine operation type
+        # This should be replaced with actual logic based on feature attributes
+
+        # If ANNCSU_FIELD_PROGR empty -> Insert
+        if not feature[settings.ANNCSU_FIELD_PROGR]:
+            return TipoOperazione.I  # Insert
+        elif feature[settings.ANNCSU_FIELD_SOPPR]:
+            return TipoOperazione.S  # Suppress
+        elif feature[settings.ANNCSU_FIELD_DIRTY]:
+            return TipoOperazione.R  # Update (default)
+        else:
+            return None  # No operation, or determine based on other logic
+
     def _mapping_feature_to_pdnd(self, feature):
 
-        # TODO: implement mapping logic for aggiornamento accessi
-        return {}
+        # Get the operation for civico, if not present default to 'R'
+        operazione_civico = self._get_operazione_civico(feature),
+
+        toret = {
+            'codcom': self.anncsu_project.codice_comune.codice_catastale_del_comune,
+            'progr_nazionale': str(int(feature[settings.ANNCSU_FIELD_PROGR_NAZ]))
+        }
+
+        # Create Accesso
+        accesso_data = {
+            'operazione_civico': self._get_operazione_civico(feature),
+            'progr_civico': str(int(feature[settings.ANNCSU_FIELD_PROGR])),            
+            'codice_civico_comunale': str(feature[settings.ANNCSU_FIELD_COD_CIV_COMUNALE]),
+            'metrico': str(feature[settings.ANNCSU_FIELD_METRICO]) if feature[settings.ANNCSU_FIELD_METRICO] else '',
+            'sezione_censimento': str(feature[settings.ANNCSU_FIELD_SEZ_CENS]),
+            'coordinate': self._get_coordinates(feature),
+            'data_valid_amm': str(feature[settings.ANNCSU_FIELD_DT_VAL_AMM]),
+            'isolato': str(feature[settings.ANNCSU_FIELD_ISOLATO]),
+        }
+            
+        
+        if operazione_civico != TipoOperazione.S:
+            accesso_data['numero'] = str(feature[settings.ANNCSU_FIELD_NUMERO])
+            accesso_data['esponente'] = str(feature[settings.ANNCSU_FIELD_ESPONENTE])
+            accesso_data['specificita'] = str(feature[settings.ANNCSU_FIELD_SPECIFICITA])
+
+        if operazione_civico == TipoOperazione.S:
+            accesso_data['numero'] = ''
+            accesso_data['metrico'] = ''
+            accesso_data['sezione_censimento'] = ''
+            accesso_data['isolato'] = ''
+        
+        accesso = AccessoAggiornamentiAccessi(**accesso_data)
+
+        return {
+            'richiesta': accesso.model_dump()
+        }
     
 
+    
+# Mapping of API types to their corresponding classes
+# ---------------------------------------------------
 MAP_API_CLASS = {
     'aggcoord': ANNCSUPDND_GestioneCoordinate_API,
     'aggacc': ANNCSUPDND_AggiornamentoAccessi_API

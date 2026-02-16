@@ -114,9 +114,15 @@ def send_anncsu_pdnd_task(anncsu_project, send_type, task):
     )
 
     # Instance sepcific API class
-    gc = MAP_API_CLASS[anncsu_project.api_type](anncsu_project, send_type, process_info)
+    api = MAP_API_CLASS[anncsu_project.api_type](anncsu_project, send_type, process_info)
+
+    # Store results
+    results = api.send_features()
+
+    anncsu_project.results = results
+    anncsu_project.save()
     
-    return gc.send_features()
+    return results
 
 
 

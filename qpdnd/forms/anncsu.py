@@ -112,6 +112,7 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
         """
 
         layer = self.cleaned_data['layer']
+        api_type = self.cleaned_data.get('api_type')
 
         # Check required fields
         # Valid for every apit type
@@ -125,6 +126,20 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
             #settings.ANNCSU_FIELD_QUOTA # optional
         ]
 
+        # Additional required fields based on API type
+        if api_type == 'aggacc':
+            required_fields_accessi = [
+                settings.ANNCSU_FIELD_SOPPR,
+                settings.ANNCSU_FIELD_PROGR_NAZ,
+                settings.ANNCSU_FIELD_NUMERO,
+                settings.ANNCSU_FIELD_ESPONENTE,
+                settings.ANNCSU_FIELD_METRICO,
+                settings.ANNCSU_FIELD_SEZ_CENS,
+                settings.ANNCSU_FIELD_DT_VAL_AMM,
+                settings.ANNCSU_FIELD_ISOLATO
+            ]
+            required_fields.extend(required_fields_accessi)
+
         layer_fields = [f.name() for f in layer.qgis_layer.fields()]
         missing_fields = [field for field in required_fields if field not in layer_fields]
 
@@ -133,7 +148,6 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                 _("The layer is missing required fields: {}").format(', '.join(missing_fields))
             )
 
-       
         return layer
     
     def clean_govway_password(self):

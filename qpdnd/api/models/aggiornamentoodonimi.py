@@ -9,11 +9,8 @@ from typing import Annotated
 
 from pydantic import AnyUrl, BaseModel, Extra, Field, StringConstraints, model_validator
 
+from .mtype import TipoOperazione
 
-class TipoOperazione(Enum):
-    I = 'I'
-    R = 'R'
-    S = 'S'
 
 
 class Provvedimento(BaseModel):

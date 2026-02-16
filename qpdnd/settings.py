@@ -117,17 +117,37 @@ ANNCSU_GOVWAY_API_PASSWORD = 'your_govway_password'
 
 # Internal fields mapping
 # -----------------------------
-ANNCSU_FIELD_STATO_INVIO = 'anncsu_stato_invio' # varchar
-ANNCSU_FIELD_DATA_INVIO = 'anncsu_data_invio' # datetime
-ANNCSU_FIELD_DIRTY = 'anncsu_dirty' # boolean
+ANNCSU_FIELD_STATO_INVIO = 'anncsu_sta' # varchar
+ANNCSU_FIELD_DATA_INVIO = 'anncsu_dat' # datetime
+ANNCSU_FIELD_DIRTY = 'anncsu_dir' # boolean
 
-# API - /gestioneaccessi
+
+# API - /gestioneaccessi /accessi
 # -----------------------------
-
-ANNCSU_FIELD_PROGR = 'progressivo'
-ANNCSU_FIELD_LAT = 'latitudine'
-ANNCSU_FIELD_LON = 'longitudine'
+ANNCSU_FIELD_PROGR = 'progr_civico'
+ANNCSU_FIELD_LAT = 'lat'
+ANNCSU_FIELD_LON = 'long'
 ANNCSU_FIELD_QUOTA = 'quota'
+
+# API - /accessi
+# -----------------------------
+# The following fields are required only for accessi 
+# and is used for to known if accesso is suppressed
+ANNCSU_FIELD_SOPPR = 'anncsu_soppr' # boolean
+# ---
+ANNCSU_FIELD_PROGR_NAZ = 'progr_nazionale'
+ANNCSU_FIELD_NUMERO = 'numero'
+ANNCSU_FIELD_ESPONENTE = 'esponente'
+ANNCSU_FIELD_METRICO = 'metrico'
+ANNCSU_FIELD_SPECIFICITA = 'specificita'
+ANNCSU_FIELD_SEZ_CENS = 'sezione_censimento'
+ANNCSU_FIELD_DT_VAL_AMM = 'data_valid_amm'
+ANNCSU_FIELD_ISOLATO = 'isolato'
+ANNCSU_FIELD_COD_CIV_COMUNALE = 'codice_civico_comunale'
+
+
+
+
 
 # Max requests per day
 ANNCSU_MAX_REQUESTS_PER_CICLE = 2000

@@ -101,6 +101,8 @@ class ANNCSUProject(models.Model):
 
     govway_password = models.CharField(max_length=255, blank=True, null=True, help_text=_('GovWay API password'))
 
+    results = models.JSONField(blank=True, null=True, help_text=_('Field to store results of the API call or error messages.'))
+
     def get_features(self, send_type=None):
         """
         Get QGIS features from the configured layer.
