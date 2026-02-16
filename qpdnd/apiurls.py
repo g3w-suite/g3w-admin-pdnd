@@ -20,7 +20,7 @@ from .settings import (
 from .api.views import (
     QPDNDAPIOgcView,
     QPDNDInfoProjectAPIView, 
-    ANNCSUGestioneCoordinateAPIView, 
+    ANNCSURunAPIView, 
     ANNCSURunInfoTaskView,
     ANNCSURunKillTaskView, 
     ANNCSUDownTaskResultsView
@@ -43,7 +43,7 @@ urlpatterns = [
     # Send ANNCSU data to PDND API
     # --------------------------------
     path('api/anncsu/gestionecoordinate/<int:anncsu_project_id>',
-         ANNCSUGestioneCoordinateAPIView.as_view(),
+         ANNCSURunAPIView.as_view(),
          name='anncsu-api-gestionecoordinate'
     ),
     

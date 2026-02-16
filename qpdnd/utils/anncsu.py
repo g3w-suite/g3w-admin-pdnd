@@ -324,3 +324,9 @@ class ANNCSUPDND_AggiornamentoAccessi_API(ANNCSUPDNDAPI):
 
         # TODO: implement mapping logic for aggiornamento accessi
         return {}
+    
+
+MAP_API_CLASS = {
+    'aggcoord': ANNCSUPDND_GestioneCoordinate_API,
+    'aggacc': ANNCSUPDND_AggiornamentoAccessi_API
+}

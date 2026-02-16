@@ -16,7 +16,7 @@ from huey.contrib.djhuey import HUEY
 from huey_monitor.tqdm import ProcessInfo
 from celery import shared_task, current_task
 from celery.utils.log import get_task_logger
-from .utils.anncsu import ANNCSUPDND_GestioneCoordinate_API
+from .utils.anncsu import MAP_API_CLASS
 from .models import ANNCSUProject
 
 from qgis.core import (
@@ -113,8 +113,8 @@ def send_anncsu_pdnd_task(anncsu_project, send_type, task):
         total=len(anncsu_project.get_features())
     )
 
-
-    gc = ANNCSUPDND_GestioneCoordinate_API(anncsu_project, send_type, process_info)
+    # Instance sepcific API class
+    gc = MAP_API_CLASS[anncsu_project.api_type](anncsu_project, send_type, process_info)
     
     return gc.send_features()
 

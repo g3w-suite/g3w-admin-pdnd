@@ -158,7 +158,7 @@ class QPDNDInfoProjectAPIView(G3WAPIView):
         self.results.results.update(toret)
         return Response(self.results.results)
 
-class ANNCSUGestioneCoordinateAPIView(G3WAPIView):
+class ANNCSURunAPIView(G3WAPIView):
     """
     ANNCSU gestione coordinate API view
     """
