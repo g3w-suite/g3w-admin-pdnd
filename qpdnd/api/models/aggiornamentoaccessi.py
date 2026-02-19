@@ -18,7 +18,7 @@ class AccessoAggiornamentiAccessi(BaseModel):
     progr_civico: Annotated[str, StringConstraints(max_length=15)] | None = Field(
         None,
         description="Progressivo accesso (obbligatorio solo per operazione_civico='R','S')",
-        example='1370588',
+        example='1370588'
     )
     
     @model_validator(mode='after')

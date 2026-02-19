@@ -155,6 +155,18 @@ class ANNCSUProject(models.Model):
 
             return TaskModel.objects.get(task_id=self.task_id)
         return None
+    
+    @property
+    def fenv_type(self):
+        """Get human readable environment type."""
+
+        return self.ENV_TYPE[self.env_type]
+
+    @property
+    def fapi_type(self):
+        """Get human readable API type."""
+        
+        return self.API_TYPE[self.api_type]
 
     def clean(self):
 

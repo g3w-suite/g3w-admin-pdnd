@@ -21,6 +21,10 @@
         ga.QPDND.ANNCSU.render_task_results();
     }
 
+    if ('{{ task_model.state.signal_name }}' == '{{ huey_signals.SIGNAL_COMPLETE }}') {
+        ga.QPDND.ANNCSU.render_task_results();
+    }   
+
     // Set huey signals
     ga.QPDND.ANNCSU.huey_signals = {
             'CANCELLED': '{{ huey_signals.SIGNAL_CANCELED }}',
@@ -51,10 +55,10 @@
 <div class="row">
     <div class="col-md-12 col-xs-12">
         <div class="box box-abstract">
-            <div class="box-header with-border"> <h3 class="box-title"><i class="fa fa-file"></i> Actual status</h3></div>
+            <div class="box-header with-border"> <h3 class="box-title"><i class="fa fa-file"></i> {% trans "CURRENT STATUS" %}</h3></div>
             <div class="box-body">
             <div class="row">
-                <div class="col-md-4 col-xs-12">
+                <div class="col-md-3 col-xs-12">
                     <div class="small-box bg-aqua">
                         <div class="inner">
                             <h3>{{ num_features }}</h3>
@@ -65,7 +69,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-xs-12">
+                <div class="col-md-3 col-xs-12">
+                    <div class="small-box bg-yellow">
+                        <div class="inner">
+                            <h3>{{ num_features_by_status.DIRTY }}</h3>
+                            <p>{% trans 'Features TO SEND' %}</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-location-pin"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-xs-12">
                     <div class="small-box bg-success">
                         <div class="inner">
                             <h3>{{ num_features_by_status.INVIATO }}</h3>
@@ -76,7 +91,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-xs-12">
+                <div class="col-md-3 col-xs-12">
                     <div class="small-box bg-danger">
                         <div class="inner">
                             <h3>{{ num_features_by_status.ERRORE }}</h3>
@@ -95,16 +110,16 @@
 <div class="row">
     <div class="col-md-6 col-xs-12">
         <div class="box box-abstract">
-            <div class="box-header with-border"> <h3 class="box-title"><i class="fa fa-file"></i> Abstract</h3></div>
+            <div class="box-header with-border"> <h3 class="box-title"><i class="fa fa-file"></i> {% trans "ABSTRACT" %}</h3></div>
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-12">
-                        {% if object.env_type == 'test' %}
-                        <span class="label label-success" style="font-size: 24px; padding: 5px 10px;">{{ anncsu_project.env_type|upper }}</span>
-                        <span class="label label-success" style="font-size: 24px; padding: 5px 10px;">{{ anncsu_project.api_type|upper }}</span>
+                        {% if anncsu_project.env_type == 'test' %}
+                        <span class="label label-success" style="font-size: 24px; padding: 5px 10px;">{{ anncsu_project.fenv_type|upper }}</span>
+                        <span class="label label-success" style="font-size: 24px; padding: 5px 10px;">{{ anncsu_project.fapi_type|upper }}</span>
                         {% else %}
-                        <span class="label label-danger" style="font-size: 24px; padding: 5px 10px;">{{ anncsu_project.env_type|upper }}</span>
-                        <span class="label label-danger" style="font-size: 24px; padding: 5px 10px;">{{ anncsu_project.api_type|upper }}</span>
+                        <span class="label label-danger" style="font-size: 24px; padding: 5px 10px;">{{ anncsu_project.fenv_type|upper }}</span>
+                        <span class="label label-danger" style="font-size: 24px; padding: 5px 10px;">{{ anncsu_project.fapi_type|upper }}</span>
                         {% endif %}
                         <h5 style="font-size: 24px;"><strong>Project</strong>: {{ anncsu_project.project.title }} </h5>
                         <h5><strong>Layer</strong>: {{ layer }}</h5>
@@ -131,13 +146,15 @@
     </div>
     <div class="col-md-6 col-xs-12">
         <div class="box box-abstract">
-            <div class="box-header with-border"> <h3 class="box-title"><i class="fa fa-file"></i> Runtime</h3></div>
+            <div class="box-header with-border"> <h3 class="box-title"><i class="fa fa-file"></i> {% trans "Runtime: SEND TO PDND API" %}</h3></div>
             <div class="box-body">
                 <div class="row">
-                    <div class="col-md-12">
-                        <button class="btn btn-lg btn-primary" id="anncsu_sendToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send to PDND API" %}</button>
-                        <button class="btn btn-lg btn-warning" id="anncsu_sendOnlyNotSentToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send only not sent features to PDND API" %}</button>
-                        <button class="btn btn-lg btn-warning" id="anncsu_sendOnlyErrorToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send only error features to PDND API" %}</button>
+                    <div class="col-md-6">
+                        <button class="btn btn-lg btn-primary" id="anncsu_sendToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send ALL" %}</button><br />
+                        <button style="margin-top: 10px;" class="btn btn-lg btn-warning" id="anncsu_sendOnlyNotSentToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send only `TO SEND` features" %}</button><br />
+                        <button style="margin-top: 10px;" class="btn btn-lg btn-warning" id="anncsu_sendOnlyErrorToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send only `ERROR` features" %}</button><br />
+                    </div>
+                    <div class="col-md-6">
                         <button class="btn btn-lg btn-danger" id="anncsu_stopSendToPdnd"><i class="glyphicon glyphicon-stop"></i> {% trans "STOP send to PDND API" %}</button>
                     </div>
                 </div>
@@ -161,7 +178,8 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div id='task_results'></div>
+                        <div id='task_results'>
+                        </div>
                     </div>
                 </div>
             </div>

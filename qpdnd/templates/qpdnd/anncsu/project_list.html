@@ -67,12 +67,12 @@
                         </span>
 
                     </td>
-                    <td>{{ object.api_type }}</td>
+                    <td>{{ object.fapi_type }}</td>
                     <td>
                         {% if object.env_type == 'test' %}
-                        <span class="label label-success">{{ object.env_type|upper }}</span>
+                        <span class="label label-success">{{ object.fenv_type|upper }}</span>
                         {% else %}
-                        <span class="label label-danger">{{ object.env_type|upper }}</span>
+                        <span class="label label-danger">{{ object.fenv_type|upper }}</span>
                         {% endif %}
                     </td>
                     <td>{{ object.project }}</td>

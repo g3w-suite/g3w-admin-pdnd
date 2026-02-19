@@ -11,6 +11,7 @@ __date__ = '2025-11-19 09:22:24'
 __copyright__ = 'Copyright Gis3w'
 
 
+from django.conf import settings
 from django.views.generic import TemplateView
 from huey.contrib.djhuey import HUEY
 from huey.exceptions import TaskException
@@ -44,6 +45,7 @@ class ANNCSURunView(TemplateView):
         ctx['layer'] = ctx['anncsu_project'].layer
         ctx['qgs_layer'] = ctx['layer'].qgis_layer
 
+
         # Feacture count
 
         original_subset_string = ctx['qgs_layer'].subsetString()
@@ -52,18 +54,32 @@ class ANNCSURunView(TemplateView):
 
 
         # Count feature by anncsu_sta field
+        # ========================================================
+
+        # SENDED
+        # --------------------
         ctx['num_features_by_status'] = {}
         request = QgsFeatureRequest().setFilterExpression(
-            f"\"anncsu_sta\" = '{_ANNCSU_SENDED_STATUS}'"
+            f"\"{settings.ANNCSU_FIELD_STATO_INVIO}\" = '{_ANNCSU_SENDED_STATUS}'"
         )
 
         ctx['num_features_by_status'][_ANNCSU_SENDED_STATUS] = count_qgis_features(ctx['qgs_layer'], request)
 
+        # WITH ERROR
+        # --------------------
         request = QgsFeatureRequest().setFilterExpression(
-            f"\"anncsu_sta\" = '{_ANNCSU_ERROR_STATUS}'"
+            f"\"{settings.ANNCSU_FIELD_STATO_INVIO}\" = '{_ANNCSU_ERROR_STATUS}'"
         )
 
         ctx['num_features_by_status'][_ANNCSU_ERROR_STATUS] = count_qgis_features(ctx['qgs_layer'], request)
+
+        # DIRTY
+        # --------------------
+        request = QgsFeatureRequest().setFilterExpression(
+            f"\"{settings.ANNCSU_FIELD_DIRTY}\" is true"
+        )
+
+        ctx['num_features_by_status']['DIRTY'   ] = count_qgis_features(ctx['qgs_layer'], request)
 
         # Restore the original subset string and select no features
         ctx['qgs_layer'].selectByIds([])
@@ -101,6 +117,11 @@ class ANNCSURunView(TemplateView):
                 # Get tasks results
                 try:
                     ctx['task_results'] = HUEY.result(ctx['anncsu_project'].task_id)
+
+                    # Try to get results from model
+                    if not ctx['task_results']:
+                        ctx['task_results'] = ctx['anncsu_project'].results
+                        
                 except TaskException:
                     ctx['task_results'] = None
             except Exception:
@@ -109,5 +130,6 @@ class ANNCSURunView(TemplateView):
         
         # Task huey signals
         ctx['huey_signals'] = signals
+
 
         return ctx

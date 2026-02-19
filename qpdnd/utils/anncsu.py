@@ -11,8 +11,9 @@ __date__ = '2025-11-19 12:44:23'
 __copyright__ = 'Copyright Gis3w'
 
 from django.conf import settings
-#from pydantic import ValidationError
+from huey import signals
 from huey_monitor.models import TaskModel
+from pydantic import ValidationError
 from core.utils.qgisapi import get_qgis_features
 from qpdnd.api.models import (
     AccessoGestioneCoordinate, 
@@ -85,9 +86,12 @@ class ANNCSUPDNDAPI(object):
 
         # Truncate coordinates to max 12 characters total (including decimal point)
         # Truncate coordinates ensuring proper decimal precision
-        x_str = f"{float(feature[settings.ANNCSU_FIELD_LON]):.8f}"[:12]
-        y_str = f"{float(feature[settings.ANNCSU_FIELD_LAT]):.8f}"[:12]
-        z_str = z[:12]
+        try:
+            x_str = f"{float(feature[settings.ANNCSU_FIELD_LON]):.8f}"[:12]
+            y_str = f"{float(feature[settings.ANNCSU_FIELD_LAT]):.8f}"[:12]
+            z_str = z[:12]
+        except Exception as e:
+            raise ValueError(f"Invalid coordinate values: lat={feature[settings.ANNCSU_FIELD_LAT]}, lon={feature[settings.ANNCSU_FIELD_LON]}, quota={z}. Exception: {e}")   
 
         return Coordinate(**{
                 'x': x_str,
@@ -131,6 +135,14 @@ class ANNCSUPDNDAPI(object):
         for qgis_field in qgis_layer.fields():
                 mapping[qgis_field.name()] = qgis_layer.fields().indexFromName(qgis_field.name())
         return mapping
+    
+    def _fields_to_update(self, feature, res):
+        """
+        Get the fields to update in QGIS layer after sending to API.
+        :param res: API response
+        :return: dict with field names and values to update
+        """
+        return {}
 
     def send_features(self):
         """
@@ -165,17 +177,23 @@ class ANNCSUPDNDAPI(object):
                         findex = len(features)
                         break
 
-                self.send_feature(feature)
+                res = self.send_feature(feature)
 
-                # Update results
-                self.results['success'] += 1
-                qgis_layer.dataProvider().changeAttributeValues({
-                    feature.id(): {
+                # Update fields in QGIS layer to mark as sent
+                # first specific for ANNCSU API TYPE
+                ftoupdate = self._fields_to_update(feature, res)
+                ftoupdate.update({
                         fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_SENDED_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
                         fmapping[settings.ANNCSU_FIELD_DIRTY]: False
-                        }
                     })
+
+                qgis_layer.dataProvider().changeAttributeValues({
+                    feature.id(): ftoupdate
+                    })
+                
+                # Update results
+                self.results['success'] += 1
                 
             except HTTPError as http_err:    
                 logger.error(f"HTTP error sending feature ID {feature.id()}: {http_err}")
@@ -209,15 +227,13 @@ class ANNCSUPDNDAPI(object):
                 continue
 
             except Exception as e:
-                # if isinstance(e, ValidationError):
-                #     print(e)
                 logger.error(f"Error sending feature ID {feature.id()}: {e}")
                 self._register_error(feature.id(), str(e))
                 qgis_layer.dataProvider().changeAttributeValues({
                     feature.id(): {
                         fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_ERROR_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
-                        #fmapping[settings.ANNCSU_FIELD_DIRTY]: True
+                        fmapping[settings.ANNCSU_FIELD_DIRTY]: True
                         }
                     })
                 continue
@@ -270,11 +286,11 @@ class ANNCSUPDNDAPI(object):
         }
 
         tosend = {
-            'rihiesta': pdata.model_dump()
+            'richiesta': pdata.model_dump(mode='json', exclude_none=True)
         }
 
         print(tosend)
-        return {}
+        #return {}
         
         response = requests.post(
             self.api_url,
@@ -282,7 +298,7 @@ class ANNCSUPDNDAPI(object):
             json=tosend,
             auth=auth
         )
-        logger.debug(f"[ANNCSU gestioneaccessi] - {response.json()}")
+        logger.debug(f"[ANNCSU] - {response.json()}")
         response.raise_for_status()
         
         
@@ -312,10 +328,8 @@ class ANNCSUPDND_GestioneCoordinate_API(ANNCSUPDNDAPI):
             'coordinate': self._get_coordinates(feature)
         }
 
-        accesso = AccessoGestioneCoordinate(**accesso_data)
-
         return {
-            "accesso": accesso.model_dump()
+            "accesso": AccessoGestioneCoordinate(**accesso_data)
         }
 
 
@@ -348,48 +362,88 @@ class ANNCSUPDND_AggiornamentoAccessi_API(ANNCSUPDNDAPI):
             return TipoOperazione.S  # Suppress
         elif feature[settings.ANNCSU_FIELD_DIRTY]:
             return TipoOperazione.R  # Update (default)
-        else:
-            return None  # No operation, or determine based on other logic
+        
+    def _fields_to_update(self, feature, res):
+        toret = super()._fields_to_update(feature, res)
+
+        operazione_civico = self._get_operazione_civico(feature)
+
+        # Upate progr_civico only for I operation, for R and S it should not be updated
+        if operazione_civico == TipoOperazione.I:
+            toret.update({
+                settings.ANNCSU_FIELD_PROGR: res['dati'].get('progr_civico'),
+            })
+
+        return toret
+
+        
+        
+    def _to_NULL_to_empty_string(self, value):
+        """
+        Convert None or NULL values to empty string, to avoid issues with API validation.
+        """
+        value_str = str(value)
+        if value_str == 'NULL':
+            return ''
+        
+        return value_str
 
     def _mapping_feature_to_pdnd(self, feature):
 
         # Get the operation for civico, if not present default to 'R'
-        operazione_civico = self._get_operazione_civico(feature),
+        operazione_civico = self._get_operazione_civico(feature)
 
-        toret = {
+        richiesta = {
             'codcom': self.anncsu_project.codice_comune.codice_catastale_del_comune,
             'progr_nazionale': str(int(feature[settings.ANNCSU_FIELD_PROGR_NAZ]))
         }
 
+        # Formats the data according to the API requirements, including conditional fields based on operation type
+        # data_valid_amm is mandatory for API
+        data_valid_amm = feature[settings.ANNCSU_FIELD_DT_VAL_AMM]
+        if not isinstance(data_valid_amm, str):
+            data_valid_amm = data_valid_amm.toString('dd/MM/yyyy')
+            
+        
+
         # Create Accesso
         accesso_data = {
-            'operazione_civico': self._get_operazione_civico(feature),
-            'progr_civico': str(int(feature[settings.ANNCSU_FIELD_PROGR])),            
-            'codice_civico_comunale': str(feature[settings.ANNCSU_FIELD_COD_CIV_COMUNALE]),
-            'metrico': str(feature[settings.ANNCSU_FIELD_METRICO]) if feature[settings.ANNCSU_FIELD_METRICO] else '',
-            'sezione_censimento': str(feature[settings.ANNCSU_FIELD_SEZ_CENS]),
+            'operazione_civico': operazione_civico,           
+            'codice_civico_comunale': self._to_NULL_to_empty_string(feature[settings.ANNCSU_FIELD_COD_CIV_COMUNALE]),
+            'metrico': self._to_NULL_to_empty_string(feature[settings.ANNCSU_FIELD_METRICO]),
+            'sezione_censimento': self._to_NULL_to_empty_string(feature[settings.ANNCSU_FIELD_SEZ_CENS]),
             'coordinate': self._get_coordinates(feature),
-            'data_valid_amm': str(feature[settings.ANNCSU_FIELD_DT_VAL_AMM]),
-            'isolato': str(feature[settings.ANNCSU_FIELD_ISOLATO]),
-        }
+            'data_valid_amm': data_valid_amm,
+            'isolato': self._to_NULL_to_empty_string(feature[settings.ANNCSU_FIELD_ISOLATO]),
+        } 
+
+        try:
+
+            # Case I: remove progr_civico if TipoOperanzione.I, 
+            # because it will be generated by API and returned in response, 
+            # so we need to update it in QGIS layer with the value returned by API
+            accesso_data['progr_civico'] = str(int(feature[settings.ANNCSU_FIELD_PROGR]))
+        except:
+            pass
             
         
         if operazione_civico != TipoOperazione.S:
+
             accesso_data['numero'] = str(feature[settings.ANNCSU_FIELD_NUMERO])
-            accesso_data['esponente'] = str(feature[settings.ANNCSU_FIELD_ESPONENTE])
-            accesso_data['specificita'] = str(feature[settings.ANNCSU_FIELD_SPECIFICITA])
+            accesso_data['esponente'] = self._to_NULL_to_empty_string(str(feature[settings.ANNCSU_FIELD_ESPONENTE]))
+            if str(feature[settings.ANNCSU_FIELD_SPECIFICITA]) != 'NULL':
+                accesso_data['specificita'] = str(feature[settings.ANNCSU_FIELD_SPECIFICITA])
 
         if operazione_civico == TipoOperazione.S:
-            accesso_data['numero'] = ''
-            accesso_data['metrico'] = ''
-            accesso_data['sezione_censimento'] = ''
-            accesso_data['isolato'] = ''
+            accesso_data['numero'] = None
+            accesso_data['metrico'] = None
+            accesso_data['sezione_censimento'] = None
+            accesso_data['isolato'] = None
+            accesso_data['codice_civico_comunale'] = None
         
-        accesso = AccessoAggiornamentiAccessi(**accesso_data)
+        richiesta['accesso'] = AccessoAggiornamentiAccessi(**accesso_data)
 
-        return {
-            'richiesta': accesso.model_dump()
-        }
+        return richiesta
     
 
     
