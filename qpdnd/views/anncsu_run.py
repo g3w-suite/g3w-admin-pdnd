@@ -22,10 +22,12 @@ from qpdnd.models import ANNCSUProject
 from qpdnd.settings import (
     _BASE_URL_INFO_TASK, 
     _BASE_URL_KILL_TASK,
-    _BASE_URL_DOWN_TASK_RESULTS,
+    _BASE_URL_DOWN_TASK_RESULTS, 
+    _BASE_URL_CONSCOM,
     _ANNCSU_SENDED_STATUS,
     _ANNCSU_ERROR_STATUS
 )
+from qpdnd.forms import ANNCSUCONSCOMForm
 
 from qgis.core import QgsFeatureRequest
 
@@ -37,11 +39,24 @@ class ANNCSURunView(TemplateView):
     """
     template_name = 'qpdnd/anncsu/run.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Get project and layer info
+        self.anncsu_project = ANNCSUProject.objects.get(pk=kwargs.get('pk'))
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+
+        if self.anncsu_project.api_type == 'conscom':
+            return ['qpdnd/anncsu/run_conscom.html']
+        else:
+            return super().get_template_names()
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
         # Get QGIS layewr instance
-        ctx['anncsu_project'] = ANNCSUProject.objects.get(pk=kwargs.get('pk'))
+        ctx['anncsu_project'] = self.anncsu_project
         ctx['layer'] = ctx['anncsu_project'].layer
         ctx['qgs_layer'] = ctx['layer'].qgis_layer
 
@@ -130,6 +145,11 @@ class ANNCSURunView(TemplateView):
         
         # Task huey signals
         ctx['huey_signals'] = signals
+
+        # Specific case for consultazione comuni
+        if self.anncsu_project.api_type == 'conscom':
+            ctx['form'] = ANNCSUCONSCOMForm()
+            ctx['BASE_URL_CONSCOM'] = _BASE_URL_CONSCOM
 
 
         return ctx

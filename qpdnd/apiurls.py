@@ -15,7 +15,8 @@ from django.urls import path, re_path
 from .settings import (
     _BASE_URL_INFO_TASK, 
     _BASE_URL_KILL_TASK,
-    _BASE_URL_DOWN_TASK_RESULTS
+    _BASE_URL_DOWN_TASK_RESULTS,
+    _BASE_URL_CONSCOM
 )
 from .api.views import (
     QPDNDAPIOgcView,
@@ -23,7 +24,8 @@ from .api.views import (
     ANNCSURunAPIView, 
     ANNCSURunInfoTaskView,
     ANNCSURunKillTaskView, 
-    ANNCSUDownTaskResultsView
+    ANNCSUDownTaskResultsView, 
+    ANNCSURunCONSCOMAPIView
 )
 
 BASE_URLS = 'qpdnd'
@@ -42,6 +44,17 @@ urlpatterns = [
 
     # Send ANNCSU data to PDND API
     # --------------------------------
+
+    path(f'{_BASE_URL_CONSCOM}<int:anncsu_project_id>',
+         ANNCSURunCONSCOMAPIView.as_view(),
+         name='anncsu-api-conscom'
+    ),
+
+    path(f'{_BASE_URL_CONSCOM}<str:service>/<int:anncsu_project_id>',
+         ANNCSURunCONSCOMAPIView.as_view(),
+         name='anncsu-api-conscom-with-service'
+    ),
+
     path('api/anncsu/gestionecoordinate/<int:anncsu_project_id>',
          ANNCSURunAPIView.as_view(),
          name='anncsu-api-gestionecoordinate'

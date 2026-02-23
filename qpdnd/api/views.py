@@ -11,6 +11,7 @@ __date__ = '2024-07-24'
 __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
+from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -20,6 +21,7 @@ from huey.exceptions import TaskException
 from huey_monitor.models import TaskModel
 from rest_framework.response import Response
 from OWS.views import OWSView
+from core.api.authentication import CsrfExemptSessionAuthentication
 from qdjango.ows import OWSRequestHandler
 from qdjango.models import Project
 from core.api.base.views import G3WAPIView
@@ -39,6 +41,10 @@ from qgis.server import QgsServerProjectUtils
 from django.test import Client
 import json
 from django.http import HttpResponse
+
+from requests.exceptions import HTTPError
+from requests.auth import HTTPBasicAuth
+import requests
 
 class QDPNDOWSRequestHandler(OWSRequestHandler):
 
@@ -375,3 +381,91 @@ class ANNCSUDownTaskResultsView(G3WAPIView):
                 'status': 'error',
                 'error': str(e)
             }, status=500)  
+        
+
+class ANNCSURunCONSCOMAPIView(G3WAPIView):
+
+    authentication_classes = (
+        CsrfExemptSessionAuthentication,
+    )
+
+    def post(self, request, *args, **kwargs):
+
+        try:
+            anncsu_project = ANNCSUProject.objects.get(pk=kwargs['anncsu_project_id'])
+            payload = request.data['payload']
+
+            try:
+                service = kwargs['service']
+            except:
+
+                # Try to get from payload
+                try:
+                    service = json.loads(payload)['req']
+                except:
+                    return JsonResponse({
+                        'status': 'error', 
+                        'error': 'Missing `req` in payload or service as parameter'
+                    },status=400)
+            
+            # Make apiurl by service    
+            api_url = f"{anncsu_project.govway_api_endpoint}/{service}"
+
+
+            if not service or not payload:
+                return JsonResponse({
+                    'status': 'error', 
+                    'error': 'Missing service or payload in request body'
+                },status=400)
+
+            if anncsu_project.govway_username and anncsu_project.govway_password:
+                auth = HTTPBasicAuth(anncsu_project.govway_username, anncsu_project.govway_password)
+            else:       
+                auth = HTTPBasicAuth(settings.ANNCSU_GOVWAY_API_USER, settings.ANNCSU_GOVWAY_API_PASSWORD)
+
+
+            headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+
+            
+            response = requests.post(
+                api_url,
+                headers=headers,
+                json=json.loads(payload),
+                auth=auth
+            )
+            
+            #logger.debug(f"[ANNCSU] - {response.json()}")
+            response.raise_for_status()
+            
+            
+
+
+
+            # For demonstration, we'll just return the received data
+            return JsonResponse({
+                'status': 'success', 
+                'service': service, 
+                'payload': response.json()
+            }, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'status': 'error', 
+                'error': 'Invalid JSON in request body'
+            }, status=400)
+        
+        except HTTPError as http_err:
+            return JsonResponse({
+                'status': 'error', 
+                'error': f'HTTP error occurred: {str(http_err)}: {http_err.response.text if http_err.response.text else "No response content"}'
+            }, status=response.status_code if response else 500)
+
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error', 
+                'error': str(e)
+            }, status=500)
+        

@@ -16,8 +16,12 @@ from django.core.exceptions import ValidationError
 from django.forms import (
     ModelForm, 
     Select,
+    ChoiceField,
     CharField, 
-    PasswordInput
+    JSONField,
+    Textarea,
+    PasswordInput, 
+    Form
 )
 from django.db.models import Q  
 from django.utils.translation import gettext_lazy as _
@@ -167,3 +171,62 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
             password = None
         
         return password
+    
+
+class ANNCSUCONSCOMForm(G3WFormMixin, Form):
+
+
+    # service = ChoiceField(
+    #     label=_("Request"),
+    #     required=True,
+    #     choices=(
+    #         ('esisteodonimo', '/esisteodonimo'),
+    #         ('esisteodonimo/{codcom}/{denom}', '/esisteodonimo/{codcom}/{denom}'),
+    #         ('esisteaccesso', '/esisteaccesso'),
+    #         ('esisteaccesso/{codcom}/{denom}/{accesso}', '/esisteaccesso/{codcom}/{denom}/{accesso}'),
+    #         ('elencoodonimi', '/elencoodonimi'),
+    #         ('elencoodonimi/{codcom}/{denomparz}', '/elencoodonimi/{codcom}/{denomparz}'),
+    #         ('elencoaccessi', '/elencoaccessi'),
+    #         ('elencoaccessi/{codcom}/{denom}/{accparz}', '/elencoaccessi/{codcom}/{denom}/{accparz}'),
+    #         ('elencoodonimiprog', '/elencoodonimiprog'),
+    #         ('elencoodonimiprog/{codcom}/{denomparz}', '/elencoodonimiprog/{codcom}/{denomparz}'),
+    #         ('elencoaccessiprog', '/elencoaccessiprog'),
+    #         ('elencoaccessiprog/{prognaz}/{accparz}', '/elencoaccessiprog/{prognaz}/{accparz}'),
+    #         ('prognazarea', '/prognazarea'),
+    #         ('prognazarea/{prognaz}', '/prognazarea/{prognaz}'),
+    #         ('prognazacc', '/prognazacc'),
+    #         ('prognazacc/{prognazacc}', '/prognazacc/{prognazacc}'),
+    #         ('status', '/status'),
+    #     )
+    # )
+
+    payload = JSONField(
+        label=_("JSON payload"),
+        required=True,
+        widget=Textarea(attrs={"rows": 10}),
+        help_text=_("Inserisci un JSON valido.")
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper(self)
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Div(
+                Div(
+                    Div(
+                        HTML("<h3 class='box-title'><i class='fa fa-cog'></i> {}</h3>".format(
+                            _('ANNCSU Consultazione Comuni'))),
+                        css_class='box-header with-border'
+                    ),
+                    Div(
+                        # Field('service', css_class='select2'),
+                        Field('payload', rows='10'),
+                        css_class='box-body',
+                    ),
+                    css_class='box box-success'
+                ),
+                css_class='col-md-12'
+            )
+        )

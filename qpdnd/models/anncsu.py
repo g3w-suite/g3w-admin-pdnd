@@ -77,7 +77,8 @@ class ANNCSUProject(models.Model):
 
     API_TYPE = Choices(
         ('aggcoord', 'AGGIORNAMENTO COORDINATE'),
-        ('aggacc', 'AGGIORNAMENTO ACCESSI')
+        ('aggacc', 'AGGIORNAMENTO ACCESSI'),
+        ('conscom', 'CONSULTAZIONE COMUNI')
     )
 
     api_type = models.CharField(max_length=10, choices=API_TYPE, default=API_TYPE.aggcoord)
@@ -165,7 +166,7 @@ class ANNCSUProject(models.Model):
     @property
     def fapi_type(self):
         """Get human readable API type."""
-        
+
         return self.API_TYPE[self.api_type]
 
     def clean(self):
