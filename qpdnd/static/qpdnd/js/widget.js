@@ -245,7 +245,7 @@ ga.QPDND.ANNCSU = {
                               .text(current_progress + "% Complete");
                         }
 
-                        if (res['progress'] == 100 && res['status'] == that.huey_signals.COMPLETE) {
+                        if (res['progress'] == 100 || res['status'] == that.huey_signals.COMPLETE) {
                             clearInterval(that.task_info_interval);
                             that.progress_bar.css("width",  "100%")
                                 .attr("aria-valuenow", '100')

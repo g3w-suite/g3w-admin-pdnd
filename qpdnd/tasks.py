@@ -110,7 +110,7 @@ def send_anncsu_pdnd_task(anncsu_project, send_type, task):
     process_info = ProcessInfo(
         task,
         desc='Send ANNCSU PDND data',
-        total=len(anncsu_project.get_features())
+        total=len(anncsu_project.get_features(send_type))
     )
 
     # Instance sepcific API class
