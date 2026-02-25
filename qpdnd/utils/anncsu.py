@@ -136,7 +136,7 @@ class ANNCSUPDNDAPI(object):
                 mapping[qgis_field.name()] = qgis_layer.fields().indexFromName(qgis_field.name())
         return mapping
     
-    def _fields_to_update(self, feature, res):
+    def _fields_to_update(self, feature, res,fmapping=None):
         """
         Get the fields to update in QGIS layer after sending to API.
         :param res: API response
@@ -181,7 +181,7 @@ class ANNCSUPDNDAPI(object):
 
                 # Update fields in QGIS layer to mark as sent
                 # first specific for ANNCSU API TYPE
-                ftoupdate = self._fields_to_update(feature, res)
+                ftoupdate = self._fields_to_update(feature, res, fmapping)
                 ftoupdate.update({
                         fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_SENDED_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
@@ -289,8 +289,7 @@ class ANNCSUPDNDAPI(object):
             'richiesta': pdata.model_dump(mode='json', exclude_none=True)
         }
 
-        print(tosend)
-        #return {}
+        logger.debug(f"[ANNCSU] Data to send - {tosend}")
         
         response = requests.post(
             self.api_url,
@@ -298,7 +297,8 @@ class ANNCSUPDNDAPI(object):
             json=tosend,
             auth=auth
         )
-        logger.debug(f"[ANNCSU] - {response.json()}")
+
+        logger.debug(f"[ANNCSU] PDND response- {response.json()}")
         response.raise_for_status()
         
         
@@ -363,15 +363,16 @@ class ANNCSUPDND_AggiornamentoAccessi_API(ANNCSUPDNDAPI):
         elif feature[settings.ANNCSU_FIELD_DIRTY]:
             return TipoOperazione.R  # Update (default)
         
-    def _fields_to_update(self, feature, res):
-        toret = super()._fields_to_update(feature, res)
+    def _fields_to_update(self, feature, res, fmapping=None):
+
+        toret = super()._fields_to_update(feature, res, fmapping)
 
         operazione_civico = self._get_operazione_civico(feature)
 
         # Upate progr_civico only for I operation, for R and S it should not be updated
         if operazione_civico == TipoOperazione.I:
             toret.update({
-                settings.ANNCSU_FIELD_PROGR: res['dati'].get('progr_civico'),
+                fmapping[settings.ANNCSU_FIELD_PROGR]: res['dati'][0].get('progr_civico'),
             })
 
         return toret

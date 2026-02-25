@@ -94,7 +94,7 @@ class ANNCSURunView(TemplateView):
             f"\"{settings.ANNCSU_FIELD_DIRTY}\" is true"
         )
 
-        ctx['num_features_by_status']['DIRTY'   ] = count_qgis_features(ctx['qgs_layer'], request)
+        ctx['num_features_by_status']['DIRTY'] = count_qgis_features(ctx['qgs_layer'], request)
 
         # Restore the original subset string and select no features
         ctx['qgs_layer'].selectByIds([])

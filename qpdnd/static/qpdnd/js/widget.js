@@ -169,7 +169,7 @@ ga.QPDND.ANNCSU = {
             that.task_results_container.html('');
             var btn_id = $(this).attr('id');
             if (btn_id == 'anncsu_sendOnlyNotSentToPdnd'){
-                run_url += '?send_type=not-sent';
+                run_url += '?send_type=dirty';
             } else if (btn_id == 'anncsu_sendOnlyErrorToPdnd'){
                 run_url += '?send_type=error';
             }
