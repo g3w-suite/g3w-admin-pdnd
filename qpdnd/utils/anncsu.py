@@ -72,7 +72,8 @@ class ANNCSUPDNDAPI(object):
         self.results = {
             'success': 0,
             'failed': 0,
-            'errors': {}
+            'errors': {},
+            'results': {}
         }
 
     def _get_coordinates(self, feature):
@@ -125,6 +126,15 @@ class ANNCSUPDNDAPI(object):
         """
         self.results['failed'] += 1
         self.results['errors'][feature_id] = error_msg
+
+    def _register_success(self, feature_id, success_msg):
+        """
+        Register a success for a feature.
+        :param feature_id: ID of the feature
+        :param success_msg: Success message
+        """
+        self.results['success'] += 1
+        self.results['results'][feature_id] = success_msg
 
     def _layer_fields_mapping(self, qgis_layer):
         """
@@ -193,7 +203,7 @@ class ANNCSUPDNDAPI(object):
                     })
                 
                 # Update results
-                self.results['success'] += 1
+                self._register_success(feature.id(), res)
                 
             except HTTPError as http_err:    
                 logger.error(f"HTTP error sending feature ID {feature.id()}: {http_err}")
