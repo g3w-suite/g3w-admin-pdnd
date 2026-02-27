@@ -76,10 +76,27 @@ class ANNCSUPDNDAPI(object):
             'results': {}
         }
 
+    def _is_numeric_string(self, value):
+        """
+        Check if a string value is numeric (integer or float).
+        :param value: String value to check
+        :return: True if numeric, False otherwise
+        """
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+
     def _get_coordinates(self, feature):
 
         try:
             z = str(feature[settings.ANNCSU_FIELD_QUOTA])
+            
+            # Validate that z is numeric
+            if not self._is_numeric_string(z):
+                raise ValueError(f"Field {settings.ANNCSU_FIELD_QUOTA} must be numeric, got: {z}")
+            
         except:
             z = '0'
 
