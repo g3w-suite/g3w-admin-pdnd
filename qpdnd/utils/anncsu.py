@@ -53,14 +53,14 @@ class ANNCSUPDNDAPI(object):
     api_url = None
 
 
-    def __init__(self, anncsu_project_pk, send_type, process_info=None):
+    def __init__(self, anncsu_project, send_type, process_info=None):
         """ 
         Constructor 
-        :param anncsu_project_pk: Primary key of ANNCSUProject instance
+        :param anncsu_project: ANNCSUProject instance
         :param process_info: huey_monitor.ProcessInfo instance
         """
 
-        self.anncsu_project = ANNCSUProject.objects.get(pk=anncsu_project_pk)
+        self.anncsu_project = anncsu_project
         self.send_type = send_type
         self.process_info = process_info
 

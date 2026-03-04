@@ -187,7 +187,7 @@ class ANNCSURunAPIView(G3WAPIView):
         send_type = request.GET.get('send_type', None)
 
         # Send on Huey
-        task = send_anncsu_pdnd_task(anncsu_project, send_type)
+        task = send_anncsu_pdnd_task(anncsu_project.pk, send_type)
 
         logger.debug(f"Started task {task.id} for ANNCSU project {anncsu_project.pk} with send_type {send_type}")
 
