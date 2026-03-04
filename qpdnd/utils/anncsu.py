@@ -206,6 +206,8 @@ class ANNCSUPDNDAPI(object):
 
                 res = self.send_feature(feature)
 
+                logger.debug(f"Feature ID {feature.id()} sent successfully. Response: {res}")
+
                 # Update fields in QGIS layer to mark as sent
                 # first specific for ANNCSU API TYPE
                 ftoupdate = self._fields_to_update(feature, res, fmapping)
