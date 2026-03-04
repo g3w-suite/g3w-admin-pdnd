@@ -141,7 +141,8 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                 settings.ANNCSU_FIELD_SEZ_CENS,
                 settings.ANNCSU_FIELD_DT_VAL_AMM,
                 settings.ANNCSU_FIELD_ISOLATO,
-                settings.ANNCSU_FIELD_SPECIFICITA
+                settings.ANNCSU_FIELD_SPECIFICITA,
+                settings.ANNCSU_FIELD_COD_CIV_COMUNALE
             ]
             required_fields.extend(required_fields_accessi)
 
