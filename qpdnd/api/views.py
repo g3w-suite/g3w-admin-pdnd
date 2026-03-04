@@ -45,7 +45,6 @@ from django.http import HttpResponse
 from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 import requests
-import time
 
 import logging
 
@@ -219,8 +218,13 @@ class ANNCSURunInfoTaskView(G3WAPIView):
 
             # Try to retrieve the task result, may throw an exception
             try:
-                time.sleep(0.30)  # Simulate some delay in retrieving the result
                 result = HUEY.result(task_id)
+                
+                # Retry 3 times if result is None
+                retry_count = 0
+                while result is None and retry_count < 3:
+                    result = HUEY.result(task_id)
+                    retry_count += 1
                 ret_status = 200
             except TaskException:
                 result = None
