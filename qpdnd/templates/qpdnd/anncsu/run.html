@@ -29,7 +29,6 @@
     ga.QPDND.ANNCSU.huey_signals = {
             'CANCELLED': '{{ huey_signals.SIGNAL_CANCELED }}',
             'COMPLETE': '{{ huey_signals.SIGNAL_COMPLETE }}',
-            {% comment %} 'ENQUEUED': '{{ huey_signals.SIGNAL_ENQUEUED }}', {% endcomment %}
             'ERROR': '{{ huey_signals.SIGNAL_ERROR }}',
             'EXECUTING': '{{ huey_signals.SIGNAL_EXECUTING }}',
             'EXPIRED': '{{ huey_signals.SIGNAL_EXPIRED }}',
