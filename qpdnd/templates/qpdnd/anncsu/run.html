@@ -148,7 +148,9 @@
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-6">
+                        {% if anncsu_project.api_type == 'aggcoord'%}
                         <button class="btn btn-lg btn-primary" id="anncsu_sendToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send ALL" %}</button><br />
+                        {% endif %}
                         <button style="margin-top: 10px;" class="btn btn-lg btn-warning" id="anncsu_sendOnlyNotSentToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send only `TO SEND` features" %}</button><br />
                         <button style="margin-top: 10px;" class="btn btn-lg btn-warning" id="anncsu_sendOnlyErrorToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send only `ERROR` features" %}</button><br />
                     </div>

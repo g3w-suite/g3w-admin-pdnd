@@ -46,6 +46,10 @@ from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 import requests
 
+import logging
+
+logger = logging.getLogger('qpdnd.anncsu')
+
 class QDPNDOWSRequestHandler(OWSRequestHandler):
 
     def doRequest(self):
@@ -184,6 +188,8 @@ class ANNCSURunAPIView(G3WAPIView):
 
         # Send on Huey
         task = send_anncsu_pdnd_task(anncsu_project, send_type)
+
+        logger.debug(f"Started task {task.id} for ANNCSU project {anncsu_project.pk} with send_type {send_type}")
 
         # Send on Celery
         # task = object()
