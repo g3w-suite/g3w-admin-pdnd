@@ -157,6 +157,17 @@ class ANNCSUProject(models.Model):
             return TaskModel.objects.get(task_id=self.task_id)
         return None
     
+    def get_task_status(self):
+        """
+        Get the status of the associated task.
+        :return: task status or None
+        """
+        task = self.get_task()
+        if task:
+             # Get current status
+            return task.state.signal_name
+        return None
+    
     @property
     def fenv_type(self):
         """Get human readable environment type."""

@@ -22,6 +22,7 @@ from django.views.generic import (
 )
 from django.views.generic.detail import SingleObjectMixin
 from guardian.decorators import permission_required
+from huey import signals
 from core.mixins.views import G3WAjaxDeleteViewMixin, G3WRequestViewMixin
 from qdjango.models import (
     Project, 
@@ -43,6 +44,13 @@ class ANNCSUProjectsListView(ListView):
     @method_decorator(permission_required('qpdnd.add_anncsuproject', return_403=True))
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        ctx['huey_signals'] = signals
+
+        return ctx
     
 
 class ANNCSUProjectCreateView(G3WRequestViewMixin, CreateView):

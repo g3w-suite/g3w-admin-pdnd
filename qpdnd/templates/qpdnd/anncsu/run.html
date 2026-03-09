@@ -121,18 +121,10 @@
                         {% endif %}
                         <h5 style="font-size: 24px;"><strong>Project</strong>: {{ anncsu_project.project.title }} </h5>
                         <h5><strong>Layer</strong>: {{ layer }}</h5>
-                        <h5><strong>Task ID</strong>: <span id="task_id">{{ anncsu_project.task_id }}</span> - <em>Status: 
-                            {% if task_model.state.signal_name == huey_signals.SIGNAL_EXECUTING %}
-                                <span id="task_status" class="label label-warning blink-animation" style="font-size: 12px; padding: 3px 8px;">{{ task_model.state.signal_name|upper }}</span>
-                            {% elif task_model.state.signal_name == huey_signals.SIGNAL_COMPLETE %}
-                                <span id="task_status" class="label label-success" style="font-size: 12px; padding: 3px 8px;">{{ task_model.state.signal_name|upper }}</span>
-                            {% elif task_model.state.signal_name == huey_signals.SIGNAL_ERROR or task_model.state.signal_name == huey_signals.SIGNAL_EXPIRED %}
-                                <span id="task_status" class="label label-danger" style="font-size: 12px; padding: 3px 8px;">{{ task_model.state.signal_name|upper }}</span>
-                            {% elif task_model.state.signal_name == huey_signals.SIGNAL_CANCELED or task_model.state.signal_name == huey_signals.SIGNAL_REVOKED %}
-                                <span id="task_status" class="label label-default" style="font-size: 12px; padding: 3px 8px;">{{ task_model.state.signal_name|upper }}</span>
-                            {% else %}
-                                <span id="task_status" class="label label-info" style="font-size: 12px; padding: 3px 8px;">{{ task_model.state.signal_name|upper }}</span>
-                            {% endif %}
+                        <h5><strong>Task ID</strong>: <span id="task_id">{{ anncsu_project.task_id }}</span> - <em>Status:
+                            {% with task_status=task_model.state.signal_name %}
+                            {% include "qpdnd/anncsu/include/task_status.html" %}
+                            {% endwith %}  
                         </em></h5>
                         <h5><strong>Start at</strong>: {{ task_model.create_dt }}</h5>
                         <h5><strong>Stop at</strong>: {{ task_model.update_dt }}</h5>

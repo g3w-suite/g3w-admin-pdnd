@@ -1,0 +1,11 @@
+{% if task_status == huey_signals.SIGNAL_EXECUTING %}
+    <span id="task_status" class="label label-warning blink-animation" style="font-size: 12px; padding: 3px 8px;">{{ task_status|upper }}</span>
+{% elif task_status == huey_signals.SIGNAL_COMPLETE %}
+    <span id="task_status" class="label label-success" style="font-size: 12px; padding: 3px 8px;">{{ task_status|upper }}</span>
+{% elif task_status == huey_signals.SIGNAL_ERROR or task_status == huey_signals.SIGNAL_EXPIRED %}
+    <span id="task_status" class="label label-danger" style="font-size: 12px; padding: 3px 8px;">{{ task_status|upper }}</span>
+{% elif task_status == huey_signals.SIGNAL_CANCELED or task_status == huey_signals.SIGNAL_REVOKED %}
+    <span id="task_status" class="label label-default" style="font-size: 12px; padding: 3px 8px;">{{ task_status|upper }}</span>
+{% else %}
+    <span id="task_status" class="label label-info" style="font-size: 12px; padding: 3px 8px;">{{ task_status|upper }}</span>
+{% endif %}
