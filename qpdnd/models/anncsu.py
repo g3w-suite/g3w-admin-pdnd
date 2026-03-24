@@ -18,7 +18,13 @@ from django.utils.translation import gettext_lazy as _
 from huey.contrib.djhuey import HUEY
 from huey.exceptions import TaskException
 from huey_monitor.models import TaskModel
+from core.mixins.models import G3WACLModelMixins
 from core.utils.qgisapi import get_qgis_features
+from usersmanage.utils import setPermissionUserObject
+from usersmanage.models import (
+    User, 
+    Group as AuthGroup
+)
 from qpdnd.settings import (
     _ANNCSU_SENDED_STATUS, 
     _ANNCSU_ERROR_STATUS
@@ -28,6 +34,8 @@ from qgis.core import (
     QgsSettings, 
     QgsFeatureRequest
 )
+
+
 
 
 
@@ -67,7 +75,7 @@ class IstatCodiciUi(models.Model):
 
 
 
-class ANNCSUProject(models.Model):
+class ANNCSUProject(G3WACLModelMixins, models.Model):
     """ Projects to expose with ANNCSU PDND extension """
 
     ENV_TYPE = Choices(
@@ -103,6 +111,12 @@ class ANNCSUProject(models.Model):
     govway_password = models.CharField(max_length=255, blank=True, null=True, help_text=_('GovWay API password'))
 
     results = models.JSONField(blank=True, null=True, help_text=_('Field to store results of the API call or error messages.'))
+
+
+    class Meta:
+        permissions = (
+            ('send_to_pdnd', 'Can send features to PDND API'),
+        )
 
     def get_features(self, send_type=None):
         """
@@ -167,6 +181,22 @@ class ANNCSUProject(models.Model):
              # Get current status
             return task.state.signal_name
         return None
+    
+    def _permissionsToViewers(self, users_id, mode='add'):
+        """
+        Add/Remove guardian permissions to Viewers
+        """
+
+        for user_id in users_id:
+            setPermissionUserObject(User.objects.get(pk=user_id), self,
+                                    permissions=['view_anncsuproject', 'send_to_pdnd'], mode=mode)
+            
+    def _permissions_to_user_groups_viewer(self, groups_id, mode='add'):
+
+        for group_id in groups_id:
+            auth_group = AuthGroup.objects.get(pk=group_id)
+            setPermissionUserObject(auth_group, self, permissions=['view_anncsuproject', 'send_to_pdnd'], mode=mode)
+
     
     @property
     def fenv_type(self):

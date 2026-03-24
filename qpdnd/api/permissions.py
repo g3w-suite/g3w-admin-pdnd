@@ -12,6 +12,7 @@ __license__ = 'MPL 2.0'
 
 from rest_framework.permissions import BasePermission
 from qdjango.models import Project
+from qpdnd.models import ANNCSUProject
 
 
 class ProjectEditPermission(BasePermission):
@@ -25,3 +26,26 @@ class ProjectEditPermission(BasePermission):
 
         project = Project.objects.get(pk=kwargs['project_id'])
         return request.user.has_perm('qdjango.change_project', project)
+    
+class SendToPDNDPermission(BasePermission):
+    """
+    Allows access only to users have send_to_pdnd permission on anncsu_project
+    """
+
+    def has_permission(self, request, view):
+
+        func, args, kwargs = request.resolver_match
+
+        anncsu_project = ANNCSUProject.objects.get(pk=kwargs['anncsu_project_id'])
+        return request.user.has_perm('qpdnd.send_to_pdnd', anncsu_project)
+    
+
+class SuperuserPermission(BasePermission):
+    """
+    Allows access only to superusers
+    """
+
+    def has_permission(self, request, view):
+
+        return request.user.is_superuser
+    

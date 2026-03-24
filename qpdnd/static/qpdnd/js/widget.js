@@ -34,14 +34,14 @@ ga.QPDND = {
     },
 
     /**
-     * Gte current project selected
+     * Get current project selected
      */
     get_current_project: function(){
         return this.project_select.val();
     },
 
     /**
-     * Set the current project ina property
+     * Set the current project in a property
      */
     set_current_project: function(){
         this.current_project = this.get_current_project();
@@ -66,11 +66,9 @@ ga.QPDND = {
 
                 that.title.val(data['Title']);
                 that.abstract.val(data['Abstract'])
-
-
-
             });
 
+        
         });
     }
 }

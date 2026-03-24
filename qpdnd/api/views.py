@@ -34,7 +34,17 @@ from qpdnd.tasks import (
     send_anncsu_pdnd_task, 
     send_anncsu_pdnd_ceery_task
 )
-from .permissions import ProjectEditPermission
+from usersmanage.configs import G3W_VIEWER1
+from usersmanage.utils import (
+    get_user_groups_for_object, 
+    get_users_for_object
+)
+from usersmanage.forms import label_users
+from .permissions import (
+    ProjectEditPermission, 
+    SendToPDNDPermission, 
+    SuperuserPermission
+)
 from .decorators.voucher_checker import pdnd_voucher_required
 from qgis.server import QgsServerProjectUtils
 
@@ -173,9 +183,9 @@ class ANNCSURunAPIView(G3WAPIView):
     ANNCSU gestione coordinate API view
     """
 
-    # permission_classes = [
-    #     ProjectEditPermission
-    # ]
+    permission_classes = [
+        SendToPDNDPermission
+    ]
 
     def get(self, request, *args, **kwargs):
 
@@ -284,6 +294,10 @@ class ANNCSURunKillTaskView(G3WAPIView):
     """
     ANNCSU view to kill a huey/celery task.
     """
+
+    permission_classes = [
+        SuperuserPermission
+    ]
 
     def get(self, request, task_id):
         """
@@ -451,10 +465,6 @@ class ANNCSURunCONSCOMAPIView(G3WAPIView):
             
             #logger.debug(f"[ANNCSU] - {response.json()}")
             response.raise_for_status()
-            
-            
-
-
 
             # For demonstration, we'll just return the received data
             return JsonResponse({
@@ -481,3 +491,72 @@ class ANNCSURunCONSCOMAPIView(G3WAPIView):
                 'error': str(e)
             }, status=500)
         
+
+class ANNCSUUsersGroupsConfigAPIView(G3WAPIView):
+    """
+    Return users for ANNCSU config
+    """
+    viewer_permission = 'view_project'
+    viewer_permission_configs = 'send_to_pdnd'
+
+    def get(self, *args, **kwargs):
+
+        # object to send with response
+        to_res = {}
+
+        # get project from url
+        project = Project.objects.get(pk=kwargs['project_id'])
+
+        # get cdu config from url if is set
+        try:
+            anncsu_project = ANNCSUProject.objects.get(pk=kwargs['anncsu_project_id'])
+        except:
+            anncsu_project = None
+
+
+        # Viewer Level 1 users:
+        # ===============================================================================
+        # get every Viewer level 1 users for project
+        viewer_users = get_users_for_object(project, self.viewer_permission, [G3W_VIEWER1],
+                                             with_anonymous=True)
+
+        viewer_users_selected = {}
+        if anncsu_project:
+            viewer_users_selected = get_users_for_object(anncsu_project, self.viewer_permission_configs,
+                                                         [G3W_VIEWER1], with_anonymous=True)
+
+        # add Editor level 1 to response
+        to_res.update({
+            'viewer_users': [
+                 {
+                     'id': viewer.pk,
+                     'text': label_users(viewer),
+                     'selected': viewer in viewer_users_selected
+                 } for viewer in viewer_users
+             ]})
+
+
+        # Viewer group users:
+        # ===============================================================================
+        # get every Viewer editor users
+        viewer_editors = get_user_groups_for_object(project, self.request.user, self.viewer_permission, 'viewer')
+
+        viewer_editors_selected = {}
+        if anncsu_project:
+            viewer_editors_selected = get_user_groups_for_object(
+                anncsu_project,
+                self.request.user,
+                self.viewer_permission_configs,
+                'viewer')
+
+        # add Edito viewer users to res
+        to_res.update({
+            'group_viewers': [
+                {
+                    'id': viewer.pk,
+                    'text': viewer.name,
+                    'selected': viewer in viewer_editors_selected
+                } for viewer in viewer_editors
+            ]})
+
+        return JsonResponse(to_res)

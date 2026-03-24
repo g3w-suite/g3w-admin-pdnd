@@ -12,6 +12,7 @@ __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
 from django.urls import path, re_path
+from django.contrib.auth.decorators import login_required
 from .settings import (
     _BASE_URL_INFO_TASK, 
     _BASE_URL_KILL_TASK,
@@ -25,7 +26,8 @@ from .api.views import (
     ANNCSURunInfoTaskView,
     ANNCSURunKillTaskView, 
     ANNCSUDownTaskResultsView, 
-    ANNCSURunCONSCOMAPIView
+    ANNCSURunCONSCOMAPIView, 
+    ANNCSUUsersGroupsConfigAPIView
 )
 
 BASE_URLS = 'qpdnd'
@@ -46,32 +48,45 @@ urlpatterns = [
     # --------------------------------
 
     path(f'{_BASE_URL_CONSCOM}<int:anncsu_project_id>',
-         ANNCSURunCONSCOMAPIView.as_view(),
+         login_required(ANNCSURunCONSCOMAPIView.as_view()),
          name='anncsu-api-conscom'
     ),
 
     path(f'{_BASE_URL_CONSCOM}<str:service>/<int:anncsu_project_id>',
-         ANNCSURunCONSCOMAPIView.as_view(),
+         login_required(ANNCSURunCONSCOMAPIView.as_view()),
          name='anncsu-api-conscom-with-service'
     ),
 
     path('api/anncsu/gestionecoordinate/<int:anncsu_project_id>',
-         ANNCSURunAPIView.as_view(),
+         login_required(ANNCSURunAPIView.as_view()),
          name='anncsu-api-gestionecoordinate'
     ),
     
     # Use for asyncronous task
     path(f'{_BASE_URL_INFO_TASK}<str:task_id>/',
-         ANNCSURunInfoTaskView.as_view(),
+         login_required(ANNCSURunInfoTaskView.as_view()),
          name='anncsu-api-infotask'),
 
     path(f'{_BASE_URL_KILL_TASK}<str:task_id>/',
-         ANNCSURunKillTaskView.as_view(),
+         login_required(ANNCSURunKillTaskView.as_view()),
          name='anncsu-api-killtask'),
 
     # Download results
     path(f'{_BASE_URL_DOWN_TASK_RESULTS}<str:task_id>/',
-         ANNCSUDownTaskResultsView.as_view(),
+         login_required(ANNCSUDownTaskResultsView.as_view()),
          name='anncsu-api-downtaskresults'),
+
+    # Url for ACLBox Users
+    path(
+        'api/config/users/<int:project_id>/',
+        login_required(ANNCSUUsersGroupsConfigAPIView.as_view()),
+        name='anncsu-config-users-groups'
+    ),
+    # Url for ACLBox Users
+    path(
+        'api/config/users/<int:project_id>/<int:anncsu_project_id>/',
+        login_required(ANNCSUUsersGroupsConfigAPIView.as_view()),
+        name='anncsu-config-users-groups-with-anncsu-project'
+    ),
 
 ]

@@ -36,6 +36,12 @@ from core.mixins.forms import (
     G3WRequestFormMixin,
     G3WFormMixin
 )
+from usersmanage.configs import (
+    G3W_VIEWER1, 
+    G3W_VIEWER2
+)
+from usersmanage.forms import G3WACLForm
+from usersmanage.models import User
 from qdjango.models import (
     Project
 )
@@ -43,11 +49,55 @@ from qpdnd.models import (
     ANNCSUProject
 )
 
+def anncsuCrispyBoxACL(form, **kwargs):
+    """
+    Build a Crispy object layout element (div) for on AdminLTE2 box structure.
+    :param form: Django form instance
+    :return: Crispy form layout object
+    """
 
-class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
+    bgColorCssClass = kwargs.get('bgColorCssClass', 'bg-purple')
+    boxCssClass = kwargs.get('boxCssClass', 'col-md-6')
+    userFields = [
+        Field('viewer_users', css_class='select2 col-md-12', multiple='multiple', style='width:100%;'),
+        Field('viewer_user_groups', css_class='select2 col-md-12', multiple='multiple', style='width:100%;'),
+    ]
+
+    return Div(
+                Div(
+                    Div(
+                        HTML("<h3 class='box-title'><i class='fa fa-user'></i> {}</h3>".format(_('ACL Users'))),
+                        Div(
+                            HTML("<button class='btn btn-box-tool' data-widget='collapse'><i class='fa fa-minus'></i></button>"),
+                            css_class='box-tools',
+                        ),
+                        css_class='box-header with-border'
+                    ),
+                    Div(
+                        *userFields,
+                        css_class='box-body'
+                    ),
+                    css_class='box box-solid {} {}'.format(bgColorCssClass, form.checkEmptyInitialsData(*userFields))
+                ),
+                css_class='{} acl-box'.format(boxCssClass)
+            )
+
+
+class ANNCSUProjecACLForm(G3WACLForm):
+    """
+    ACL form for ANNCSUProject model.
+    """
+
+    viewer_groups = (G3W_VIEWER1, G3W_VIEWER2)
+
+
+class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, G3WACLForm, ModelForm):
     """
     Form for ANNCSUProject model.
     """
+
+    viewer_groups = (G3W_VIEWER1, )
+
 
     govway_password = CharField(
         label=_("GovWay API Password"),
@@ -64,7 +114,20 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+
+        # set initial users and user groups
+        self._init_users(**kwargs)
+        self._init_user_groups(**kwargs)
+
         super().__init__(*args, **kwargs)
+
+        # change ows_user field label
+        self.fields['viewer_users'].label = _('User users')
+
+        # Check if ACLBox must added
+        # True only if superuser
+        self.aclbox = self.request.user.is_superuser
+
 
         # set value for projects select only project not just in config table
         if self.instance.pk:
@@ -106,8 +169,9 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
                                         ),
                                         css_class='col-md-6'
                                     ),
+                                    anncsuCrispyBoxACL(self, boxCssClass='col-md-6') if self.aclbox else None,
                                     css_class='row'
-                                )
+                                ),
                             )
         
     def clean_layer(self):
@@ -173,6 +237,11 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, ModelForm):
             password = None
         
         return password
+    
+    def save(self, commit=True):
+        self._ACLPolicy()
+
+        return super().save(commit=commit)
     
 
 class ANNCSUCONSCOMForm(G3WFormMixin, Form):

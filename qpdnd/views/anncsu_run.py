@@ -13,6 +13,8 @@ __copyright__ = 'Copyright Gis3w'
 
 from django.conf import settings
 from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
+from guardian.decorators import permission_required
 from huey.contrib.djhuey import HUEY
 from huey.exceptions import TaskException
 from huey_monitor.models import TaskModel
@@ -39,6 +41,7 @@ class ANNCSURunView(TemplateView):
     """
     template_name = 'qpdnd/anncsu/run.html'
 
+    @method_decorator(permission_required('qpdnd.send_to_pdnd', (ANNCSUProject, 'pk', 'pk'), raise_exception=True))
     def dispatch(self, request, *args, **kwargs):
         # Get project and layer info
         self.anncsu_project = ANNCSUProject.objects.get(pk=kwargs.get('pk'))

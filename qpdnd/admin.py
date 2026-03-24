@@ -1,4 +1,5 @@
 from django.contrib import admin
+from guardian.admin import GuardedModelAdmin
 from qpdnd.models import (
     QPDNDProject, 
     ANNCSUProject,
@@ -19,7 +20,7 @@ class LicenseAdmin(admin.ModelAdmin):
    pass
 
 @admin.register(ANNCSUProject)
-class ANNCSUProjectAdmin(admin.ModelAdmin):
+class ANNCSUProjectAdmin(GuardedModelAdmin):
    list_display = [
        'project',
        'layer',

@@ -62,7 +62,7 @@
                             {% endif %}
                         </span>
                         <span class="col-xs-4 icon">
-                            {% if "change_anncsuproject" in userObj_perms %}
+                            {% if "send_to_pdnd" in userObj_perms %}
                             <a href="{% url 'qpdnd-anncsu-project-run' object.id %}" data-toggle="tooltip" data-placement="top" title="{% trans 'RUN' %}" ><i class="ion ion-play"></i></a>
                             {% endif %}
                         </span>
