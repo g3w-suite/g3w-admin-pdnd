@@ -20,8 +20,6 @@ from .settings import (
     _BASE_URL_CONSCOM
 )
 from .api.views import (
-    QPDNDAPIOgcView,
-    QPDNDInfoProjectAPIView, 
     ANNCSURunAPIView, 
     ANNCSURunInfoTaskView,
     ANNCSURunKillTaskView, 
@@ -33,16 +31,6 @@ from .api.views import (
 BASE_URLS = 'qpdnd'
 
 urlpatterns = [
-    re_path(
-        '^api/ogc/(?P<endpoint>[-_\w\d]+)/wfs3&?',
-        QPDNDAPIOgcView.as_view(),
-        name='qpdnd-api-ogc'
-    ),
-
-    path('api/infoproject/<int:project_id>',
-         QPDNDInfoProjectAPIView.as_view(),
-         name='qpdnd-api-prj-info'
-    ),
 
     # Send ANNCSU data to PDND API
     # --------------------------------
