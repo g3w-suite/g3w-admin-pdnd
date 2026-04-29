@@ -66,7 +66,7 @@ def db_task(*args, **kwargs):
         # This workaround is needed to avoid parallel loading of providers
         # By Alessandro Pasotti 2025-11-26
         # ----------------------------------------------------------------
-        QgsSettings().setValue("core/provider-parallel-loading", False)
+        #QgsSettings().setValue("core/provider-parallel-loading", False)
 
         ret = task(*args, **kwargs)(close_db(fn))
         ret.call_local = fn
