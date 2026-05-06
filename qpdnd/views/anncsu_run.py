@@ -154,5 +154,7 @@ class ANNCSURunView(TemplateView):
             ctx['form'] = ANNCSUCONSCOMForm()
             ctx['BASE_URL_CONSCOM'] = _BASE_URL_CONSCOM
 
+        # Endpoint reachability check
+        ctx['endpoint_check'] = self.anncsu_project.check_endpoint()
 
         return ctx

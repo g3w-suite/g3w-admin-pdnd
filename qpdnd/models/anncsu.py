@@ -11,6 +11,9 @@ __date__ = '2025-10-10 15:53:19'
 __copyright__ = 'Copyright Gis3w'
 
 
+import requests
+from requests.auth import HTTPBasicAuth
+
 from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -216,6 +219,77 @@ class ANNCSUProject(G3WACLModelMixins, models.Model):
 
         if hasattr(self, 'layer') and self.layer.project != self.project:
             raise ValidationError({'layer': 'The selected layer does not belong to the selected project.'})
+
+
+    def check_endpoint(self, timeout=10):
+        """
+        Verify that ``govway_api_endpoint`` is reachable.
+
+        Performs a lightweight HTTP request and returns a dict with:
+          - ok (bool): True only on a 2xx/3xx response
+          - status_code (int|None)
+          - reason (str): HTTP reason phrase or exception message
+          - url (str): the endpoint that was probed
+          - error (str|None): short error category ('connection', 'timeout',
+            'ssl', 'http', 'exception', 'not_configured')
+        """
+
+        url = self.govway_api_endpoint
+        result = {
+            'ok': False,
+            'status_code': None,
+            'reason': '',
+            'url': url,
+            'error': None,
+        }
+
+        if not url:
+            result['error'] = 'not_configured'
+            result['reason'] = 'GovWay API endpoint not configured.'
+            return result
+
+        auth = None
+        if self.govway_username and self.govway_password:
+            auth = HTTPBasicAuth(self.govway_username, self.govway_password)
+
+        try:
+            # Empty POST: GovWay endpoints typically only accept POST.
+            # An empty body will likely return 4xx (bad request) but proves
+            # the endpoint is reachable; 5xx / connection errors signal a
+            # real problem.
+            response = requests.post(
+                url,
+                auth=auth,
+                timeout=timeout,
+                allow_redirects=True,
+                json={},
+            )
+
+            result['status_code'] = response.status_code
+            result['reason'] = response.reason or ''
+            # Reachable if any response < 500 (4xx means endpoint answered).
+            # 401/403 = auth issue, 400/404/422 = bad payload, all "reachable".
+            if response.status_code < 500:
+                result['ok'] = True
+            else:
+                result['error'] = 'http'
+        except requests.exceptions.SSLError as e:
+            result['error'] = 'ssl'
+            result['reason'] = str(e)
+        except requests.exceptions.ConnectTimeout:
+            result['error'] = 'timeout'
+            result['reason'] = 'Connection timeout.'
+        except requests.exceptions.ReadTimeout:
+            result['error'] = 'timeout'
+            result['reason'] = 'Read timeout.'
+        except requests.exceptions.ConnectionError as e:
+            result['error'] = 'connection'
+            result['reason'] = str(e)
+        except Exception as e:
+            result['error'] = 'exception'
+            result['reason'] = f'{type(e).__name__}: {e}'
+
+        return result
 
 
     def __str__(self):

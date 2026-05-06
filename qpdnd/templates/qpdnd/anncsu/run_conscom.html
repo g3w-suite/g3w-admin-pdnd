@@ -41,6 +41,7 @@
 {% endblock %}
 
 {% block main_content %}
+{% include "qpdnd/anncsu/include/endpoint_check.html" %}
 <div class="row">
     <form method="post" action="">
         {% crispy form %}  

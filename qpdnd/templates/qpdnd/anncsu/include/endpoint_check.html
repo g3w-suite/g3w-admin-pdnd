@@ -1,0 +1,29 @@
+{% load i18n %}
+{% if endpoint_check %}
+<div class="row">
+    <div class="col-md-12 col-xs-12">
+        {% if endpoint_check.ok %}
+            <div class="alert alert-success">
+                <i class="fa fa-check-circle"></i>
+                <strong>{% trans "GovWay endpoint reachable" %}</strong>
+                {% comment %} &mdash; HTTP {{ endpoint_check.status_code }} {{ endpoint_check.reason }}
+                <br><small><code>{{ endpoint_check.url }}</code></small> {% endcomment %}
+            </div>
+        {% else %}
+            <div class="alert alert-danger">
+                <i class="fa fa-exclamation-triangle"></i>
+                <strong>{% trans "GovWay endpoint NOT reachable" %}</strong>
+                {% if endpoint_check.status_code %}
+                    &mdash; HTTP {{ endpoint_check.status_code }} {{ endpoint_check.reason }}
+                {% else %}
+                    &mdash; {{ endpoint_check.reason }}
+                {% endif %}
+                <br><small>
+                    {% trans "Error type" %}: <code>{{ endpoint_check.error }}</code>
+                    {% if endpoint_check.url %} | <code>{{ endpoint_check.url }}</code>{% endif %}
+                </small>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
