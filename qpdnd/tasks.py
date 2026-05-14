@@ -17,7 +17,7 @@ from huey_monitor.tqdm import ProcessInfo
 from celery import shared_task, current_task
 from celery.utils.log import get_task_logger
 from .utils.anncsu import MAP_API_CLASS
-from .models import ANNCSUProject
+from .models import ANNCSUProject, ANNCSUTaskHistory
 
 from qgis.core import (
     QgsProject, 
@@ -98,31 +98,57 @@ def db_task(*args, **kwargs):
 
 
 @db_task(context=True)
-def send_anncsu_pdnd_task(anncsu_project, send_type, task):
+def send_anncsu_pdnd_task(anncsu_project, send_type, task, task_history_id=None):
     """
     Task to send ANNCSU PDND data to API.
     """
 
+    from django.utils import timezone
+
     if not isinstance(anncsu_project, ANNCSUProject):
         anncsu_project = ANNCSUProject.objects.get(pk=anncsu_project)
-    
 
-    process_info = ProcessInfo(
-        task,
-        desc='Send ANNCSU PDND data',
-        total=len(anncsu_project.get_features(send_type))
-    )
+    # Retrieve associated history record (created by the view before launch)
+    task_history = None
+    if task_history_id:
+        try:
+            task_history = ANNCSUTaskHistory.objects.get(pk=task_history_id)
+            # Update task_id now that we have a real huey task instance
+            task_history.task_id = task.id
+            task_history.save(update_fields=['task_id'])
+        except ANNCSUTaskHistory.DoesNotExist:
+            task_history = None
 
-    # Instance sepcific API class
-    api = MAP_API_CLASS[anncsu_project.api_type](anncsu_project, send_type, process_info)
+    try:
+        process_info = ProcessInfo(
+            task,
+            desc='Send ANNCSU PDND data',
+            total=len(anncsu_project.get_features(send_type))
+        )
 
-    # Store results
-    results = api.send_features()
+        # Instance sepcific API class
+        api = MAP_API_CLASS[anncsu_project.api_type](anncsu_project, send_type, process_info)
 
-    anncsu_project.results = results
-    anncsu_project.save()
-    
-    return results
+        # Store results
+        results = api.send_features()
+
+        anncsu_project.results = results
+        anncsu_project.save()
+
+        if task_history is not None:
+            task_history.results = results
+            task_history.status = ANNCSUTaskHistory.STATUS.success
+            task_history.ended_at = timezone.now()
+            task_history.save(update_fields=['results', 'status', 'ended_at'])
+
+        return results
+    except Exception as e:
+        if task_history is not None:
+            task_history.results = {'error': f'{type(e).__name__}: {e}'}
+            task_history.status = ANNCSUTaskHistory.STATUS.error
+            task_history.ended_at = timezone.now()
+            task_history.save(update_fields=['results', 'status', 'ended_at'])
+        raise
 
 
 

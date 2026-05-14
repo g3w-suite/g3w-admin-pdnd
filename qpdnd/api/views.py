@@ -27,7 +27,8 @@ from qdjango.models import Project
 from core.api.base.views import G3WAPIView
 from qpdnd.models import (
     QPDNDProject, 
-    ANNCSUProject
+    ANNCSUProject,
+    ANNCSUTaskHistory
 )
 from qpdnd.utils.pdnd import QPDNDAdapter
 from qpdnd.tasks import (
@@ -196,8 +197,16 @@ class ANNCSURunAPIView(G3WAPIView):
         # Check for additional GET parameters if needed
         send_type = request.GET.get('send_type', None)
 
+        # Create task history record (track which user started the task)
+        task_history = ANNCSUTaskHistory.objects.create(
+            anncsu_project=anncsu_project,
+            user=request.user if request.user.is_authenticated else None,
+            send_type=send_type,
+            status=ANNCSUTaskHistory.STATUS.running,
+        )
+
         # Send on Huey
-        task = send_anncsu_pdnd_task(anncsu_project.pk, send_type)
+        task = send_anncsu_pdnd_task(anncsu_project.pk, send_type, task_history_id=task_history.pk)
 
         logger.debug(f"Started task {task.id} for ANNCSU project {anncsu_project.pk} with send_type {send_type}")
 
@@ -207,6 +216,10 @@ class ANNCSURunAPIView(G3WAPIView):
 
         anncsu_project.task_id = task.id
         anncsu_project.save()
+
+        # Persist task_id on the history record as well
+        task_history.task_id = task.id
+        task_history.save(update_fields=['task_id'])
 
         toret.update({
             'task_id': task.id,

@@ -294,3 +294,56 @@ class ANNCSUProject(G3WACLModelMixins, models.Model):
 
     def __str__(self):
         return f'ANNCSU PDND Project: {self.project}'
+
+
+class ANNCSUTaskHistory(models.Model):
+    """
+    History record for each :func:`send_anncsu_pdnd_task` execution.
+
+    Stores the user that started the task and the final result/status.
+    """
+
+    STATUS = Choices(
+        ('running', _('Running')),
+        ('success', _('Success')),
+        ('error', _('Error')),
+    )
+
+    anncsu_project = models.ForeignKey(
+        ANNCSUProject,
+        on_delete=models.CASCADE,
+        related_name='task_history',
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='qpdnd_anncsu_task_history',
+        help_text=_('User who started the task.'),
+    )
+
+    task_id = models.CharField(max_length=255, blank=True, null=True)
+
+    send_type = models.CharField(max_length=32, blank=True, null=True)
+
+    status = models.CharField(max_length=16, choices=STATUS, default=STATUS.running)
+
+    started_at = models.DateTimeField(auto_now_add=True)
+
+    ended_at = models.DateTimeField(null=True, blank=True)
+
+    results = models.JSONField(
+        blank=True,
+        null=True,
+        help_text=_('Final result of the task or error message.'),
+    )
+
+    class Meta:
+        ordering = ('-started_at',)
+        verbose_name = 'ANNCSU Task History'
+        verbose_name_plural = 'ANNCSU Task History'
+
+    def __str__(self):
+        return f'ANNCSU Task {self.task_id} [{self.status}] by {self.user}'
