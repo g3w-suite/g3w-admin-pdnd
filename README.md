@@ -1,6 +1,6 @@
 # G3W-ADMIN-PDND
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/g3w-suite/g3w-admin-processing) [![IRPI_UP CI tests](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/test_runner.yml/badge.svg)](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/test_runner.yml)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/g3w-suite/g3w-admin-pdnd) [![IRPI_UP CI tests](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/test_runner.yml/badge.svg)](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/test_runner.yml)
 
 A [G3W-SUITE](https://github.com/g3w-suite) plugin for [**Piattaforma Digitale Nazionale Dati**](https://innovazione.gov.it/progetti/dati-e-interoperabilita/) (PDND).
 
