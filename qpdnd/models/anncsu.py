@@ -139,8 +139,11 @@ class ANNCSUProject(G3WACLModelMixins, models.Model):
             expression = f"\"{settings.ANNCSU_FIELD_DIRTY}\" IS True OR \"{settings.ANNCSU_FIELD_STATO_INVIO}\" = '{_ANNCSU_ERROR_STATUS}'"
         elif send_type == 'not-sent':
             expression = f"\"{settings.ANNCSU_FIELD_STATO_INVIO}\" IS NULL OR \"{settings.ANNCSU_FIELD_STATO_INVIO}\" <> '{_ANNCSU_SENDED_STATUS}'"
-        else:
+        elif send_type is None:
             expression = 'ALL'
+        else:
+            # For every other values return empty querysetfrom
+            return []
 
         if expression == 'ALL':
             features = get_qgis_features(qlayer)

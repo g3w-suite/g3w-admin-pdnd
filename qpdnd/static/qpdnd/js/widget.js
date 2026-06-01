@@ -166,10 +166,12 @@ ga.QPDND.ANNCSU = {
             // Clear previous results
             that.task_results_container.html('');
             var btn_id = $(this).attr('id');
-            if (btn_id == 'anncsu_sendOnlyNotSentToPdnd'){
-                run_url += '?send_type=dirty';
-            } else if (btn_id == 'anncsu_sendOnlyErrorToPdnd'){
-                run_url += '?send_type=error';
+            if (run_url.indexOf('send_type=') === -1) {
+                if (btn_id == 'anncsu_sendOnlyNotSentToPdnd'){
+                    run_url += '?send_type=dirty';
+                } else if (btn_id == 'anncsu_sendOnlyErrorToPdnd'){
+                    run_url += '?send_type=error';
+                }
             }
             
             $.ajax({
