@@ -243,12 +243,14 @@ class ANNCSUPDNDAPI(object):
                 #     # Retry the same feature (don't increment findex)
                 #     continue
                 
-                self._register_error(feature.id(), f"Status code: {http_err.response.status_code}: {http_err.response.text}")
+                err_msg = f"HTTP error: {http_err.response.status_code} - {http_err.response.text}"
+                self._register_error(feature.id(), err_msg)
                 qgis_layer.dataProvider().changeAttributeValues({
                     feature.id(): {
                         fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_ERROR_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
-                        fmapping[settings.ANNCSU_FIELD_DIRTY]: True
+                        fmapping[settings.ANNCSU_FIELD_DIRTY]: True,
+                        fmapping[settings.ANNCSU_FIELD_ERROR_INFO]: err_msg
                         }
                     })
                 
@@ -263,7 +265,8 @@ class ANNCSUPDNDAPI(object):
                     feature.id(): {
                         fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_ERROR_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
-                        fmapping[settings.ANNCSU_FIELD_DIRTY]: True
+                        fmapping[settings.ANNCSU_FIELD_DIRTY]: True,
+                        fmapping[settings.ANNCSU_FIELD_ERROR_INFO]: str(e)
                         }
                     })
                 continue

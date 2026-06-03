@@ -121,6 +121,8 @@ ANNCSU_GOVWAY_API_PASSWORD = 'your_govway_password'
 ANNCSU_FIELD_STATO_INVIO = 'anncsu_sta' # varchar
 ANNCSU_FIELD_DATA_INVIO = 'anncsu_dat' # datetime
 ANNCSU_FIELD_DIRTY = 'anncsu_dir' # boolean
+ANNCSU_FIELD_ERROR_INFO = 'anncsu_error_info' # boolean
+
 
 
 # API - /gestioneaccessi /accessi
