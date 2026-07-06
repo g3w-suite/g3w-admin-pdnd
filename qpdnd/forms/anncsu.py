@@ -192,6 +192,7 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, G3WACLForm, ModelForm
             settings.ANNCSU_FIELD_PROGR,
             settings.ANNCSU_FIELD_LAT,
             settings.ANNCSU_FIELD_LON,
+            settings.ANNCSU_FIELD_ERROR_INFO,
             #settings.ANNCSU_FIELD_QUOTA # optional
         ]
 

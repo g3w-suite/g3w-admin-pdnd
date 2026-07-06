@@ -215,7 +215,8 @@ class ANNCSUPDNDAPI(object):
                 ftoupdate.update({
                         fmapping[settings.ANNCSU_FIELD_STATO_INVIO]: _ANNCSU_SENDED_STATUS, 
                         fmapping[settings.ANNCSU_FIELD_DATA_INVIO]: send_date,
-                        fmapping[settings.ANNCSU_FIELD_DIRTY]: False
+                        fmapping[settings.ANNCSU_FIELD_DIRTY]: False,
+                        fmapping[settings.ANNCSU_FIELD_ERROR_INFO]: ''
                     })
 
                 qgis_layer.dataProvider().changeAttributeValues({
