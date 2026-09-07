@@ -11,22 +11,55 @@ __date__ = '2024-07-24'
 __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
+from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from huey.contrib.djhuey import HUEY
+from huey import signals
+from huey.exceptions import TaskException
+from huey_monitor.models import TaskModel
 from rest_framework.response import Response
 from OWS.views import OWSView
+from core.api.authentication import CsrfExemptSessionAuthentication
 from qdjango.ows import OWSRequestHandler
 from qdjango.models import Project
 from core.api.base.views import G3WAPIView
-from qpdnd.models import QPDNDProject
+from qpdnd.models import (
+    QPDNDProject, 
+    ANNCSUProject,
+    ANNCSUTaskHistory
+)
 from qpdnd.utils.pdnd import QPDNDAdapter
-from .permissions import ProjectEditPermission
+from qpdnd.tasks import (
+    send_anncsu_pdnd_task, 
+    send_anncsu_pdnd_ceery_task
+)
+from usersmanage.configs import G3W_VIEWER1
+from usersmanage.utils import (
+    get_user_groups_for_object, 
+    get_users_for_object
+)
+from usersmanage.forms import label_users
+from .permissions import (
+    ProjectEditPermission, 
+    SendToPDNDPermission, 
+    SuperuserPermission
+)
 from .decorators.voucher_checker import pdnd_voucher_required
 from qgis.server import QgsServerProjectUtils
 
 from django.test import Client
 import json
+from django.http import HttpResponse
+
+from requests.exceptions import HTTPError
+from requests.auth import HTTPBasicAuth
+import requests
+
+import logging
+
+logger = logging.getLogger('qpdnd.anncsu')
 
 class QDPNDOWSRequestHandler(OWSRequestHandler):
 
@@ -145,3 +178,398 @@ class QPDNDInfoProjectAPIView(G3WAPIView):
 
         self.results.results.update(toret)
         return Response(self.results.results)
+
+class ANNCSURunAPIView(G3WAPIView):
+    """
+    ANNCSU gestione coordinate API view
+    """
+
+    permission_classes = [
+        SendToPDNDPermission
+    ]
+
+    def get(self, request, *args, **kwargs):
+
+        toret= {}
+
+        anncsu_project = ANNCSUProject.objects.get(pk=kwargs['anncsu_project_id'])
+
+        # Check for additional GET parameters if needed
+        send_type = request.GET.get('send_type', None)
+
+        # Create task history record (track which user started the task)
+        task_history = ANNCSUTaskHistory.objects.create(
+            anncsu_project=anncsu_project,
+            user=request.user if request.user.is_authenticated else None,
+            send_type=send_type,
+            status=ANNCSUTaskHistory.STATUS.running,
+        )
+
+        # Send on Huey
+        task = send_anncsu_pdnd_task(anncsu_project.pk, send_type, task_history_id=task_history.pk)
+
+        logger.debug(f"Started task {task.id} for ANNCSU project {anncsu_project.pk} with send_type {send_type}")
+
+        # Send on Celery
+        # task = object()
+        # task.id = send_anncsu_pdnd_ceery_task.delay(kwargs['anncsu_project_id'])
+
+        anncsu_project.task_id = task.id
+        anncsu_project.save()
+
+        # Persist task_id on the history record as well
+        task_history.task_id = task.id
+        task_history.save(update_fields=['task_id'])
+
+        toret.update({
+            'task_id': task.id,
+        })
+
+        self.results.results.update(toret)
+        return Response(self.results.results)
+    
+class ANNCSURunInfoTaskView(G3WAPIView):
+    """
+    ANNCSU view to get progess state ok a huey/celery task.
+    """
+
+    def get(self, request, task_id):
+
+        #TODO: add code for celery tasks.
+
+        try:
+
+            # Try to retrieve the task result, may throw an exception
+            try:
+                result = HUEY.result(task_id)
+                
+                # Retry 3 times if result is None
+                retry_count = 0
+                while result is None and retry_count < 3:
+                    result = HUEY.result(task_id)
+                    retry_count += 1
+                ret_status = 200
+            except TaskException:
+                result = None
+                ret_status = 500
+
+            task_model = TaskModel.objects.get(task_id=task_id)
+            progress_info = task_model.progress_info
+
+            try:
+                progress_percentage = int(
+                    100 * progress_info[0] / task_model.total)
+            except:
+                progress_percentage = 0
+
+            try:
+
+                # Add current feature being processed
+
+                try:
+                    ap = ANNCSUProject.objects.get(task_id=task_id)
+                    if not result:
+                        result = {}
+                    result.update({
+                        'current_sent': len([f for f in ap.get_features(send_type='sent')]),
+                        'current_error': len([f for f in ap.get_features(send_type='error')])
+                    })
+                except:
+                    pass
+
+
+                return JsonResponse({
+                    'status': task_model.state.signal_name,
+                    'exception': task_model.state.exception_line,
+                    'progress': progress_percentage,
+                    'task_result': result
+                }, status=ret_status)
+            except:
+                return JsonResponse({
+                    'status': 'error',
+                    'exception': 'Error retrieving task informations',
+                    'progress': 0,
+                    'task_result': result,
+                }, status=500)
+
+        except TaskModel.DoesNotExist:
+
+            # Handle pending
+            pending_task_ids = [task.id for task in HUEY.pending()]
+
+            if task_id in pending_task_ids:
+                return JsonResponse({'result': True, 'status': 'pending'})
+
+            return JsonResponse({'result': False, 'error': _('Task not found!')}, status=404)
+        
+
+class ANNCSURunKillTaskView(G3WAPIView):
+    """
+    ANNCSU view to kill a huey/celery task.
+    """
+
+    permission_classes = [
+        SuperuserPermission
+    ]
+
+    def get(self, request, task_id):
+        """
+        Stops a Huey task given the task_id
+        """
+        try:
+            # Check if the task exists in the database
+            task_model = TaskModel.objects.get(task_id=task_id)
+            
+            # Check if the task is still running
+            if task_model.state.signal_name in [
+                signals.SIGNAL_EXECUTING, 
+                #signals.SIGNAL_ENQUEUED, 
+                signals.SIGNAL_SCHEDULED
+                ]:
+                
+                try:
+                    
+                    # For running tasks, Huey does not support direct interruption
+                    # You can only mark the task as revoked
+                    HUEY.revoke_by_id(task_id)
+                    
+                    # Update the state in the database
+                    task_model.state.signal_name = signals.SIGNAL_REVOKED
+                    task_model.state.save()
+                    
+                    return JsonResponse({
+                        'status': signals.SIGNAL_REVOKED,
+                        'message': 'Task revoked (may continue if already executing)',
+                        'warning': 'Huey does not support forced interruption of running tasks'
+                    }, status=200)
+                    
+                except Exception as e:
+                    return JsonResponse({
+                        'status': signals.SIGNAL_ERROR,
+                        'error': f'Error revoking task: {str(e)}'
+                    }, status=500)
+            
+            else:
+                return JsonResponse({
+                    'status': signals.SIGNAL_COMPLETE,
+                    'message': f'Task already completed with state: {task_model.state.signal_name}'
+                }, status=400)
+                
+        except TaskModel.DoesNotExist:
+
+            # Handle pending
+            pending_task_ids = [task.id for task in HUEY.pending()]
+
+            if task_id in pending_task_ids:
+                return JsonResponse({'result': True, 'status': 'pending'})
+
+            return JsonResponse({'result': False, 'error': _('Task not found!')}, status=404)
+        
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'error': str(e)
+            }, status=500)
+
+
+class ANNCSUDownTaskResultsView(G3WAPIView):
+    """
+    Donwload ANNCSU task results view
+    """
+
+    def get(self, request, task_id):
+        """
+        Download the results of a Huey task given the task_id
+        """
+        try:
+            # Try to retrieve the task result, may throw an exception
+            try:
+                result = HUEY.result(task_id)
+
+                # If result is None, try to get from ANNCSUPProject model
+                if result is None:
+                    raise TaskException("No result available for this task")
+            except TaskException:
+                # Try to get from ANNCSUPProject model
+                try:
+                    ap = ANNCSUProject.objects.get(task_id=task_id)
+                    if ap.results:
+                        result = ap.results
+                    else:
+                       return JsonResponse({
+                        'status': 'error',
+                        'error': 'No results available for this task'
+                    }, status=404)
+                
+                except ANNCSUProject.DoesNotExist:
+                    return JsonResponse({
+                    'status': 'error',
+                    'error': 'Error retrieving task results'
+                }, status=500)
+
+            # Return the results as a JSON response
+            response = HttpResponse(
+                json.dumps({'status': 'success', 'task_result': result}, indent=2),
+                content_type='application/json'
+            )
+            response['Content-Disposition'] = f'attachment; filename="task_{task_id}_results.json"'
+            return response
+
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'error': str(e)
+            }, status=500)  
+        
+
+class ANNCSURunCONSCOMAPIView(G3WAPIView):
+
+    authentication_classes = (
+        CsrfExemptSessionAuthentication,
+    )
+
+    def post(self, request, *args, **kwargs):
+
+        try:
+            anncsu_project = ANNCSUProject.objects.get(pk=kwargs['anncsu_project_id'])
+            payload = request.data['payload']
+
+            try:
+                service = kwargs['service']
+            except:
+
+                # Try to get from payload
+                try:
+                    service = json.loads(payload)['req']
+                except:
+                    return JsonResponse({
+                        'status': 'error', 
+                        'error': 'Missing `req` in payload or service as parameter'
+                    },status=400)
+            
+            # Make apiurl by service    
+            api_url = f"{anncsu_project.govway_api_endpoint}/{service}"
+
+
+            if not service or not payload:
+                return JsonResponse({
+                    'status': 'error', 
+                    'error': 'Missing service or payload in request body'
+                },status=400)
+
+            if anncsu_project.govway_username and anncsu_project.govway_password:
+                auth = HTTPBasicAuth(anncsu_project.govway_username, anncsu_project.govway_password)
+            else:       
+                auth = HTTPBasicAuth(settings.ANNCSU_GOVWAY_API_USER, settings.ANNCSU_GOVWAY_API_PASSWORD)
+
+
+            headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+
+            
+            response = requests.post(
+                api_url,
+                headers=headers,
+                json=json.loads(payload),
+                auth=auth
+            )
+            
+            #logger.debug(f"[ANNCSU] - {response.json()}")
+            response.raise_for_status()
+
+            # For demonstration, we'll just return the received data
+            return JsonResponse({
+                'status': 'success', 
+                'service': service, 
+                'payload': response.json()
+            }, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'status': 'error', 
+                'error': 'Invalid JSON in request body'
+            }, status=400)
+        
+        except HTTPError as http_err:
+            return JsonResponse({
+                'status': 'error', 
+                'error': f'HTTP error occurred: {str(http_err)}: {http_err.response.text if http_err.response.text else "No response content"}'
+            }, status=response.status_code if response else 500)
+
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error', 
+                'error': str(e)
+            }, status=500)
+        
+
+class ANNCSUUsersGroupsConfigAPIView(G3WAPIView):
+    """
+    Return users for ANNCSU config
+    """
+    viewer_permission = 'view_project'
+    viewer_permission_configs = 'send_to_pdnd'
+
+    def get(self, *args, **kwargs):
+
+        # object to send with response
+        to_res = {}
+
+        # get project from url
+        project = Project.objects.get(pk=kwargs['project_id'])
+
+        # get cdu config from url if is set
+        try:
+            anncsu_project = ANNCSUProject.objects.get(pk=kwargs['anncsu_project_id'])
+        except:
+            anncsu_project = None
+
+
+        # Viewer Level 1 users:
+        # ===============================================================================
+        # get every Viewer level 1 users for project
+        viewer_users = get_users_for_object(project, self.viewer_permission, [G3W_VIEWER1],
+                                             with_anonymous=True)
+
+        viewer_users_selected = {}
+        if anncsu_project:
+            viewer_users_selected = get_users_for_object(anncsu_project, self.viewer_permission_configs,
+                                                         [G3W_VIEWER1], with_anonymous=True)
+
+        # add Editor level 1 to response
+        to_res.update({
+            'viewer_users': [
+                 {
+                     'id': viewer.pk,
+                     'text': label_users(viewer),
+                     'selected': viewer in viewer_users_selected
+                 } for viewer in viewer_users
+             ]})
+
+
+        # Viewer group users:
+        # ===============================================================================
+        # get every Viewer editor users
+        viewer_editors = get_user_groups_for_object(project, self.request.user, self.viewer_permission, 'viewer')
+
+        viewer_editors_selected = {}
+        if anncsu_project:
+            viewer_editors_selected = get_user_groups_for_object(
+                anncsu_project,
+                self.request.user,
+                self.viewer_permission_configs,
+                'viewer')
+
+        # add Edito viewer users to res
+        to_res.update({
+            'group_viewers': [
+                {
+                    'id': viewer.pk,
+                    'text': viewer.name,
+                    'selected': viewer in viewer_editors_selected
+                } for viewer in viewer_editors
+            ]})
+
+        return JsonResponse(to_res)

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load g3wadmin_tags %}
+{% load crispy_forms_tags %}
+
+
+{% block custom_js_links_page %}
+<script>
+
+    config_id = {% if form.instance.pk %}'{{ form.instance.pk }}'{% else %}''{% endif %};
+
+    ga.$projectSelect = $('#id_project');
+    ga.$layerSelect = $('#id_layer');
+
+    ga.$projectSelect.on('change', function(e){
+
+        var value = $(this).val();
+
+
+        // For layers
+        var $layers_select = $("#id_layer");
+        if (value) {
+            $.ajax({
+                url: '{% url 'qpdnd-project-layers' %}' + '?project_id='+value+'&config_id='+config_id,
+                success:function(res){
+                    $layers_select.html('');
+                    $layers_select.select2({data: res.layers});
+
+                    $(document).ready(ga.$layerSelect.trigger('change'));
+
+                }
+            });
+
+            // For ACL
+            if (config_id) {
+                var jxurl = '{% url 'anncsu-config-users-groups-with-anncsu-project' project_id=0 anncsu_project_id=0 %}';
+                jxurl = jxurl.replace('/0/0/', '/'+value+'/'+config_id+'/');    
+            } else {
+                var jxurl = '{% url 'anncsu-config-users-groups' project_id=0 %}';
+                jxurl = jxurl.replace('/0/', '/'+value+'/');    
+            }
+            var $viewers_select = $("#id_viewer_users");
+            var $viewer_groups_select = $("#id_viewer_user_groups");
+            $.ajax({
+                url: jxurl,
+                success:function(res){
+                    $viewers_select.html('');
+                    $viewers_select.select2({data: res.viewer_users});
+                    $viewer_groups_select.html('');
+                    $viewer_groups_select.select2({data: res.group_viewers});
+                }
+            });
+        } else {
+            $layers_select.html('');
+            $layers_select.select2({data: []});
+           
+        } 
+
+    });
+
+    // to start
+    $(document).ready(ga.$projectSelect.trigger('change'));
+
+</script>
+{% endblock %}
+
+{% block page_header %}
+    <h1>{% trans 'ANNCSU' %}
+    <small>{% trans 'Projects' %}</small>
+    </h1>
+{% endblock %}
+
+{% block main_content %}
+    <form method="post">
+    {% crispy form %}
+    {% g3wadmin_add_button_form redo=False %}
+    </form>
+{% endblock %}

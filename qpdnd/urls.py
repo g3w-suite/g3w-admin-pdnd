@@ -23,7 +23,13 @@ from qpdnd.views import (
     QPDNDClientSettingListView,
     QPDNDClientSettingAddView,
     QPDNDClientSettingUpdateView,
-    QPDNDClientSettingDeleteView
+    QPDNDClientSettingDeleteView,
+    ANNCSUProjectsListView, 
+    ANNCSUProjectCreateView, 
+    ANNCSUProjectUpdateView, 
+    ANNCSUProjectDeleteView,
+    LayersConfigView, 
+    ANNCSURunView
 )
 
 G3W_SITETREE_I18N_ALIAS.append('qpdnd')
@@ -80,6 +86,44 @@ urlpatterns = [
         'projects/delete/<int:pk>/',
         login_required(QPDNDProjectDeleteView.as_view()),
         name='qpdnd-project-delete'
-    )
+    ),
+
+    # For ANNCSU projects
+    # -------------------
+    path(
+        'anncsu/projects/', 
+        login_required(ANNCSUProjectsListView.as_view()), 
+        name='qpdnd-anncsu-project-list'
+    ),
+
+    path(
+        'anncsu/projects/add/', 
+        login_required(ANNCSUProjectCreateView.as_view()), 
+        name='qpdnd-anncsu-project-add'
+    ),
+
+    path(
+        'anncsu/projects/update/<int:pk>/', 
+        login_required(ANNCSUProjectUpdateView.as_view()),
+        name='qpdnd-anncsu-project-update'
+    ),
+
+    path(
+        'anncsu/projects/delete/<int:pk>/', 
+        login_required(ANNCSUProjectDeleteView.as_view()),
+        name='qpdnd-anncsu-project-delete'
+        ),
+
+    # Path to get layers list of a project
+    path(
+        'jx/config/project_layers/', 
+        login_required(LayersConfigView.as_view()),
+        name='qpdnd-project-layers'),
+
+    # To Run and reports page
+    path(
+        'anncsu/projects/run/<int:pk>/', 
+        login_required(ANNCSURunView.as_view()),
+        name='qpdnd-anncsu-project-run'),
 ]
 

@@ -21,6 +21,13 @@ sitetrees = (
           item('Agg. servizio {{ object.title }}', 'qpdnd-project-update object.pk', url_as_pattern=True,
                icon_css_class='fa fa-edit', in_menu=False, alias='qpdndproject-update'),
       ]),
+      item('ANNCSU', '#', icon_css_class='fa fa-globe', children=[
+          item('Aggiungi projetto', 'qpdnd-anncsu-project-add', url_as_pattern=True, icon_css_class='fa fa-plus',
+               access_by_perms=['qpdnd.add_anncsuproject']),
+          item('Lista projetti', 'qpdnd-anncsu-project-list', url_as_pattern=True, icon_css_class='fa fa-list'),
+          item('Agg. Progetto {{ object.project }}', 'qpdnd-anncsu-project-update object.pk', url_as_pattern=True,
+               icon_css_class='fa fa-edit', in_menu=False, alias='qpdnd-anncsu-project-update'),
+      ]),
   ]),
 
   G3Wtree('qpdnd_en', title='PDND', module='qpdnd', items=[
@@ -39,6 +46,13 @@ sitetrees = (
           item('Services list', 'qpdnd-project-list', url_as_pattern=True, icon_css_class='fa fa-list'),
           item('Update service {{ object.title }}', 'qpdnd-project-update object.pk', url_as_pattern=True,
                icon_css_class='fa fa-edit', in_menu=False, alias='qpdndproject-update'),
+      ]),
+      item('ANNCSU', '#', icon_css_class='fa fa-globe', children=[
+          item('Add project', 'qpdnd-anncsu-project-add', url_as_pattern=True, icon_css_class='fa fa-plus',
+               access_by_perms=['qpdnd.add_anncsuproject']),
+          item('Projects list', 'qpdnd-anncsu-project-list', url_as_pattern=True, icon_css_class='fa fa-list'),
+          item('Update Progetto {{ object.project }}', 'qpdnd-anncsu-project-update object.pk', url_as_pattern=True,
+               icon_css_class='fa fa-edit', in_menu=False, alias='qpdnd-anncsu-project-update'),
       ]),
   ]),
 )

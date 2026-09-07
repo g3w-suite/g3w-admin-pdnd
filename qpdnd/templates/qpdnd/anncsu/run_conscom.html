@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load g3wadmin_tags %}
+{% load crispy_forms_tags %}
+
+
+{% block page_header %}
+    <h1>{% trans 'ANNCSU' %}
+    <small>{% trans 'PDND API: Consultazione Comuni' %}</small>
+    </h1>
+{% endblock %}
+
+{% block custom_js_links_page %}
+<script>
+    $('#anncsu_conscom_sendToPdnd').on('click', function(e){
+        e.preventDefault();
+
+        // var service = $('#id_service').val();
+        var project_id = {{ anncsu_project.id }};
+        var url = '/qpdnd/' + '{{ BASE_URL_CONSCOM }}' + project_id;
+
+
+        if(project_id){
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    payload: $('#id_payload').val()
+                },
+                success:function(res){ 
+                    $('.results').html(JSON.stringify(res.payload, null, 4));
+                },
+                error:function(err){ 
+                    $('.results').html(JSON.stringify(err.responseJSON, null, 4));
+                }
+            });
+        }
+
+    });
+</script>
+{% endblock %}
+
+{% block main_content %}
+{% include "qpdnd/anncsu/include/endpoint_check.html" %}
+<div class="row">
+    <form method="post" action="">
+        {% crispy form %}  
+        
+    </form>
+</div>
+<div class="row">
+    <div class="col-md-12 col-xs-12">
+        <button class="btn btn-lg btn-primary" id="anncsu_conscom_sendToPdnd"><i class="glyphicon glyphicon-upload"></i> {% trans "Send" %}</button><br />
+    </div>
+</div>
+
+<div class="row" style="margin-top: 20px;">
+    <div class="col-md-12 col-xs-12">
+        <div class="box box-abstract">
+            <div class="box-header with-border"> <h3 class="box-title"><i class="fa fa-file"></i> {% trans "RESULTS" %}</h3></div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <textarea class="results" rows="20" style="width: 100%;"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load g3wadmin_tags %}
+{% load guardian_tags %}
+
+
+
+{% block page_header %}
+<h1>
+{% trans 'ANNCSU projects' %}
+</h1>
+{% endblock %}
+
+
+{% block main_content %}
+
+<div class="row">
+    <div class="col-md-12 col-xs-12">
+        <div class="box">
+            <div class="box-body">
+                {% trans 'Add, update or delete ANNCSU projects' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-header">
+        <div class="box-header">
+            {% if perms.qpdnd.add_anncsuproject %}
+            <a class="btn btn-info" href="{% url 'qpdnd-anncsu-project-add' %}"><i class="ion ion-plus-circled"></i> {% trans 'Configs' %}</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="box-body">
+        <table id="projects_table" class="table table-hover table-striped" data-widget-type="dataTable">
+            <thead>
+                <tr>
+                    <th style="width:120px">Actions</th>
+                    <th>{% trans 'API Type' %}</th>
+                    <th>{% trans 'PDND environment' %}</th>
+                    <th>{% trans 'Projects' %}</th>
+                    <th>{% trans 'Layers' %}</th>
+                    <th>{% trans 'Comune code' %}</th>
+                    <th>{% trans 'Task Status' %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for object in object_list %}
+                {% get_obj_perms user for object as "userObj_perms" %}
+                {% get_obj_perms user for object.project as "userObj_project_perms" %}
+                <tr id="config_{{ object.pk }}">
+                    <td>
+                        <span class="col-xs-4 icon">
+                            {% if "change_anncsuproject" in userObj_perms %}
+                            <a href="{% url 'qpdnd-anncsu-project-update' object.id %}" data-toggle="tooltip" data-placement="top" title="{% trans 'Edit' %}" ><i class="ion ion-edit"></i></a>
+                            {% endif %}
+                        </span>
+                        <span class="col-xs-4 icon">
+                            {% if "delete_anncsuproject" in userObj_perms %}
+                            <a href="#" data-toggle="tooltip" data-placement="top" title="{% trans 'Delete' %}"  data-widget-type="deleteItem" data-delete-url="{% url 'qpdnd-anncsu-project-delete' object.pk %}" data-item-selector="#config_{{ object.pk }}"><i class="ion ion-trash-b"></i></a>
+                            {% endif %}
+                        </span>
+                        <span class="col-xs-4 icon">
+                            {% if "send_to_pdnd" in userObj_perms %}
+                            <a href="{% url 'qpdnd-anncsu-project-run' object.id %}" data-toggle="tooltip" data-placement="top" title="{% trans 'RUN' %}" ><i class="ion ion-play"></i></a>
+                            {% endif %}
+                        </span>
+                    
+
+                    </td>
+                    <td>{{ object.fapi_type }}</td>
+                    <td>
+                        {% if object.env_type == 'test' %}
+                        <span class="label label-success">{{ object.fenv_type|upper }}</span>
+                        {% else %}
+                        <span class="label label-danger">{{ object.fenv_type|upper }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ object.project }}</td>
+                    <td>{{ object.layer }}</td>
+                    <td>{{ object.codice_comune }}</td>
+                    <td>
+                        {% with task_status=object.get_task_status %}
+                        {% include "qpdnd/anncsu/include/task_status.html" %}
+                        {% endwith %}   
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

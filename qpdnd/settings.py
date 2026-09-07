@@ -13,6 +13,12 @@ __license__ = 'MPL 2.0'
 
 import os
 
+# Base urls
+_BASE_URL_INFO_TASK = 'api/infotask/'
+_BASE_URL_KILL_TASK = 'api/killtask/'
+_BASE_URL_DOWN_TASK_RESULTS = 'api/downtaskresults/'
+_BASE_URL_CONSCOM = 'api/anncsu/conscom/'
+
 
 #############################################################
 # For PDND request authentication
@@ -94,3 +100,62 @@ QPDND_TESTING_VOUCHER_EXP = None
 #     'test': "auth.uat.interop.pagopa.it/client-assertion",
 #     'prod': "auth.interop.pagopa.it/client-assertion"
 # }
+
+
+#############################################################
+# For ANNCSU 
+#############################################################'
+
+# Private settings for GovWay API access
+_ANNCSU_SENDED_STATUS = 'INVIATO'
+_ANNCSU_ERROR_STATUS = 'ERRORE'
+
+# GovWay API auth user
+ANNCSU_GOVWAY_API_USER = 'your_govway_user'
+ANNCSU_GOVWAY_API_PASSWORD = 'your_govway_password'
+
+# ANNCSU FIELDS:
+
+# Internal fields mapping
+# -----------------------------
+ANNCSU_FIELD_STATO_INVIO = 'anncsu_sta' # varchar
+ANNCSU_FIELD_DATA_INVIO = 'anncsu_dat' # datetime
+ANNCSU_FIELD_DIRTY = 'anncsu_dir' # boolean
+ANNCSU_FIELD_ERROR_INFO = 'anncsu_error_info' # boolean
+
+
+
+# API - /gestioneaccessi /accessi
+# -----------------------------
+ANNCSU_FIELD_PROGR = 'progr_civico'
+ANNCSU_FIELD_LAT = 'lat'
+ANNCSU_FIELD_LON = 'long'
+ANNCSU_FIELD_QUOTA = 'quota'
+
+# API - /accessi
+# -----------------------------
+# The following fields are required only for accessi 
+# and is used for to known if accesso is suppressed
+ANNCSU_FIELD_SOPPR = 'anncsu_soppr' # boolean
+# ---
+ANNCSU_FIELD_PROGR_NAZ = 'progr_nazionale'
+ANNCSU_FIELD_NUMERO = 'numero'
+ANNCSU_FIELD_ESPONENTE = 'esponente'
+ANNCSU_FIELD_METRICO = 'metrico'
+ANNCSU_FIELD_SPECIFICITA = 'specificita'
+ANNCSU_FIELD_SEZ_CENS = 'sezione_censimento'
+ANNCSU_FIELD_DT_VAL_AMM = 'data_valid_amm'
+ANNCSU_FIELD_ISOLATO = 'isolato'
+ANNCSU_FIELD_COD_CIV_COMUNALE = 'codice_civico_comunale'
+
+
+
+
+
+# Max requests per day
+ANNCSU_MAX_REQUESTS_PER_CICLE = 2000
+
+# Timeout between requests (seconds)
+ANNCSU_REQUEST_TIME_INTERVAL = 60 * 5 # 5 minutes
+#ANNCSU_REQUEST_TIME_INTERVAL = 'NEXT_DAY'  # Special value to indicate reset after midnight'
+

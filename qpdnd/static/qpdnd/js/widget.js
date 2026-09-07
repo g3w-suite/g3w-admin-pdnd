@@ -34,14 +34,14 @@ ga.QPDND = {
     },
 
     /**
-     * Gte current project selected
+     * Get current project selected
      */
     get_current_project: function(){
         return this.project_select.val();
     },
 
     /**
-     * Set the current project ina property
+     * Set the current project in a property
      */
     set_current_project: function(){
         this.current_project = this.get_current_project();
@@ -66,11 +66,262 @@ ga.QPDND = {
 
                 that.title.val(data['Title']);
                 that.abstract.val(data['Abstract'])
-
-
-
             });
 
+        
         });
     }
 }
+
+/// For ANNCSU project
+ga.QPDND.ANNCSU = {
+
+    init: function(){
+        this.run_btn = $("#anncsu_sendToPdnd");
+        this.run_not_sent_btn = $("#anncsu_sendOnlyNotSentToPdnd");
+        this.run_only_error_btn = $("#anncsu_sendOnlyErrorToPdnd");
+        this.stop_btn = $("#anncsu_stopSendToPdnd");
+        this.progress_bar = $(".progress-bar");
+        this.task_id_container = $("#task_id");
+        this.task_results_container = $("#task_results");
+        this.task_status_container = $("#task_status");
+        this.base_url_info_task = null;
+        this.base_url_kill_task = null;
+        this.task_id = null;
+        this.task_results = null;
+        this.huey_signals = null;
+        this.task_info_interval = null;
+    },
+
+    disable_run_btn: function(){
+        this.run_btn.prop('disabled', true);
+    },
+
+    disable_run_not_sent_btn: function(){
+        this.run_not_sent_btn.prop('disabled', true);
+    },
+
+    disable_run_only_error_btn: function(){
+        this.run_only_error_btn.prop('disabled', true);
+    },
+
+    enable_run_btn: function(){
+        this.run_btn.prop('disabled', false);
+    },
+
+    enable_run_not_sent_btn: function(){
+        this.run_not_sent_btn.prop('disabled', false);
+    },
+
+    enable_run_only_error_btn: function(){
+        this.run_only_error_btn.prop('disabled', false);
+    },  
+
+    disable_stop_btn: function(){
+        this.stop_btn.prop('disabled', true);
+    },
+
+    enable_stop_btn: function(){
+        this.stop_btn.prop('disabled', false);
+    },
+
+    stop: function(kill_url){
+        var that = this;
+        this.stop_btn.on("click", function(){
+           
+           $.ajax({
+                   method: 'get',
+                   url: kill_url,
+                   success: function (res) {
+                       console.log(res);
+                       if (res['status'] == that.huey_signals.REVOKED) {
+                           that.enable_run_btn();
+                           that.enable_run_not_sent_btn();
+                           that.enable_run_only_error_btn();
+                           that.disable_stop_btn();
+                           that.task_status_container.text(that.huey_signals.REVOKED.toUpperCase());
+                           clearInterval(that.task_info_interval);
+
+                           // Wait a moment and get final task info
+                           that.show_loading_task_results();
+                           setTimeout(function(){
+                               that.taskInfoOnceTime();
+                           }, 500);
+                       } else {
+                           throw (res['error_message']);
+                       }
+                   },
+                   error: function (xhr, textStatus, errorMessage) {
+                       ga.widget.showError(ga.utils.buildAjaxErrorMessage(xhr.status, errorMessage));
+                   }
+
+           });
+       });
+    },
+
+    run: function(run_url){
+         var that = this;
+         var run_function = function(){
+
+            // Clear previous results
+            that.task_results_container.html('');
+            var btn_id = $(this).attr('id');
+            if (run_url.indexOf('send_type=') === -1) {
+                if (btn_id == 'anncsu_sendOnlyNotSentToPdnd'){
+                    run_url += '?send_type=dirty';
+                } else if (btn_id == 'anncsu_sendOnlyErrorToPdnd'){
+                    run_url += '?send_type=error';
+                }
+            }
+            
+            $.ajax({
+                    method: 'get',
+                    url: run_url,
+                    success: function (res) {
+                        console.log(res);
+                        if (res['result']) {
+                            that.task_id = res['task_id'];
+
+                            that.disable_run_btn();
+                            that.disable_run_not_sent_btn();
+                            that.disable_run_only_error_btn();
+                            that.stop("/qpdnd/" + that.base_url_kill_task + that.task_id);
+                            that.enable_stop_btn();
+
+                            // Show task id
+                            that.task_id_container.text(that.task_id);
+                            that.task_status_container.text(that.huey_signals.EXECUTING.toUpperCase());
+                            
+
+                            // Start task info polling
+                            that.taskInfo();
+                        } else {
+                            throw Error(res['error_message']);
+                        }
+                    },
+                    error: function (xhr, textStatus, errorMessage) {
+                        ga.widget.showError(ga.utils.buildAjaxErrorMessage(xhr.status, errorMessage));
+                    }
+
+            });
+        }; 
+
+        this.run_btn.on("click", run_function);
+        this.run_not_sent_btn.on("click", run_function);
+        this.run_only_error_btn.on("click", run_function);
+    },
+
+    taskInfoOnceTime: function(){
+        var that = this;
+         $.ajax({
+                method: 'get',
+                url: '/qpdnd/' + that.base_url_info_task + that.task_id + '/',
+                success: function (res) {
+
+                    that.task_results = res['task_result'];
+                    that.render_task_results();
+                },
+                error: function (xhr, textStatus, errorMessage) {
+                    ga.widget.showError(ga.utils.buildAjaxErrorMessage(xhr.status, errorMessage));
+                }
+            });
+
+    },
+
+    taskInfo: function(){
+        try {           
+            var that = this;
+            //call ajax info url
+            var _taskinfo = function () {
+                $.ajax({
+                    method: 'get',
+                    url: '/qpdnd/' + that.base_url_info_task + that.task_id + '/',
+                    success: function (res) {
+                        var current_progress = 0;
+                        if (res['status'] == that.huey_signals.EXECUTING) {
+                            current_progress = res['progress'];
+                            that.progress_bar.css("width", current_progress + "%")
+                              .attr("aria-valuenow", current_progress)
+                              .text(current_progress + "% Complete");
+                        }
+
+                        if (res['progress'] == 100 || res['status'] == that.huey_signals.COMPLETE) {
+                            clearInterval(that.task_info_interval);
+                            that.progress_bar.css("width",  "100%")
+                                .attr("aria-valuenow", '100')
+                                .text("100% Complete");
+
+                            that.enable_run_btn();  
+                            that.enable_run_not_sent_btn();
+                            that.enable_run_only_error_btn();
+                            that.task_status_container.text(res['status'].toUpperCase());
+                            that.task_results = res['task_result'];
+                            that.render_task_results();
+                        }
+
+                        if (res['status'] == 'unknown' || res['status'] == that.huey_signals.INTERRUPTED) {
+                            //reload page after 1sec
+                            setTimeout(function(){
+                               window.location.reload(1);
+                               }, 5000);
+                        }
+                    },
+                    error: function (xhr, textStatus, errorMessage) {
+                        ga.widget.showError(ga.utils.buildAjaxErrorMessage(xhr.status, errorMessage));
+                    }
+
+
+                });
+            };
+
+            this.task_info_interval = setInterval(_taskinfo, 1000)
+
+
+        } catch (e) {
+            this.showError(e.message);
+        }
+    },
+
+    show_loading_task_results: function(){
+        this.task_results_container.html('<p>Loading task results...</p>');
+    },
+
+    render_task_results: function(){
+
+        if (this.task_results){
+            var total = this.task_results['success'] + this.task_results['failed'];
+            var perc_success = total > 0 ? (this.task_results['success'] / total * 100).toFixed(2) : 0;
+            var perc_failed = total > 0 ? (this.task_results['failed'] / total * 100).toFixed(2) : 0;
+            
+            this.task_results_container.html(this.template_task_results({
+                success: this.task_results['success'],
+                failed: this.task_results['failed'],
+                perc_success: perc_success,
+                perc_failed: perc_failed,
+                url_down_task_results: "/qpdnd/" + this.base_url_down_task_results + this.task_id,
+            }));
+        }
+    },
+
+    template_task_results: _.template(`
+        <div class="info-box bg-green">
+            <span class="info-box-icon"><i class="ion ion-ios-heart-outline"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">Feature sent</span>
+                <span class="info-box-number"> <%= success %></span>
+            </div>
+        </div>
+
+        <div class="info-box bg-red">
+            <span class="info-box-icon"><i class="ion ion-ios-cloud-download-outline"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">Errors</span>
+                <span class="info-box-number"><%= failed %></span>
+            </div>
+        </div>
+
+        <a href= "<%= url_down_task_results %>" class="btn btn-lg btn-success" id="anncsu_downloadResults"><i class="glyphicon glyphicon-download"></i> Download Results</a>
+    `),
+};
