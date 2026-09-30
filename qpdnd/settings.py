@@ -148,6 +148,20 @@ ANNCSU_FIELD_DT_VAL_AMM = 'data_valid_amm'
 ANNCSU_FIELD_ISOLATO = 'isolato'
 ANNCSU_FIELD_COD_CIV_COMUNALE = 'codice_civico_comunale'
 
+# API - /interno
+# -----------------------------
+# The following fields are required only for interni 
+# and is used for to known if accesso is suppressed
+# ---
+ANNCSU_FIELD_PROGR_INT = 'progr_interno'
+ANNCSU_FIELD_INTERNO = 'interno'
+ANNCSU_FIELD_COD_INTERNO_COMUNALE = 'codice_interno_comunale'
+ANNCSU_FIELD_CORTILE = 'cortile'
+ANNCSU_FIELD_EDIFICIO = 'edificio'
+ANNCSU_FIELD_SCALA = 'scala'
+ANNCSU_FIELD_PIANO = 'piano'
+ANNCSU_FIELD_ESP_INTERNO = 'esponente_interno'
+
 
 
 

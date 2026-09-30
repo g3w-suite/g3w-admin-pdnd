@@ -20,6 +20,7 @@ from qpdnd.api.models import (
     AccessoAggiornamentiAccessi,
     RichiestaGestioneCoordinate,
     RichiestaAggiornamentoAccessi, 
+    RichiestaAggiornamentoInterni, 
     Coordinate,
     TipoOperazione
 )
@@ -171,6 +172,32 @@ class ANNCSUPDNDAPI(object):
         :return: dict with field names and values to update
         """
         return {}
+
+    def _get_operazione(self, feature):
+            """
+            Get the operation for civico|interni etc. based on specific fields in feature.
+            If not present, default to 'R'.
+            """
+            # Example logic to determine operation type
+            # This should be replaced with actual logic based on feature attributes
+    
+            # If ANNCSU_FIELD_PROGR empty -> Insert
+            if not feature[settings.ANNCSU_FIELD_PROGR]:
+                return TipoOperazione.I  # Insert
+            elif feature[settings.ANNCSU_FIELD_SOPPR]:
+                return TipoOperazione.S  # Suppress
+            elif feature[settings.ANNCSU_FIELD_DIRTY]:
+                return TipoOperazione.R  # Update (default)
+
+    def _to_NULL_to_empty_string(self, value):
+            """
+            Convert None or NULL values to empty string, to avoid issues with API validation.
+            """
+            value_str = str(value)
+            if value_str == 'NULL':
+                return ''
+            
+            return value_str
 
     def send_features(self):
         """
@@ -381,29 +408,14 @@ class ANNCSUPDND_AggiornamentoAccessi_API(ANNCSUPDNDAPI):
         # Set specific API URL
         self.api_url = self.anncsu_project.govway_api_endpoint
 
-    def _get_operazione_civico(self, feature):
-        """
-        Get the operation for civico based on specific fields in feature.
-        If not present, default to 'R'.
-        """
-        # Example logic to determine operation type
-        # This should be replaced with actual logic based on feature attributes
-
-        # If ANNCSU_FIELD_PROGR empty -> Insert
-        if not feature[settings.ANNCSU_FIELD_PROGR]:
-            return TipoOperazione.I  # Insert
-        elif feature[settings.ANNCSU_FIELD_SOPPR]:
-            return TipoOperazione.S  # Suppress
-        elif feature[settings.ANNCSU_FIELD_DIRTY]:
-            return TipoOperazione.R  # Update (default)
         
     def _fields_to_update(self, feature, res, fmapping=None):
 
         toret = super()._fields_to_update(feature, res, fmapping)
 
-        operazione_civico = self._get_operazione_civico(feature)
+        operazione_civico = self._get_operazione(feature)
 
-        # Upate progr_civico only for I operation, for R and S it should not be updated
+        # Update progr_civico only for I operation, for R and S it should not be updated
         if operazione_civico == TipoOperazione.I:
             toret.update({
                 fmapping[settings.ANNCSU_FIELD_PROGR]: res['dati'][0].get('progr_civico'),
@@ -411,22 +423,11 @@ class ANNCSUPDND_AggiornamentoAccessi_API(ANNCSUPDNDAPI):
 
         return toret
 
-        
-        
-    def _to_NULL_to_empty_string(self, value):
-        """
-        Convert None or NULL values to empty string, to avoid issues with API validation.
-        """
-        value_str = str(value)
-        if value_str == 'NULL':
-            return ''
-        
-        return value_str
 
     def _mapping_feature_to_pdnd(self, feature):
 
         # Get the operation for civico, if not present default to 'R'
-        operazione_civico = self._get_operazione_civico(feature)
+        operazione_civico = self._get_operazione(feature)
 
         richiesta = {
             'codcom': self.anncsu_project.codice_comune.codice_catastale_del_comune,
@@ -481,10 +482,55 @@ class ANNCSUPDND_AggiornamentoAccessi_API(ANNCSUPDNDAPI):
         return richiesta
     
 
+class ANNCSUPDND_AggiornamentoInterni_API(ANNCSUPDNDAPI):
+    """
+    ANNCSU PDND Aggiornamento Interni API utils class.
+    """
+
+    model = RichiestaAggiornamentoInterni
+
+    def __init__(self, anncsu_project, send_type, process_info=None, **kwargs):
+            
+        super().__init__(anncsu_project, send_type, process_info, **kwargs)
+
+        # Set specific API URL
+        self.api_url = self.anncsu_project.govway_api_endpoint
+
+    def _mapping_feature_to_pdnd(self, feature):
+    
+        # Get the operation for civico, if not present default to 'R'
+        operazione_interno = self._get_operazione(feature)
+
+        richiesta = {
+            'codcom': self.anncsu_project.codice_comune.codice_catastale_del_comune,
+            'progr_civico': str(int(feature[settings.ANNCSU_FIELD_PROGR])),
+            'interno': str(int(feature[settings.ANNCSU_FIELD_INTERNO])),
+            'tipo_operazione': operazione_interno,
+            'codice_interno_comunale': self._to_NULL_to_empty_string(feature[settings.ANNCSU_FIELD_COD_INTERNO_COMUNALE]),
+            'cortile': self._to_NULL_to_empty_string(feature[settings.ANNCSU_FIELD_CORTILE]),
+            'edificio': self._to_NULL_to_empty_string(feature[settings.ANNCSU_FIELD_EDIFICIO]),
+            'scala': self._to_NULL_to_empty_string(feature[settings.ANNCSU_FIELD_SCALA]),
+            'piano': self._to_NULL_to_empty_string(str(feature[settings.ANNCSU_FIELD_PIANO])),
+            'esponente_interno': self._to_NULL_to_empty_string(str(feature[settings.ANNCSU_FIELD_ESP_INTERNO])),
+
+        }
+
+        try:
+
+            # Case I: remove progr_interno if TipoOperanzione.I, 
+            # because it will be generated by API and returned in response, 
+            # so we need to update it in QGIS layer with the value returned by API
+            richiesta['progr_interno'] = str(int(feature[settings.ANNCSU_FIELD_PROGR_INT]))
+        except:
+            pass
+
+        return richiesta
+
     
 # Mapping of API types to their corresponding classes
 # ---------------------------------------------------
 MAP_API_CLASS = {
     'aggcoord': ANNCSUPDND_GestioneCoordinate_API,
-    'aggacc': ANNCSUPDND_AggiornamentoAccessi_API
+    'aggacc': ANNCSUPDND_AggiornamentoAccessi_API,
+    'aggint': ANNCSUPDND_AggiornamentoInterni_API,
 }

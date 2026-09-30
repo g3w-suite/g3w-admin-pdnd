@@ -190,11 +190,14 @@ class ANNCSUProjectForm(G3WFormMixin, G3WRequestFormMixin, G3WACLForm, ModelForm
             settings.ANNCSU_FIELD_DIRTY,
             settings.ANNCSU_FIELD_ERROR_INFO,
             settings.ANNCSU_FIELD_PROGR,
-            settings.ANNCSU_FIELD_LAT,
-            settings.ANNCSU_FIELD_LON,
             settings.ANNCSU_FIELD_ERROR_INFO,
             #settings.ANNCSU_FIELD_QUOTA # optional
         ]
+
+
+        if api_type != 'aggint':
+            required_fields.append(settings.ANNCSU_FIELD_LAT)
+            required_fields.append(settings.ANNCSU_FIELD_LON)
 
         # Additional required fields based on API type
         if api_type == 'aggacc':

@@ -89,6 +89,7 @@ class ANNCSUProject(G3WACLModelMixins, models.Model):
     API_TYPE = Choices(
         ('aggcoord', 'AGGIORNAMENTO COORDINATE'),
         ('aggacc', 'AGGIORNAMENTO ACCESSI'),
+        ('aggint', 'AGGIORNAMENTO INTERNI'),
         ('conscom', 'CONSULTAZIONE COMUNI')
     )
 
