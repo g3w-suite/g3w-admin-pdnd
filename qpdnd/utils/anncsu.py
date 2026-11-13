@@ -464,7 +464,7 @@ class ANNCSUPDND_AggiornamentoAccessi_API(ANNCSUPDNDAPI):
         
         if operazione_civico != TipoOperazione.S:
 
-            accesso_data['numero'] = str(feature[settings.ANNCSU_FIELD_NUMERO])
+            accesso_data['numero'] = self._to_NULL_to_empty_string(str(feature[settings.ANNCSU_FIELD_NUMERO]))
             accesso_data['esponente'] = self._to_NULL_to_empty_string(str(feature[settings.ANNCSU_FIELD_ESPONENTE]))
             if str(feature[settings.ANNCSU_FIELD_SPECIFICITA]) != 'NULL':
                 accesso_data['specificita'] = str(feature[settings.ANNCSU_FIELD_SPECIFICITA])
