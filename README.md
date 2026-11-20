@@ -1,6 +1,6 @@
 # G3W-ADMIN-PDND
 
-[![PyPI version](https://img.shields.io/pypi/v/qpdnd)](https://pypi.org/project/qpdnd/)
+[![PyPI version](https://img.shields.io/pypi/v/g3w-admin-pdnd)](https://pypi.org/project/g3w-admin-pdnd/)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/g3w-suite/g3w-admin-pdnd) [![CI](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/ci.yml/badge.svg)](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/ci.yml)
 
 A [G3W-SUITE](https://github.com/g3w-suite) plugin for [**Piattaforma Digitale Nazionale Dati**](https://innovazione.gov.it/progetti/dati-e-interoperabilita/) (PDND).
