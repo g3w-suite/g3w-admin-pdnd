@@ -13,7 +13,7 @@ __license__ = 'MPL 2.0'
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 
-from .base import (
+from qpdnd.tests.base import (
     TestQPDNDBase,
     CURRENT_PATH,
     TEST_BASE_PATH

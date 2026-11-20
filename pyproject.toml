@@ -17,7 +17,7 @@ description     = "G3W-ADMIN plugin for Italy PDND service"
 readme          = "README.md"
 license         = { text = "Mozilla Public License 2.0 (MPL 2.0)" }
 classifiers     = [
-    "Development Status :: 3 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
     "Framework :: Django",
     "Intended Audience :: Developers",
@@ -32,18 +32,13 @@ classifiers     = [
 "Homepage"      = "https://github.com/g3w-suite/g3w-admin-pdnd"
 "Bug Tracker"   = "https://github.com/g3w-suite/g3w-admin-pdnd/issues"
 
-[tool.setuptools]
-# Manual package discovery
-packages        = ["qpdnd"]
-package-dir     = { qpdnd = "qpdnd" }
+[tool.setuptools.packages.find]
+include = ["qpdnd*"]
+exclude = ["*.tests", "*.tests.*"]
+namespaces = false
 
-# Custom package discovery
-# [tool.setuptools.packages]
-# find = { }
-
-# https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#automatic-discovery
-#
-# NB: see also: MANIFEST.in
+[tool.setuptools.exclude-package-data]
+"*" = ["tests/*", "tests/**/*"]
 
 [tool.setuptools.dynamic]
 dependencies    = { file = ["requirements.txt"] }

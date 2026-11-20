@@ -1,6 +1,7 @@
 # G3W-ADMIN-PDND
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/g3w-suite/g3w-admin-pdnd) [![IRPI_UP CI tests](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/test_runner.yml/badge.svg)](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/test_runner.yml)
+[![PyPI version](https://img.shields.io/pypi/v/qpdnd)](https://pypi.org/project/qpdnd/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/g3w-suite/g3w-admin-pdnd) [![CI](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/ci.yml/badge.svg)](https://github.com/g3w-suite/g3w-admin-pdnd/actions/workflows/ci.yml)
 
 A [G3W-SUITE](https://github.com/g3w-suite) plugin for [**Piattaforma Digitale Nazionale Dati**](https://innovazione.gov.it/progetti/dati-e-interoperabilita/) (PDND).
 
@@ -35,4 +36,25 @@ pip3 install git+https://github.com/g3w-suite/g3w-admin-pdnd.git@v1.0.0
 ### Load lincense fixture data
 ```sh
 python3 manaage.py loaddata license
+```
+
+## Development and tests
+
+The integration BDD scenarios are in [`qpdnd/tests/features`](qpdnd/tests/features).
+They run in the G3W-ADMIN/QGIS environment used by CI. Install test dependencies:
+
+```sh
+python3 -m pip install -r requirements_test.txt
+```
+
+From the configured G3W-ADMIN directory, run:
+
+```sh
+python3 manage.py behave --simple qpdnd/tests
+```
+
+The existing Django unit tests can be run with:
+
+```sh
+python3 manage.py test qpdnd
 ```

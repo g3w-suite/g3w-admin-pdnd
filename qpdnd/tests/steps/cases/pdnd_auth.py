@@ -14,8 +14,8 @@ from django.urls import reverse
 from django.core.cache import cache
 from vcr_unittest import VCRMixin
 from vcr.record_mode import RecordMode
-from .base import TestQPDNDBase, CURRENT_PATH, TEST_BASE_PATH, override_settings
-from .pdnd_params import *
+from qpdnd.tests.base import TestQPDNDBase, CURRENT_PATH, TEST_BASE_PATH, override_settings
+from qpdnd.tests.pdnd_params import *
 import jwt
 import datetime
 import uuid

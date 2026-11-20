@@ -12,7 +12,7 @@ __copyright__ = 'Copyright 2015 - 2024, Gis3w'
 __license__ = 'MPL 2.0'
 
 
-from .base import TestQPDNDBase
+from qpdnd.tests.base import TestQPDNDBase
 from qpdnd.models import (
     QPDNDProject,
     QPDNDClientSetting,
